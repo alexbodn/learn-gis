@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<title>OpenLayers .osm File Example</title>
+		
+<script src="https://cdn.jsdelivr.net/npm/ol@v8.1.0/dist/ol.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.1.0/ol.css">
+<script src="https://unpkg.com/ol-layerswitcher@4.1.1"></script>
+<link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css" />
+
+		<script type="text/javascript">
+			var lat=34.070;
+			var lon=-118.73;
+			var zoom=15;
+			let osmFile = 'display-osm.osm';
+
+var map, layer, center;																	
+
+function init(){																			 
+	map = new ol.Map({																	 
+		target:'map',																	
+		renderer:'canvas',															 
+		view: new ol.View({															
+			projection: 'EPSG:900913',											 
+		})																		 
+	});																				
+	const baseOSM = new ol.layer.Tile({															
+		title: 'baseOSM',
+		source: new ol.source.OSM()													
+	});																				
+	map.addLayer(baseOSM); // this can actually come up last								 
+	center = new ol.proj.transform(
+		[lon, lat],
+		'EPSG:4326', // essentially LonLat						
+		map.getView().getProjection()
+	);						 
+	map.getView().setCenter(center);														 
+	map.getView().setZoom(zoom);																
+	const formatOSM = new ol.format.OSMXML();
+	const vectorSource = new ol.source.Vector({
+		format: formatOSM,
+		loader: function (extent, resolution, projection, success, failure) {
+			const epsg4326Extent = ol.proj.transformExtent(extent, projection, 'EPSG:4326');
+			fetch(osmFile).then(reply => {
+				reply.text().then(replyText => {
+					const features = formatOSM.readFeatures(replyText, {
+						featureProjection: map.getView().getProjection(),
+					});
+					vectorSource.addFeatures(features);
+					success(features);
+				});
+			}).catch(failure);
+		},
+		strategy: ol.loadingstrategy.fixed,
+	});
+	
+	const dim_orange = ol.color.asString(
+		ol.color.asArray('orange').slice(0, 3).concat(0.3));
+	const localOSM = new ol.layer.Vector({
+		title: 'localOSM',
+		source: vectorSource,
+		style: new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: 'orange',
+				width: 1,
+			}),
+			fill: new ol.style.Fill({
+				color: dim_orange,
+			}),
+			image: new ol.style.Circle({
+				fill: new ol.style.Fill({
+					color: dim_orange,
+				}),
+				radius: 6,
+				stroke: new ol.style.Stroke({
+					color: 'orange',
+					width: 1,
+				}),
+			}),
+		}),
+	});
+	
+	map.addLayer(localOSM);
+	let layerSwitcher = new ol.control.LayerSwitcher({
+		tipLabel: 'Légende' // Optional label for button
+	});
+	map.addControl(layerSwitcher);
+}
+		</script>
+	</head>
+	<body onload="init()">
+		<div id="map"></div>
+		<nav id="layers" style="display: none;">
+			<ul>
+				<li><input type="radio" name="layer" value="baseOSM" checked>baseOSM</li>
+				<li><input type="radio" name="layer" value="localOSM">localOSM</li>
+			</ul>
+		</nav>
+		<div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div>
+	</body>
+</html>

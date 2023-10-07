@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<body>
+Import a GeoPackage
+	<div id="sqlQuery"></div>
+		
+		<script src="./lib/sqlquery.js"></script>
+		<script>
+function uncomment(text) {
+	let commentRe = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)|(--.*)/g;
+	return text.replaceAll(commentRe, '');
+}
+
+function prepKeys(obj, query, label) {
+	let ret = obj;
+	if (false) warn(label);
+	if (Array.isArray(obj)) {
+		return obj;
+	}
+	let paramRe = /:[a-z_A-Z][a-z_A-Z0-9]*/g;
+	if (typeof(obj) == 'object') {
+		ret = {};
+		let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
+		query = uncomment(query);
+		let param;
+		while (param = paramRe.exec(query)) {
+			let val = obj[param[1]];
+			if (typeof(val) == 'undefined') {
+				throw new Error(`parameter ${param[1]} not defined for ${label}.`);
+			}
+			ret[param[0]] = val;
+		}
+	}
+//console.log(obj, ret, query);
+	return ret;
+}
+		</script>
+		<script type="module">
+
+import SPL from './dist/index.js';
+
+//const spl = await SPL();
+const spl = await SPL([], {
+    autoGeoJSON: {
+        precision: 0,
+        options: 0
+    }
+});
+console.log('spl loaded');
+//const url = 'https://data.london.gov.uk/download/london_boroughs/9502cdec-5df0-46e3-8aa1-2b5c5233a31f/london_boroughs.gpkg'
+const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toString();
+console.log(url);
+
+const london = await fetch(url)
+    .then(response => {
+    	return response.arrayBuffer();
+    })
+    .catch(error => {console.error(error)})
+    ;
+console.log('london fetched', london);
+
+const db = await spl.db(london)
+    .exec('SELECT EnableGpkgAmphibiousMode()');
+	window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole');
+console.log('london db loaded');
+
+const srid = await db.exec('SELECT SRID(geom) FROM london_boroughs').get.first;
+
+		</script>
+	</body>
+</html>

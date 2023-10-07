@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>OpenLayers .osm File Example</title>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.11/lib/OpenLayers.js"></script>           
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.11/lib/OpenLayers.css">
+        <script type="text/javascript">
+            var lat=34.070;
+            var lon=-118.73;
+            var zoom=15;
+            var map;
+ 
+            function init(){
+                map = new OpenLayers.Map ("map");
+ 
+                map.addControl(new OpenLayers.Control.LayerSwitcher());
+                
+                map.addLayer(new OpenLayers.Layer.OSM()); //OSM base map
+ 
+                var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+ 
+                map.setCenter (lonLat, zoom);
+
+                //Initialise the vector layer using OpenLayers.Format.OSM
+                var layer = new OpenLayers.Layer.Vector("Polygon", {
+                    strategies: [new OpenLayers.Strategy.Fixed()],
+                    protocol: new OpenLayers.Protocol.HTTP({
+                        url: "display-osm.osm",   //<-- relative or absolute URL to your .osm file
+                        format: new OpenLayers.Format.OSM()
+                    }),
+                    projection: new OpenLayers.Projection("EPSG:4326")
+                });
+ 
+                map.addLayers([layer]);
+            }
+        </script>
+    </head>
+    <body onload="init()">
+        <div id="map"></div>
+        <div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div>
+    </body>
+</html>
