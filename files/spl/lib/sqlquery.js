@@ -1,19 +1,37 @@
 
+'use strict';
+
+function uncomment(text) {
+	let commentRe = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)|(--.*)/g;
+	return text.replaceAll(commentRe, '');
+}
+
 class SQLQuery {
 	
 	fieldTypes = {
 		NULL: ['^$', '', x => null, true, 'null'],
 		INTEGER: ['^([+-]?[1-9]\\d*([Ee][+-]?[1-9]\\d*)?|0)$', '', parseInt, false, '123'],
-		REAL: ['^([+-]?[1-9]\\d*(\\.\\d*)?([Ee][+-]?[1-9]\\d*)?|0)$', '', parseFloat, false, '123.45'],
+		REAL: ['^[+-]?(([1-9]\\d*(\\.\\d*)?([Ee][+-]?[1-9]\\d*)?|0)|Infinity)$', '', parseFloat, false, '123.45'],
 		TEXT: ['.*', '', x => x, false, 'abc'],
 		BLOB: ['.*', '', x => x, false, 'abc'],
 		DATETIME: ['^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$', '', x => parseDate(x), false, '2009-09-28T09:15:15'],
 	};
 	
-	constructor(selector, db, thisName) {
+	snippets = {
+		sqliteAllTables: `
+			SELECT name
+			FROM sqlite_schema
+			WHERE type ='table' AND 
+				name NOT LIKE 'sqlite_%';`
+	};
+	
+	constructor(selector, db, thisName, snippets) {
 		this.sqlQuerySelector = selector;
 		this.db = db;
 		this.thisName = thisName;
+		if (snippets) {
+			this.snippets = snippets;
+		}
 		this.buildForm();
 	}
 	
@@ -101,6 +119,42 @@ class SQLQuery {
 		}
 	}
 	
+	addSnippets(snippets) {
+		for (let [name, query] of Object.entries(snippets)) {
+			this.snippets[name] = query;
+		}
+		this.buildSnippetsMenu();
+	}
+	
+	buildSnippetsMenu() {
+		let snippets = Object.keys(this.snippets)
+			.map(
+				name => 
+				`<tr>
+				<td>${name}</td>
+				<td><button onclick="${this.thisName}.pasteSnippet('${name}');">paste</button></td>
+				<td><button onclick="${this.thisName}.runSnippet('${name}');">run</button></td>
+				</tr>`
+			)
+			.reduce((a, b) => a + b, '');
+		let target = document.querySelector(`${this.sqlQuerySelector} .snippetsMenu`);
+		target.textContent = '';
+		target.insertAdjacentHTML('beforeend', snippets);
+	}
+	
+	pasteSnippet(snippet) {
+		if (snippet in this.snippets) {
+			let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
+			queryElem.value = this.snippets[snippet];
+		}
+	}
+	
+	runSnippet(snippet) {
+		if (snippet in this.snippets) {
+			return this.runQuery(this.snippets[snippet]);
+		}
+	}
+	
 	runQuery(query) {
 		let params = this.buildParams();
 		let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
@@ -108,7 +162,7 @@ class SQLQuery {
 		this.sql(query || queryElem.value, params);
 	}
 	
-	showResults(results) {
+	showResults(results, logRows=false) {
 		let target = document.querySelector(`${this.sqlQuerySelector} .sqlResults`);
 		target.textContent = '';
 		if (results) {
@@ -121,7 +175,9 @@ class SQLQuery {
 				`<tr>${columns}</tr>`
 			);
 			for(let row of results) {
-console.log(row);
+				if (logRows) {
+					console.log(row);
+				}
 				row = colnames
 					.map(col => `<td>${row[col]}</td>`)
 					.reduce((acc, curr) => acc + curr, '');
@@ -165,26 +221,20 @@ console.log(row);
 	}
 	
 	buildForm() {
-		let sqlAllTables = `
-			SELECT name
-			FROM sqlite_schema
-			WHERE type ='table' AND 
-				name NOT LIKE 'sqlite_%';`
-			.replace(/[\n\r]/g, '')
-			.replace(/\'/g, "\\'");
 		let html = `
 			<table border="0"><tbody class="sqlParams"></tbody></table>
 			<div>
 				<button onclick="${this.thisName}.addParam()">add param</button>
 				<button onclick="${this.thisName}.makeParams()">make params</button>
 				<button onclick="${this.thisName}.runQuery()">run</button>
-				<button onclick="${this.thisName}.runQuery('${sqlAllTables}');">all tables</button>
 			</div>
 			<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
+			<table border="1"><tbody class="snippetsMenu"></tbody></table>
 			<table border="1"><tbody class="sqlResults"></tbody></table>
 		`;
 		let target = document.querySelector(this.sqlQuerySelector);
 		target.textContent = '';
 		target.insertAdjacentHTML('beforeend', html);
+		this.buildSnippetsMenu();
 	}
 };

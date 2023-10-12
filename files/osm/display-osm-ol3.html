@@ -3,7 +3,7 @@
 		<title>OpenLayers .osm File Example</title>
 		
 <script src="https://cdn.jsdelivr.net/npm/ol@v8.1.0/dist/ol.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.1.0/ol.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.1.0/ol.css" />
 <script src="https://unpkg.com/ol-layerswitcher@4.1.1"></script>
 <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css" />
 
@@ -13,9 +13,9 @@
 			var zoom=15;
 			let osmFile = 'display-osm.osm';
 
-var map, layer, center;																	
 
 function init(){																			 
+	var map, layer, center;																	
 	map = new ol.Map({																	 
 		target:'map',																	
 		renderer:'canvas',															 
@@ -89,12 +89,6 @@ function init(){
 	</head>
 	<body onload="init()">
 		<div id="map"></div>
-		<nav id="layers" style="display: none;">
-			<ul>
-				<li><input type="radio" name="layer" value="baseOSM" checked>baseOSM</li>
-				<li><input type="radio" name="layer" value="localOSM">localOSM</li>
-			</ul>
-		</nav>
 		<div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div>
 	</body>
 </html>
