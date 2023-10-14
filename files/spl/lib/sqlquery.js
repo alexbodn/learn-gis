@@ -22,7 +22,11 @@ class SQLQuery {
 			SELECT name
 			FROM sqlite_schema
 			WHERE type ='table' AND 
-				name NOT LIKE 'sqlite_%';`
+				name NOT LIKE 'sqlite_%';`,
+		spatiaLiteVersion: `
+			SELECT spatialite_version()`,
+		projVersion: `
+			SELECT proj_version()`,
 	};
 	
 	constructor(selector, db, thisName, snippets) {
@@ -145,7 +149,7 @@ class SQLQuery {
 	pasteSnippet(snippet) {
 		if (snippet in this.snippets) {
 			let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
-			queryElem.value = this.snippets[snippet];
+			queryElem.value = this.snippets[snippet].replace(/\n\s+/g, '\n');
 		}
 	}
 	
@@ -162,11 +166,11 @@ class SQLQuery {
 		this.sql(query || queryElem.value, params);
 	}
 	
-	showResults(results, logRows=false) {
+	showResults(results, colnames, logRows=false) {
 		let target = document.querySelector(`${this.sqlQuerySelector} .sqlResults`);
 		target.textContent = '';
 		if (results) {
-			let colnames = Object.keys(results[0]);
+			//let colnames = Object.keys(results[0]);
 			let columns = colnames
 				.map(col => `<th>${col}</th>`)
 				.reduce((acc, curr) => acc + curr, '');
@@ -178,8 +182,9 @@ class SQLQuery {
 				if (logRows) {
 					console.log(row);
 				}
-				row = colnames
-					.map(col => `<td>${row[col]}</td>`)
+				row = row//colnames
+					//.map(col => `<td>${row[col]}</td>`)
+					.map(col => `<td>${col}</td>`)
 					.reduce((acc, curr) => acc + curr, '');
 				target.insertAdjacentHTML(
 					'beforeend',
@@ -204,8 +209,7 @@ class SQLQuery {
 	}
 	
 	async sql(query, params={}) {
-		let results = 
-		await this.db.exec(
+		let cols = await this.db.exec(
 			//query
 		//{
 			//sql: 
@@ -215,9 +219,19 @@ class SQLQuery {
 				params,
 				query),
 		//}
-		)
-		.get.objs;
-		this.showResults(results);
+		).get.cols;
+		let rows = await this.db.exec(
+			//query
+		//{
+			//sql: 
+			query,
+			//bind: 
+			prepKeys(
+				params,
+				query),
+		//}
+		).get.rows;
+		this.showResults(rows, cols);
 	}
 	
 	buildForm() {
