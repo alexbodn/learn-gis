@@ -257,7 +257,11 @@
 	});
 //	map.getView().fit(extent, map.getSize());
 	console.log(extent, map.getSize());
-	mapView.fit(extent, map.getSize());
+	mapView.fit(extent, {
+		size: map.getSize(),
+		padding: [0, 0, 0, 0],
+		constrainResolution: false,
+	});
 	map.setView(mapView);
 	
 	let layerSwitcher = new ol.control.LayerSwitcher({
