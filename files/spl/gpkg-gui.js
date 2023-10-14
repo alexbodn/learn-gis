@@ -41,8 +41,6 @@
 	});
 	console.log('db loaded');
 	
-	// Initial map view [xmin, ymin, xmax, ymax]
-	const initialMapExtent = [-20000000, 3000000, 20000000, 12000000];
 	// Map View Projection
 	const displayProjection = 'EPSG:3857';
 	
@@ -118,10 +116,10 @@
 	let [min_x, min_y, max_x, max_y] = 
 		ol.proj.transformExtent(layerExtent, 'EPSG:27700', displayProjection);
 	const extentObject = {
-		'type': 'Feature',
-		'geometry': {
-			'type': 'Polygon',
-			'coordinates': [
+		type: 'Feature',
+		geometry: {
+			type: 'Polygon',
+			coordinates: [
 				[
 					[min_x, min_y],
 					[max_x, min_y],
@@ -199,32 +197,10 @@
 		vectorSource.setProperties({origProjection: tableDataProjection});
 		dataFromGpkg[table_name] = vectorSource;
 		
-		const orange = 'orange';
-		const dim_orange = ol.color.asString(
-			ol.color.asArray(orange).slice(0, 3).concat(0.3));
-		let style = new ol.style.Style({
-			stroke: new ol.style.Stroke({
-				color: orange,
-				width: 1,
-			}),
-			fill: new ol.style.Fill({
-				color: dim_orange,
-			}),
-			image: new ol.style.Circle({
-				fill: new ol.style.Fill({
-					color: dim_orange,
-				}),
-				radius: 6,
-				stroke: new ol.style.Stroke({
-					color: orange,
-					width: 1,
-				}),
-			}),
-		});
 		const vectorLayer = new ol.layer.Vector({
 			title: table_name,
 			source: vectorSource,
-			//style: style,
+			//style: orangeStyle(),
 		});
 		if (table_name in sldsFromGpkg) {
 			applySLD(vectorLayer, sldsFromGpkg[table_name]);
@@ -268,6 +244,31 @@
 		tipLabel: 'Légende' // Optional label for button
 	});
 	map.addControl(layerSwitcher);
+
+function orangeStyle() {
+	const orange = 'orange';
+	const dim_orange = ol.color.asString(
+		ol.color.asArray(orange).slice(0, 3).concat(0.3));
+	return new ol.style.Style({
+		stroke: new ol.style.Stroke({
+			color: orange,
+			width: 1,
+		}),
+		fill: new ol.style.Fill({
+			color: dim_orange,
+		}),
+		image: new ol.style.Circle({
+			fill: new ol.style.Fill({
+				color: dim_orange,
+			}),
+			radius: 6,
+			stroke: new ol.style.Stroke({
+				color: orange,
+				width: 1,
+			}),
+		}),
+	});
+}
 
 /**
  * Extract (SRS ID &) WKB from an OGC GeoPackage feature
@@ -343,4 +344,51 @@ function applySLD(vectorLayer, text) {
 		vectorLayer.changed();
 	},
 	}));
+}
+
+const mousePositionControl = new ol.control.MousePosition({
+	coordinateFormat: ol.coordinate.createStringXY(4),
+	projection: 'EPSG:4326',
+	// comment the following two lines to have the mouse position
+	// be placed within the map.
+	className: 'custom-mouse-position',
+	target: document.getElementById('mouse-position'),
+});
+
+const projectionSelect = document.getElementById('projection');
+projectionSelect.addEventListener('change', function (event) {
+	mousePositionControl.setProjection(event.target.value);
+});
+
+const precisionInput = document.getElementById('precision');
+precisionInput.addEventListener('change', function (event) {
+	const format = ol.coordinate.createStringXY(event.target.valueAsNumber);
+	mousePositionControl.setCoordinateFormat(format);
+});
+
+map.addControl(mousePositionControl);
+
+map.on('singleclick', function(evt) {
+	var coordinates = map.getEventCoordinate(evt.originalEvent);
+	//var feature = vectorlayer.getClosestFeatureToCoordinate(coordinates);
+	//console.log(coordinates);
+	let target = document.getElementById('mouse-position');
+	target.textContent = coordinates;
+	
+	map.forEachFeatureAtPixel(
+		evt.pixel,
+		function (feature, layer) {
+			getData(feature.getProperties());
+			// getData(layer.getProperties());
+			feature.setStyle(orangeStyle());
+		},
+		{
+			hitTolerance: 5
+		}
+	);
+});
+
+function getData(data) {
+	console.log(data);
+	console.log(data.id);
 }

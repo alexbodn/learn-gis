@@ -19,10 +19,23 @@
 				/*position: fixed;*/
 			}
 		</style>
+		<title>
+			Import a GeoPackage
+		</title>
 	</head>
 	<body>
-		Import a GeoPackage
 		<div id="sqlQuery"></div>
+		<form>
+			<label for="projection">Projection </label>
+			<select id="projection">
+				<option value="EPSG:4326">EPSG:4326</option>
+				<option value="EPSG:3857">EPSG:3857</option>
+				<option value="EPSG:27700">EPSG:3857</option>
+			</select>
+			<label for="precision">Precision</label>
+			<input id="precision" type="number" min="0" max="12" value="4"/>
+		</form>
+		<div id="mouse-position"></div>
 		<div id="map" class="map"></div>
 		<!--div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div-->
 		
