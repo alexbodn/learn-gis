@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<!--script src="./lib/lib.js"></script-->
 		<script src="https://cdn.jsdelivr.net/npm/ol@v8.1.0/dist/ol.js"></script>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.1.0/ol.css" />
-		<script src="https://unpkg.com/ol-layerswitcher@4.1.1"></script>
+		<script src="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css" />
+		<!--
+		<link rel="stylesheet" href="./lib/ol.css" />
+		<script src="./lib/ol-layerswitcher.js"></script>
+		<link rel="stylesheet" href="./lib/ol-layerswitcher.css" />
 		<script src="./sld/sldreader.js"></script>
+		-->
+		
 		<script src="./lib/proj4.min.js"></script>
 		<style>
-			/*@import "./lib/ol.css";*/
 			body {
 				/*margin: 0px;*/
 			}
@@ -25,17 +31,20 @@
 	</head>
 	<body>
 		<div id="sqlQuery"></div>
-		<form>
-			<label for="projection">Projection </label>
-			<select id="projection">
-				<option value="EPSG:4326">EPSG:4326</option>
-				<option value="EPSG:3857">EPSG:3857</option>
-				<option value="EPSG:27700">EPSG:3857</option>
-			</select>
-			<label for="precision">Precision</label>
-			<input id="precision" type="number" min="0" max="12" value="4"/>
-		</form>
 		<div id="mouse-position"></div>
+		<form>
+			<label for="hitTolerance">
+				Hit tolerance for selecting features:
+				<br />Area: &nbsp;
+				<canvas id="circle" width="22px" height="22px" style="vertical-align: middle;"></canvas>
+				&nbsp;
+			</label>
+			<select id="hitTolerance">
+				<option value="0" selected>0 Pixels</option>
+				<option value="5">5 Pixels</option>
+				<option value="10">10 Pixels</option>
+			</select>
+		</form>
 		<div id="map" class="map"></div>
 		<!--div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div-->
 		
@@ -65,7 +74,6 @@ function prepKeys(obj, query, label) {
 	return ret;
 }
 		</script>
-		<script type="module" src="gpkg-gui.js">
-		</script>
+		<script type="module" src="./gpkg-gui.js"></script>
 	</body>
 </html>
