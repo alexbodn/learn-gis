@@ -23,10 +23,11 @@ class SQLQuery {
 			FROM sqlite_schema
 			WHERE type ='table' AND 
 				name NOT LIKE 'sqlite_%';`,
-		spatiaLiteVersion: `
-			SELECT spatialite_version()`,
-		projVersion: `
-			SELECT proj_version()`,
+		allDbs: `
+			select * 
+			from PRAGMA_database_list`,
+		attachDb: `
+			ATTACH DATABASE '/proj/proj.db' AS proj`,
 	};
 	
 	constructor(selector, db, thisName, snippets) {

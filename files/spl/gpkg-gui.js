@@ -520,23 +520,21 @@ show_map(map);
 
 window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole');
 window.sqlConsole.addSnippets({
-	allDbs: `
-	select * 
-	from PRAGMA_database_list`,
-	attachDb: `
-	ATTACH DATABASE '/proj/proj.db' AS proj`,
+	spatiaLiteVersion: `
+		SELECT spatialite_version()`,
+	projVersion: `
+		SELECT proj_version()`,
 	gpkg_contents: `
-	SELECT *
-	FROM gpkg_contents`,
+		SELECT *
+		FROM gpkg_contents`,
 	transform_point: `
-	select 
-	--aswkt (
-	st_transform(
-	--gpkg\\
-	MakePoint (-22562.401432422717, 6730934.887787993, 3857)
-	, 27700)
-	--)`,
+		select 
+		--aswkt (
+		st_transform(
+		MakePoint (-22562.401432422717, 6730934.887787993, 3857)
+		, 27700)
+		--)`,
 	gpkg_spatial_ref_sys: `
-	select * from gpkg_spatial_ref_sys;
-	`,
+		select *
+		from gpkg_spatial_ref_sys;`,
 });
