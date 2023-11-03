@@ -1,4 +1,9 @@
 
+/*
+import {ol} from './lib/build/ol/index.js';
+import * as LayerSwitcher from './lib/ol-layerswitcher.js';
+import * as SLDReader from './sld/sldreader.js';
+*/
 import SPL from './dist/index.js';
 
 async function build_source(tableInfo, displayProjection) {
@@ -55,7 +60,6 @@ async function build_source(tableInfo, displayProjection) {
 	
 	// For information only, save details of	original projection (SRS)
 	vectorSource.setProperties({origProjection: tableDataProjection});
-	dataFromGpkg[table_name] = vectorSource;
 	
 	return vectorSource;
 }
@@ -200,75 +204,85 @@ const changeHitTolerance = function () {
 selectHitToleranceElement.onchange = changeHitTolerance;
 changeHitTolerance();
 
+async function spl_db() {
 	const spl = await SPL();
-	
 	console.log('spl loaded');
-	//const url = 'https://data.london.gov.uk/download/london_boroughs/9502cdec-5df0-46e3-8aa1-2b5c5233a31f/london_boroughs.gpkg'
-	const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toString();
-	//const url = new URL('./test/files/dbs/Natural_Earth_QGIS_layers_and_styles.gpkg', window.location.href).toString();
-	console.log(url);
 	
-	const gpkgArrayBuffer = await fetch(url)
-		.then(response => {
-			return response.arrayBuffer();
-		})
+	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString() 
+	const projdbArrayBuffer = await fetch(projdbUrl)
+		.then(response => response.arrayBuffer())
 		.catch(error => {console.error(error)})
 		;
-	console.log('london fetched', gpkgArrayBuffer);
+	console.log('projdb fetched', projdbArrayBuffer);
 	
-	const db = await spl.db(gpkgArrayBuffer)
-		.exec("SELECT InitSpatialMetaData();")
-		.exec("SELECT EnableGpkgAmphibiousMode();")
-		.exec("SELECT AutoGPKGStart();")
-		//.exec("SELECT AutoGPKGStop();")
+	const db = await spl
+		.mount('proj', [
+            { name: 'proj.db', data: projdbArrayBuffer }
+        ])
+        .db()
+            .read(`
+                --SELECT enablegpkgmode();
+				SELECT EnableGpkgAmphibiousMode();
+				SELECT AutoGPKGStart();
+				--SELECT AutoGPKGStop();
+                SELECT initspatialmetadata(1);
+                SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
+            `);
+	console.log('db loaded', db);
+	
+	return db;
+}
+
+async function spl_loadgpkg(url) {
+	const spl = await SPL(
+		[],
+		{
+			autoGeoJSON: {
+				precision: 6,
+				options: 0,
+			},
+		},
+	);
+	console.log('spl loaded');
+	
+	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString() 
+	const projdbArrayBuffer = await fetch(projdbUrl)
+		.then(response => response.arrayBuffer())
+		.catch(error => {console.error(error)})
 		;
-	console.log('db loaded');
-	window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole');
-	window.sqlConsole.addSnippets({
-		gpkg_extensions: `
-		SELECT *
-		FROM gpkg_extensions;`,
-		gpkg_contents: `
-		SELECT *
-		FROM gpkg_contents`,
-		transform_point: `
-		select 
-		aswkt (
-		--st_transform(
-		--gpkg
-		MakePoint (-22562.401432422717, 6730934.887787993, 3857)
-		--, 27700)
-		)`,
-		gpkg_spatial_ref_sys: `
-		select * from gpkg_spatial_ref_sys;
-		`,
-		load_3857_to_gpkg: `
-		--begin transaction;
-		delete from gpkg_spatial_ref_sys
-		where srs_id=3857;
-		--srs_name	srs_id	organization	organization_coordsys_id	definition	description
-		insert into gpkg_spatial_ref_sys 
-		(srs_name, srs_id, organization, organization_coordsys_id, definition, description)
-		--srid	auth_name	auth_srid	ref_sys_name	proj4text	srtext
-		select auth_name||':'||cast(auth_srid as text) as srs_name, auth_srid as srs_id, auth_name, auth_srid, srtext, auth_name||':'||cast(auth_srid as text) as description
-		from spatial_ref_sys
-		where auth_srid=3857;
-		--commit;
-		`,
-		transformed_extent: `
-		SELECT
-			min_x, min_y, max_x, max_y, srs_id, 
-			st_transform(makepoint(min_x, min_y), srs_id, 4326) as minp,
-			makepoint(max_x, max_y) as maxp
-		FROM gpkg_contents
-		WHERE data_type='features'`,
-	});
+	console.log('projdb fetched');
 	
-	// Map View Projection
-	const displayProjection = 'EPSG:3857';
-	const displayProjDef = 
-	'+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs';
+	const gpkgArrayBuffer = await fetch(url)
+		.then(response => response.arrayBuffer())
+		.catch(error => {console.error(error)})
+		;
+	console.log('london fetched');
 	
+	//await Promise.all([projdbArrayBuffer, gpkgArrayBuffer]);
+	const db = spl
+		.mount('proj', [
+            { name: 'proj.db', data: projdbArrayBuffer }
+        ])
+        .mount('data', [
+            { name: 'london_boroughs.gpkg', data: gpkgArrayBuffer }
+        ])
+        //.db()
+        //    .load('file:data/london_boroughs.gpkg?immutable=1')
+        .db(gpkgArrayBuffer)
+            .read(`
+                --SELECT enablegpkgmode();
+				SELECT EnableGpkgAmphibiousMode();
+				SELECT AutoGPKGStart();
+				--SELECT AutoGPKGStop();
+                SELECT initspatialmetadata(1);
+                SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
+            `);
+	console.log('db loaded', db);
+	
+	return db;
+}
+
+async function read_gpkg(db, displayProjection) {
 	// Data and associated SLD styles loaded both from GPKG
 	var dataFromGpkg = {};
 	var sldsFromGpkg = {};
@@ -292,16 +306,13 @@ changeHitTolerance();
 		WHERE gpkg_contents.data_type='features'
 	`).get.objs;
 	
-	// Use Proj4js to define EPSG:27700 Projection (British National Grid)
-	// (parameters from https://epsg.io/27700)
 	let projections = await db.exec(`
-		SELECT organization||':'||organization_coordsys_id as srs, proj4text
+		SELECT
+			organization||':'||organization_coordsys_id as srs,
+			definition
 		FROM gpkg_spatial_ref_sys
-		INNER JOIN spatial_ref_sys on srid=srs_id
-		WHERE organization<>'NONE'
+		WHERE srs_id>0 AND srs_id NOT IN (4326, 3857);
 	`).get.rows;
-	projections.push([displayProjection, displayProjDef]);
-	console.log(projections);
 	proj4.defs(projections);
 	// Make non-built-in projections defined in proj4 available in OpenLayers.
 	// (must be done before GeoPackages are loaded)
@@ -323,6 +334,23 @@ changeHitTolerance();
 		}
 	}
 	
+	// For each table, extract geometry and other properties
+	// (Note: becomes OpenLayers-specific from here)
+	for (let tableInfo of featureTable) {
+		let table_name = tableInfo.table_name;
+		let tableDataProjection = 'EPSG:' + tableInfo.srs_id;
+		
+		tableInfo.vectorSource = await build_source(tableInfo, displayProjection);
+		if (table_name in sldsFromGpkg) {
+			tableInfo.style = sldsFromGpkg[row.f_table_name];
+		}
+	}
+	
+	return featureTable;
+}
+
+async function build_map(db, displayProjection) {
+	let featureTable = await read_gpkg(db, displayProjection);
 	// Create Map canvas and View
 	let map = new ol.Map({
 		target: 'map',
@@ -340,10 +368,10 @@ changeHitTolerance();
 		let table_name = tableInfo.table_name;
 		let tableDataProjection = 'EPSG:' + tableInfo.srs_id;
 		
-		let vectorSource = await build_source(tableInfo, displayProjection);
+		//let vectorSource = dataFromGpkg[table_name];
 		const vectorLayer = new ol.layer.Vector({
 			title: table_name,
-			source: vectorSource,
+			source: tableInfo.vectorSource,
 			//style: colorStyle(),
 		});
 		
@@ -381,14 +409,20 @@ changeHitTolerance();
 			source: extentSource,
 		});
 		
-		if (table_name in sldsFromGpkg) {
-			applySLD(extentLayer, sldsFromGpkg[table_name]);
-			applySLD(vectorLayer, sldsFromGpkg[table_name]);
+		if ('style' in tableInfo) {
+			applySLD(extentLayer, tableInfo.style);
+			applySLD(vectorLayer, tableInfo.style);
 		}
 		map.addLayer(extentLayer);
 		map.addLayer(vectorLayer);
 	}
 	
+	return map;
+}
+
+let commonClickStyle = colorStyle('orange');
+
+function show_map(map) {
 	let mapView = new ol.View({
 		projection: displayProjection,
 		maxZoom: 28,
@@ -421,55 +455,88 @@ changeHitTolerance();
 	});
 	map.addControl(layerSwitcher);
 
-
-
-let commonClickStyle = colorStyle('orange');
-
-function styleOnClick(feature, resolution, dom) {
-	let style = commonClickStyle;
-	style.getText().setText(feature.get("name"));
-	return style;
-}
-
-map.on('singleclick', (evt) => {
-	var coordinates = map.getEventCoordinate(evt.originalEvent);
-	//console.log(coordinates);
-	//let target = document.getElementById('mouse-position');
-	//target.textContent = coordinates;
+	function styleOnClick(feature, resolution, dom) {
+		let style = commonClickStyle;
+		style.getText().setText(feature.get("name"));
+		return style;
+	}
 	
-	let hit = false;
-	map.forEachFeatureAtPixel(
-		evt.pixel,
-		(feature, layer) => {
-			// getData(feature.getProperties());
-			// getData(layer.getProperties());
-			if (hit) {
-				return;
+	map.on('singleclick', (evt) => {
+		var coordinates = map.getEventCoordinate(evt.originalEvent);
+		//console.log(coordinates);
+		//let target = document.getElementById('mouse-position');
+		//target.textContent = coordinates;
+		
+		let hit = false;
+		map.forEachFeatureAtPixel(
+			evt.pixel,
+			(feature, layer) => {
+				// getData(feature.getProperties());
+				// getData(layer.getProperties());
+				if (hit) {
+					return;
+				}
+				if (!feature) {
+					feature = layer.getClosestFeatureToCoordinate(coordinates);
+				}
+				if (feature) {
+					feature.setStyle(styleOnClick);
+					let source = layer.getSource();
+					let layerProjection = source.get('origProjection');
+					//let layerCoordinates = ol.proj.fromLonLat(coordinates, layerProjection);
+					let layerCoordinates = ol.proj.transform(coordinates, map.getView().getProjection(), layerProjection);
+					let target = document.getElementById('mouse-position');
+					let stringifyFunc = ol.coordinate.createStringXY(4);
+					let out = stringifyFunc(layerCoordinates);
+					console.log(layerCoordinates, coordinates);
+					target.textContent = out;
+					hit = true;
+				}
+			},
+			{
+				hitTolerance: hitTolerance
 			}
-			if (!feature) {
-				feature = layer.getClosestFeatureToCoordinate(coordinates);
-			}
-			if (feature) {
-				feature.setStyle(styleOnClick);
-				let source = layer.getSource();
-				let layerProjection = source.get('origProjection');
-				//let layerCoordinates = ol.proj.fromLonLat(coordinates, layerProjection);
-				let layerCoordinates = ol.proj.transform(coordinates, map.getView().getProjection(), layerProjection);
-				let target = document.getElementById('mouse-position');
-				let stringifyFunc = ol.coordinate.createStringXY(4);
-				let out = stringifyFunc(layerCoordinates);
-				console.log(layerCoordinates, coordinates);
-				target.textContent = out;
-				hit = true;
-			}
-		},
-		{
-			hitTolerance: hitTolerance
-		}
-	);
-});
-
-function getData(data) {
-	console.log(data);
-	console.log(data.id);
+		);
+	});
+	
+	function getData(data) {
+		console.log(data);
+		console.log(data.id);
+	}
 }
+
+//const url = 'https://data.london.gov.uk/download/london_boroughs/9502cdec-5df0-46e3-8aa1-2b5c5233a31f/london_boroughs.gpkg'
+const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toString();
+//const url = new URL('./test/files/dbs/Natural_Earth_QGIS_layers_and_styles.gpkg', window.location.href).toString();
+// Map View Projection
+const displayProjection = 'EPSG:3857';
+
+let db = await spl_loadgpkg(url);
+//let db = await spl_db();
+console.log('db', db);
+
+let map = await build_map(db, displayProjection);
+show_map(map);
+
+window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole');
+window.sqlConsole.addSnippets({
+	allDbs: `
+	select * 
+	from PRAGMA_database_list`,
+	attachDb: `
+	ATTACH DATABASE '/proj/proj.db' AS proj`,
+	gpkg_contents: `
+	SELECT *
+	FROM gpkg_contents`,
+	transform_point: `
+	select 
+	--aswkt (
+	st_transform(
+	--gpkg\\
+	MakePoint (-22562.401432422717, 6730934.887787993, 3857)
+	, 27700)
+	--)`,
+	gpkg_spatial_ref_sys: `
+	select * from gpkg_spatial_ref_sys;
+	`,
+});

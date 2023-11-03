@@ -184,7 +184,7 @@ class SQLQuery {
 				}
 				row = row//colnames
 					//.map(col => `<td>${row[col]}</td>`)
-					.map(col => `<td>${col}</td>`)
+					.map(col => `<td>${typeof col === 'object' ? JSON.stringify(col) : col}</td>`)
 					.reduce((acc, curr) => acc + curr, '');
 				target.insertAdjacentHTML(
 					'beforeend',
