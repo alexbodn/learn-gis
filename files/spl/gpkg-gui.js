@@ -468,6 +468,11 @@ function show_map(map) {
 	});
 	map.setView(mapView);
 	
+var sidebar = new ol.control.Sidebar({ element: 'sidebar', position: 'left' });
+//var toc = document.getElementById("layers");
+//ol.control.LayerSwitcher.renderPanel(map, toc);
+map.addControl(sidebar);
+
 	let layerSwitcher = new ol.control.LayerSwitcher({
 		tipLabel: 'Légende', // Optional label for button
 		trash: true,
