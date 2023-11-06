@@ -285,23 +285,23 @@ async function spl_loadgpkg(gpkgUrl) {
 	
 	const db = spl
 		.mount('proj', [
-						{ name: 'proj.db', data: projdbArrayBuffer }
-				])
-				.mount('data', [
-						{ name: 'london_boroughs.gpkg', data: gpkgArrayBuffer }
-				])
-				//.db()
-				//		.load('file:data/london_boroughs.gpkg?immutable=1')
-				.db(gpkgArrayBuffer)
-						.read(`
-								--SELECT enablegpkgmode();
+			{ name: 'proj.db', data: projdbArrayBuffer }
+		])
+		.mount('data', [
+			{ name: 'london_boroughs.gpkg', data: gpkgArrayBuffer }
+		])
+		//.db()
+		//	.load('file:data/london_boroughs.gpkg?immutable=1')
+		.db(gpkgArrayBuffer)
+			.read(`
+				--SELECT enablegpkgmode();
 				SELECT EnableGpkgAmphibiousMode();
 				SELECT AutoGPKGStart();
 				--SELECT AutoGPKGStop();
-								SELECT initspatialmetadata(1);
-								SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
-						`);
-	console.log('db loaded', db);
+				SELECT initspatialmetadata(1);
+				SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
+			`);
+	//console.log('db loaded', db);
 	
 	return db;
 }
@@ -388,7 +388,6 @@ async function build_map(db, displayProjection) {
 	
 	// For each table, extract geometry and other properties
 	// (Note: becomes OpenLayers-specific from here)
-	const formatJson = new ol.format.GeoJSON();
 	for (let tableInfo of featureTable) {
 		let table_name = tableInfo.table_name;
 		let tableDataProjection = 'EPSG:' + tableInfo.srs_id;
@@ -400,6 +399,10 @@ async function build_map(db, displayProjection) {
 			//style: colorStyle(),
 		});
 		
+		const formatJson = new ol.format.GeoJSON({
+				dataProjection: tableDataProjection,
+				featureProjection: displayProjection,
+			});
 		const extentObject = {
 			type: 'Feature',
 			geometry: {
@@ -416,10 +419,7 @@ async function build_map(db, displayProjection) {
 			},
 		};
 		const extentSource = new ol.source.Vector({
-			features: formatJson.readFeatures(extentObject, {
-				dataProjection: tableDataProjection,
-				featureProjection: displayProjection,
-			}),
+			features: formatJson.readFeatures(extentObject),
 		});
 		extentSource.setProperties({
 			origProjection: tableDataProjection});
@@ -439,6 +439,31 @@ async function build_map(db, displayProjection) {
 	return map;
 }
 
+function calcExtent(layers) {
+	let extent = ol.extent.createEmpty();
+	layers.forEach(layer => {
+		try {
+			let layerExtent;
+			if ('getSource' in layer) {
+				let source = layer.getSource();
+				layerExtent = source.getExtent();
+				//console.log('layer extent', layerExtent, source.getProperties());
+			}
+			else if ('getLayers' in layer) {
+				layerExtent = calcExtent(layer.getLayers());
+				//console.log('calculated extent', layerExtent);
+			}
+			if (layerExtent) {
+				ol.extent.extend(extent, layerExtent);
+			}
+		}
+		catch (err) {
+			console.log('layer without extent', err);
+		}
+	});
+	return extent;
+}
+
 let commonClickStyle = colorStyle('orange');
 
 function show_map(map) {
@@ -447,19 +472,7 @@ function show_map(map) {
 		maxZoom: 28,
 		minZoom: 1
 	});
-	let allLayers = map.getLayers();
-	let extent = ol.extent.createEmpty();
-	allLayers.forEach(layer => {
-		try {
-			let source = layer.getSource();
-			let layerExtent = source.getExtent();
-			console.log('layer extent', layerExtent, source.getProjection(), source.getProperties());
-			ol.extent.extend(extent, layerExtent);
-		}
-		catch (err) {
-			console.log('layer without extent', err);
-		}
-	});
+	let extent = calcExtent(map.getLayers());
 	console.log(extent, map.getSize());
 	mapView.fit(extent, {
 		size: map.getSize(),
@@ -468,11 +481,6 @@ function show_map(map) {
 	});
 	map.setView(mapView);
 	
-var sidebar = new ol.control.Sidebar({ element: 'sidebar', position: 'left' });
-//var toc = document.getElementById("layers");
-//ol.control.LayerSwitcher.renderPanel(map, toc);
-map.addControl(sidebar);
-
 	let layerSwitcher = new ol.control.LayerSwitcher({
 		tipLabel: 'Légende', // Optional label for button
 		trash: true,
@@ -544,25 +552,105 @@ let map = await build_map(db, displayProjection);
 	let urls = [
 		'tfl_lines.json',
 		'tfl_stations.json',
+		//'London_Train_Lines.json',
+		//'London_Stations.json',
 	].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
 	await fetchAll(urls, 'json').then(responses => {
 		const formatJson = new ol.format.GeoJSON({
 			featureProjection: displayProjection,
 		});
+		let files = {};
 		for (let response of responses) {
-			let sourceProjection = (response.data?.crs?.properties?.name) || 'urn:ogc:def:crs:OGC:1.3:CRS84';
-			console.log('sp', sourceProjection);
-			const vectorSource = new ol.source.Vector({
-				features: formatJson.readFeatures(response.data),
-			});
-			vectorSource.setProperties({origProjection: sourceProjection});
-			const vectorLayer = new ol.layer.Vector({
-				title: response.data.name,
-				source: vectorSource,
-				//style: styleFunction,
-			});
-			map.addLayer(vectorLayer);
+			let sourceProjection = 
+				(response.data?.crs?.properties?.name) || 'CRS:84'
+				;
+			files[response.data.name] = {
+				data: response.data,
+				projection: sourceProjection,
+			};
 		}
+		
+		let tfl_lines = files.tfl_lines;
+		let linesProjection = tfl_lines.projection;
+		let segments = tfl_lines.data.features;
+		let index = segments.reduce((a, b) => {a[b.properties.id] = b; return a;}, {});
+		let features = {
+			inactive: {},
+			regular: {},
+			special: {},
+		};
+		var thisYear = (new Date()).getUTCFullYear()
+		//group features by line name
+		for (let segment of segments) {
+			for (let line of segment.properties.lines) {
+				let branch;
+				let inactive =
+					'opened' in line && line.opened > thisYear ||
+					'closed' in line && line.closed <= thisYear;
+				if (inactive) {
+					branch = features.inactive;
+				}
+				else if ('name' in line && 'start_sid' in line && 'end_sid' in line) {
+					branch = features.regular;
+				}
+				else {
+					branch = features.special;
+				}
+				if (!(line.name in branch)) {
+					branch[line.name] = [];
+				}
+				branch[line.name].push({...line, id: segment.properties.id});
+			}
+		}
+		for (let [branch, contents] of Object.entries(features)) {
+			let features = [];
+			for (let [line, segments] of Object.entries(contents)) {
+				let coordinates = contents[line].map(
+					sgmnt => index[sgmnt.id].geometry.coordinates
+				);
+				features.push({
+					type: "Feature",
+					properties: {name: line,},
+					geometry: {
+						coordinates: coordinates,
+						type: 'MultiLineString',
+					},
+				});
+			}
+			let layers = features.map(feature => {
+				const vectorSource = new ol.source.Vector({
+					features: formatJson.readFeatures(feature),
+				});
+				vectorSource.setProperties({origProjection: linesProjection});
+				const vectorLayer = new ol.layer.Vector({
+					title: feature.properties.name,
+					source: vectorSource,
+					//style: styleFunction,
+				});
+				return vectorLayer;
+			});
+			let layerGroup = new ol.layer.Group({
+				title: `tfl_lines ${branch}`,
+				fold: 'close',
+				combined: false,
+				layers,
+			});
+			map.addLayer(layerGroup);
+		}
+		/*
+		let tfl_stations = files.tfl_stations;
+		let stationsProjection = tfl_stations.projection;
+		const vectorSource = new ol.source.Vector({
+			features: new ol.format.GeoJSON().readFeatures(tfl_stations.data),
+		});
+		vectorSource.setProperties({origProjection: stationsProjection});
+		const vectorLayer = new ol.layer.Vector({
+			title: 'tfl_stations',
+			source: vectorSource,
+			//style: styleFunction,
+		});
+		map.addLayer(vectorLayer);
+		*/
 	});
 
 show_map(map);
