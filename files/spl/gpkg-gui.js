@@ -537,6 +537,109 @@ function show_map(map) {
 	}
 }
 
+function handleLines(tfl_lines) {
+	const formatJson = new ol.format.GeoJSON({
+		featureProjection: displayProjection,
+	});
+	let linesProjection = tfl_lines.projection;
+	let segments = tfl_lines.data.features;
+	let index = segments.reduce((a, b) => {a[b.properties.id] = b; return a;}, {});
+	let features = {
+		inactive: {},
+		regular: {},
+		special: {},
+	};
+	var thisYear = (new Date()).getUTCFullYear()
+	//group features by line name
+	for (let segment of segments) {
+		for (let line of segment.properties.lines) {
+			let branch;
+			let inactive =
+				'opened' in line && line.opened > thisYear ||
+				'closed' in line && line.closed <= thisYear;
+			if (inactive) {
+				branch = features.inactive;
+			}
+			else if ('name' in line && 'start_sid' in line && 'end_sid' in line) {
+				branch = features.regular;
+			}
+			else {
+				branch = features.special;
+			}
+			if (!(line.name in branch)) {
+				branch[line.name] = [];
+			}
+			branch[line.name].push({...line, id: segment.properties.id});
+		}
+	}
+	for (let [branch, contents] of Object.entries(features)) {
+		let features = [];
+		for (let [line, segments] of Object.entries(contents)) {
+			let coordinates = contents[line].map(
+				sgmnt => index[sgmnt.id].geometry.coordinates
+			);
+			features.push({
+				type: "Feature",
+				properties: {name: line,},
+				geometry: {
+					coordinates: coordinates,
+					type: 'MultiLineString',
+				},
+			});
+		}
+		let layers = features.map(feature => {
+			const vectorSource = new ol.source.Vector({
+				features: formatJson.readFeatures(feature),
+			});
+			vectorSource.setProperties({origProjection: linesProjection});
+			const vectorLayer = new ol.layer.Vector({
+				title: feature.properties.name,
+				source: vectorSource,
+				//style: styleFunction,
+			});
+			return vectorLayer;
+		});
+		let layerGroup = new ol.layer.Group({
+			title: `tfl_lines ${branch}`,
+			fold: 'close',
+			combined: false,
+			layers,
+		});
+		map.addLayer(layerGroup);
+	}
+}
+
+function handleStations(tfl_stations) {
+	const formatJson = new ol.format.GeoJSON({
+		featureProjection: displayProjection,
+	});
+	let stationsProjection = tfl_stations.projection;
+	const vectorSource = new ol.source.Vector({
+		features: formatJson.readFeatures(tfl_stations.data),
+	});
+	vectorSource.setProperties({origProjection: stationsProjection});
+	const vectorLayer = new ol.layer.Vector({
+		title: 'tfl_stations',
+		source: vectorSource,
+		//style: styleFunction,
+	});
+	map.addLayer(vectorLayer);
+}
+
+function handleJson(responses) {
+	let files = {};
+	for (let response of responses) {
+		let sourceProjection = 
+			(response.data?.crs?.properties?.name) || 'CRS:84';
+		files[response.data.name] = {
+			data: response.data,
+			projection: sourceProjection,
+		};
+	}
+	handleLines(files.tfl_lines);
+	handleStations(files.tfl_stations);
+}
+
 //const url = 'https://data.london.gov.uk/download/london_boroughs/9502cdec-5df0-46e3-8aa1-2b5c5233a31f/london_boroughs.gpkg'
 const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toString();
 //const url = new URL('./test/files/dbs/Natural_Earth_QGIS_layers_and_styles.gpkg', window.location.href).toString();
@@ -553,105 +656,9 @@ let map = await build_map(db, displayProjection);
 		'tfl_lines.json',
 		'tfl_stations.json',
 		//'London_Train_Lines.json',
-		//'London_Stations.json',
+		//'London_stations.json',
 	].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
-	await fetchAll(urls, 'json').then(responses => {
-		const formatJson = new ol.format.GeoJSON({
-			featureProjection: displayProjection,
-		});
-		let files = {};
-		for (let response of responses) {
-			let sourceProjection = 
-				(response.data?.crs?.properties?.name) || 'CRS:84'
-				;
-			files[response.data.name] = {
-				data: response.data,
-				projection: sourceProjection,
-			};
-		}
-		
-		let tfl_lines = files.tfl_lines;
-		let linesProjection = tfl_lines.projection;
-		let segments = tfl_lines.data.features;
-		let index = segments.reduce((a, b) => {a[b.properties.id] = b; return a;}, {});
-		let features = {
-			inactive: {},
-			regular: {},
-			special: {},
-		};
-		var thisYear = (new Date()).getUTCFullYear()
-		//group features by line name
-		for (let segment of segments) {
-			for (let line of segment.properties.lines) {
-				let branch;
-				let inactive =
-					'opened' in line && line.opened > thisYear ||
-					'closed' in line && line.closed <= thisYear;
-				if (inactive) {
-					branch = features.inactive;
-				}
-				else if ('name' in line && 'start_sid' in line && 'end_sid' in line) {
-					branch = features.regular;
-				}
-				else {
-					branch = features.special;
-				}
-				if (!(line.name in branch)) {
-					branch[line.name] = [];
-				}
-				branch[line.name].push({...line, id: segment.properties.id});
-			}
-		}
-		for (let [branch, contents] of Object.entries(features)) {
-			let features = [];
-			for (let [line, segments] of Object.entries(contents)) {
-				let coordinates = contents[line].map(
-					sgmnt => index[sgmnt.id].geometry.coordinates
-				);
-				features.push({
-					type: "Feature",
-					properties: {name: line,},
-					geometry: {
-						coordinates: coordinates,
-						type: 'MultiLineString',
-					},
-				});
-			}
-			let layers = features.map(feature => {
-				const vectorSource = new ol.source.Vector({
-					features: formatJson.readFeatures(feature),
-				});
-				vectorSource.setProperties({origProjection: linesProjection});
-				const vectorLayer = new ol.layer.Vector({
-					title: feature.properties.name,
-					source: vectorSource,
-					//style: styleFunction,
-				});
-				return vectorLayer;
-			});
-			let layerGroup = new ol.layer.Group({
-				title: `tfl_lines ${branch}`,
-				fold: 'close',
-				combined: false,
-				layers,
-			});
-			map.addLayer(layerGroup);
-		}
-		/*
-		let tfl_stations = files.tfl_stations;
-		let stationsProjection = tfl_stations.projection;
-		const vectorSource = new ol.source.Vector({
-			features: new ol.format.GeoJSON().readFeatures(tfl_stations.data),
-		});
-		vectorSource.setProperties({origProjection: stationsProjection});
-		const vectorLayer = new ol.layer.Vector({
-			title: 'tfl_stations',
-			source: vectorSource,
-			//style: styleFunction,
-		});
-		map.addLayer(vectorLayer);
-		*/
-	});
+	await fetchAll(urls, 'json').then(handleJson);
 
 show_map(map);
 
