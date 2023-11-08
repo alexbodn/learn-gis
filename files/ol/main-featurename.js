@@ -145,7 +145,7 @@ function polygonStyleFunction(feature, resolution) {
   });
 }
 
-const vectorPolygons = new ol.source.Vector({
+const vectorPolygons = new ol.layer.Vector({
   source: new ol.source.Vector({
     url: './polygon-samples.geojson',
     format: new ol.format.GeoJSON(),
@@ -164,7 +164,7 @@ function lineStyleFunction(feature, resolution) {
   });
 }
 
-const vectorLines = new ol.source.Vector({
+const vectorLines = new ol.layer.Vector({
   source: new ol.source.Vector({
     url: './line-samples.geojson',
     format: new ol.format.GeoJSON(),
@@ -184,7 +184,7 @@ function pointStyleFunction(feature, resolution) {
   });
 }
 
-const vectorPoints = new ol.source.Vector({
+const vectorPoints = new ol.layer.Vector({
   source: new ol.source.Vector({
     url: './point-samples.geojson',
     format: new ol.format.GeoJSON(),
@@ -194,7 +194,7 @@ const vectorPoints = new ol.source.Vector({
 
 const map = new ol.Map({
   layers: [
-    new ol.source.Tile({
+    new ol.layer.Tile({
       source: new ol.source.OSM(),
     }),
     vectorPolygons,

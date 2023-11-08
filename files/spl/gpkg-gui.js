@@ -214,28 +214,28 @@ async function spl_db() {
 	
 	const db = await spl
 		.mount('proj', [
-						{ name: 'proj.db', data: projdbArrayBuffer }
-				])
-				.db()
-						.read(`
-								--SELECT enablegpkgmode();
+			{ name: 'proj.db', data: projdbArrayBuffer }
+		])
+		.db()
+			.read(`
+				--SELECT enablegpkgmode();
 				SELECT EnableGpkgAmphibiousMode();
 				SELECT AutoGPKGStart();
 				--SELECT AutoGPKGStop();
-								SELECT initspatialmetadata(1);
-								SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
-						`);
+				SELECT initspatialmetadata(1);
+				SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
+			`);
 	console.log('db loaded', db);
 	
 	return db;
 }
 
-function fetchAll(urls, method='text') {
+function fetchAll(urls, method='text', options={}) {
 	return Promise.all(
 		urls.map(url => fetch(url)
 			.then(r => r[method]())
-			.then(data => ({ data, url }))
-			.catch(error => ({ error, url }))
+			.then(data => ({ data, url, ...options }))
+			.catch(error => ({ error, url, ...options }))
 		)
 	)
 }
@@ -381,7 +381,8 @@ async function build_map(db, displayProjection) {
 		layers: [
 			new ol.layer.Tile({
 				title: 'base layer (OSM)',
-				source: new ol.source.OSM()
+				source: new ol.source.OSM(),
+				
 			}),
 		],
 	});
@@ -537,12 +538,12 @@ function show_map(map) {
 	}
 }
 
-function handleLines(tfl_lines) {
+function handleLines({data, projection, map, displayProjection}) {
 	const formatJson = new ol.format.GeoJSON({
 		featureProjection: displayProjection,
 	});
-	let linesProjection = tfl_lines.projection;
-	let segments = tfl_lines.data.features;
+	let linesProjection = projection;
+	let segments = data.features;
 	let index = segments.reduce((a, b) => {a[b.properties.id] = b; return a;}, {});
 	let features = {
 		inactive: {},
@@ -609,13 +610,13 @@ function handleLines(tfl_lines) {
 	}
 }
 
-function handleStations(tfl_stations) {
+function handleStations({data, projection, map, displayProjection}) {
 	const formatJson = new ol.format.GeoJSON({
 		featureProjection: displayProjection,
 	});
-	let stationsProjection = tfl_stations.projection;
+	let stationsProjection = projection;
 	const vectorSource = new ol.source.Vector({
-		features: formatJson.readFeatures(tfl_stations.data),
+		features: formatJson.readFeatures(data),
 	});
 	vectorSource.setProperties({origProjection: stationsProjection});
 	const vectorLayer = new ol.layer.Vector({
@@ -629,12 +630,9 @@ function handleStations(tfl_stations) {
 function handleJson(responses) {
 	let files = {};
 	for (let response of responses) {
-		let sourceProjection = 
+		let projection = 
 			(response.data?.crs?.properties?.name) || 'CRS:84';
-		files[response.data.name] = {
-			data: response.data,
-			projection: sourceProjection,
-		};
+		files[response.data.name] = {...response, projection};
 	}
 	handleLines(files.tfl_lines);
 	handleStations(files.tfl_stations);
@@ -652,13 +650,11 @@ let db = await spl_loadgpkg(url);
 
 let map = await build_map(db, displayProjection);
 
-	let urls = [
-		'tfl_lines.json',
-		'tfl_stations.json',
-		//'London_Train_Lines.json',
-		//'London_stations.json',
-	].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
-	await fetchAll(urls, 'json').then(handleJson);
+let jsonUrls = [
+	'tfl_lines.json',
+	'tfl_stations.json',
+].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
+await fetchAll(jsonUrls, 'json', {map, displayProjection}).then(handleJson);
 
 show_map(map);
 
