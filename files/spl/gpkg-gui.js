@@ -8,7 +8,7 @@ import SPL from './dist/index.js';
 
 async function build_source(tableInfo, displayProjection) {
 	let table_name = tableInfo.table_name;
-	let tableDataProjection = 'EPSG:' + tableInfo.srs_id;
+	let tableDataProjection = tableInfo.srs_id;
 	// Check if we have a definition for the data projection (SRS)
 	if (!ol.proj.get(tableDataProjection)) {
 		throw new Error("Missing data projection [" +
@@ -18,11 +18,16 @@ async function build_source(tableInfo, displayProjection) {
 	
 	let vectorSource = new ol.source.Vector();
 	let geometry_column_name = tableInfo.geometry_column_name;
+	let label = `select ${table_name}`;
+	console.time(label);
 	let allProperties = await db.exec(`
 		SELECT *
 		FROM [${table_name}]
 	`).get.objs;
+	console.timeEnd(label);
 	
+	label = `source ${table_name}`;
+	console.time(label);
 	let features;
 	const formatWKB = new ol.format.WKB();
 	const formatJson = new ol.format.GeoJSON({
@@ -33,10 +38,13 @@ async function build_source(tableInfo, displayProjection) {
 		// Extract properties & geometry for a single feature
 		let geomProp = properties[geometry_column_name];
 		delete properties[geometry_column_name];
-		if (geomProp && typeof geomProp === 'object' && geomProp.constructor === Object) {
+		if (geomProp.hasOwnProperty('coordinates')) {
 			features = formatJson.readFeatures(geomProp);
 		}
 		else {
+			if (geomProp.constructor == ArrayBuffer) {
+				geomProp = new Uint8Array(geomProp);
+			}
 			let featureWkb = parseGpkgGeom(geomProp);
 			/*
 			// DEBUG: show endianness of WKB data (can differ from header)
@@ -55,8 +63,9 @@ async function build_source(tableInfo, displayProjection) {
 		vectorSource.addFeatures(features);
 	}
 	
-	// For information only, save details of	original projection (SRS)
+	// For information only, save details of original projection (SRS)
 	vectorSource.setProperties({origProjection: tableDataProjection});
+	console.timeEnd(label);
 	
 	return vectorSource;
 }
@@ -173,6 +182,7 @@ function applySLD(vectorLayer, text) {
 	}));
 }
 
+/*
 const selectHitToleranceElement = document.getElementById('hitTolerance');
 const circleCanvas = document.getElementById('circle');
 
@@ -200,6 +210,20 @@ const changeHitTolerance = function () {
 
 selectHitToleranceElement.onchange = changeHitTolerance;
 changeHitTolerance();
+*/
+
+function init_sql() {
+	return `
+		PRAGMA foreign_keys = 1;
+		PRAGMA recursive_triggers = 1;
+		--SELECT enablegpkgmode();
+		SELECT EnableGpkgAmphibiousMode();
+		SELECT AutoGPKGStart();
+		--SELECT AutoGPKGStop();
+		SELECT initspatialmetadata(1);
+		SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
+		`;
+}
 
 async function spl_db() {
 	const spl = await SPL();
@@ -217,14 +241,7 @@ async function spl_db() {
 			{ name: 'proj.db', data: projdbArrayBuffer }
 		])
 		.db()
-			.read(`
-				--SELECT enablegpkgmode();
-				SELECT EnableGpkgAmphibiousMode();
-				SELECT AutoGPKGStart();
-				--SELECT AutoGPKGStop();
-				SELECT initspatialmetadata(1);
-				SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
-			`);
+			.read(init_sql());
 	console.log('db loaded', db);
 	
 	return db;
@@ -244,18 +261,17 @@ async function spl_loadgpkg(gpkgUrl) {
 	const spl = await SPL(
 		[],
 		{
-			autoGeoJSON: {
+			autoGeoJSON: 1 ? false : {
 				precision: 6,
 				options: 0,
 			},
 		},
 	);
-	console.log('spl loaded');
+	//console.log('spl loaded');
 	
 	let gpkgArrayBuffer, projdbArrayBuffer;
 	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
-	console.time('fetching');
-	if (1) {
+	console.time('fetching gpkgs');
 	let urls = [projdbUrl, gpkgUrl];
 	await fetchAll(urls, 'arrayBuffer').then(responses => {
 		for (let response of responses) {
@@ -267,21 +283,7 @@ async function spl_loadgpkg(gpkgUrl) {
 			}
 		}
 	});
-	}
-	else {
-	projdbArrayBuffer = await fetch(projdbUrl)
-		.then(response => response.arrayBuffer())
-		.catch(error => {console.error(error)})
-		;
-	console.log('projdb fetched');
-	
-	gpkgArrayBuffer = await fetch(gpkgUrl)
-		.then(response => response.arrayBuffer())
-		.catch(error => {console.error(error)})
-		;
-	console.log('london fetched');
-	}
-	console.timeEnd('fetching');
+	console.timeEnd('fetching gpkgs');
 	
 	const db = spl
 		.mount('proj', [
@@ -293,14 +295,7 @@ async function spl_loadgpkg(gpkgUrl) {
 		//.db()
 		//	.load('file:data/london_boroughs.gpkg?immutable=1')
 		.db(gpkgArrayBuffer)
-			.read(`
-				--SELECT enablegpkgmode();
-				SELECT EnableGpkgAmphibiousMode();
-				SELECT AutoGPKGStart();
-				--SELECT AutoGPKGStop();
-				SELECT initspatialmetadata(1);
-				SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
-			`);
+			.read(init_sql());
 	//console.log('db loaded', db);
 	
 	return db;
@@ -319,14 +314,21 @@ async function read_gpkg(db, displayProjection) {
 	//	 - e.g. LINESTRING (but info also embedded in each feature)
 	let featureTable = await db.exec(`
 		SELECT
-			gpkg_contents.table_name, 
-			cast(gpkg_contents.srs_id as text) as srs_id,
+			gpkg_contents.table_name,
+			CASE WHEN organization IS NULL THEN
+			'EPSG:'||cast(gpkg_contents.srs_id as text)
+			ELSE
+			organization||':'||organization_coordsys_id
+			END
+			AS srs_id,
 			min_x, min_y, max_x, max_y, 
 			gpkg_geometry_columns.column_name as geometry_column_name,
 			geometry_type_name
 		FROM gpkg_contents
 		INNER JOIN gpkg_geometry_columns
 			ON gpkg_contents.table_name=gpkg_geometry_columns.table_name
+		LEFT OUTER JOIN gpkg_spatial_ref_sys
+			ON gpkg_spatial_ref_sys.srs_id=gpkg_contents.srs_id
 		WHERE gpkg_contents.data_type='features'
 	`).get.objs;
 	
@@ -362,7 +364,7 @@ async function read_gpkg(db, displayProjection) {
 	// (Note: becomes OpenLayers-specific from here)
 	for (let tableInfo of featureTable) {
 		let table_name = tableInfo.table_name;
-		let tableDataProjection = 'EPSG:' + tableInfo.srs_id;
+		let tableDataProjection = tableInfo.srs_id;
 		
 		tableInfo.vectorSource = await build_source(tableInfo, displayProjection);
 		if (table_name in sldsFromGpkg) {
@@ -373,33 +375,9 @@ async function read_gpkg(db, displayProjection) {
 	return featureTable;
 }
 
-async function build_map(db, displayProjection) {
-	let featureTable = await read_gpkg(db, displayProjection);
-	// Create Map canvas and View
-	let map = new ol.Map({
-		target: 'map',
-		layers: [
-			new ol.layer.Tile({
-				title: 'base layer (OSM)',
-				source: new ol.source.OSM(),
-				
-			}),
-		],
-	});
-	
-	// For each table, extract geometry and other properties
-	// (Note: becomes OpenLayers-specific from here)
-	for (let tableInfo of featureTable) {
+function extent_layer(tableInfo, displayProjection) {
 		let table_name = tableInfo.table_name;
-		let tableDataProjection = 'EPSG:' + tableInfo.srs_id;
-		
-		//let vectorSource = dataFromGpkg[table_name];
-		const vectorLayer = new ol.layer.Vector({
-			title: table_name,
-			source: tableInfo.vectorSource,
-			//style: colorStyle(),
-		});
-		
+		let tableDataProjection = tableInfo.srs_id;
 		const formatJson = new ol.format.GeoJSON({
 				dataProjection: tableDataProjection,
 				featureProjection: displayProjection,
@@ -424,6 +402,7 @@ async function build_map(db, displayProjection) {
 		});
 		extentSource.setProperties({
 			origProjection: tableDataProjection});
+		
 		const extentLayer = new ol.layer.Vector({
 			title: `extent ${table_name}`,
 			source: extentSource,
@@ -431,16 +410,58 @@ async function build_map(db, displayProjection) {
 		
 		if ('style' in tableInfo) {
 			applySLD(extentLayer, tableInfo.style);
+		}
+		return extentLayer;
+}
+
+async function build_map(db, displayProjection) {
+	let featureTable = await read_gpkg(db, displayProjection);
+	let sourceOSM = new ol.source.OSM({
+			tileLoadFunction: function(imageTile, src) {
+				imageTile.getImage().src = src;
+			}
+		});
+	sourceOSM.set({
+		origProjection: sourceOSM.projection.code,
+	});
+	// Create Map canvas and View
+	let map = new ol.Map({
+		target: 'map',
+		layers: [
+			new ol.layer.Tile({
+				title: 'base layer (OSM)',
+				source: sourceOSM,
+			}),
+		],
+	});
+	
+	// For each table, extract geometry and other properties
+	// (Note: becomes OpenLayers-specific from here)
+	for (let tableInfo of featureTable) {
+		let table_name = tableInfo.table_name;
+		let tableDataProjection = tableInfo.srs_id;
+		
+		let label = `layer ${table_name}`;
+		console.time(label);
+		//let vectorSource = dataFromGpkg[table_name];
+		const vectorLayer = new ol.layer.Vector({
+			title: table_name,
+			source: tableInfo.vectorSource,
+			//style: colorStyle(),
+		});
+		console.timeEnd(label);
+		
+		if ('style' in tableInfo) {
 			applySLD(vectorLayer, tableInfo.style);
 		}
-		map.addLayer(extentLayer);
 		map.addLayer(vectorLayer);
+		map.addLayer(extent_layer(tableInfo, displayProjection));
 	}
 	
 	return map;
 }
 
-function calcExtent(layers) {
+function _calcExtent(layers) {
 	let extent = ol.extent.createEmpty();
 	layers.forEach(layer => {
 		try {
@@ -467,7 +488,7 @@ function calcExtent(layers) {
 
 let commonClickStyle = colorStyle('orange');
 
-function show_map(map) {
+function _show_map(map) {
 	let mapView = new ol.View({
 		projection: displayProjection,
 		maxZoom: 28,
@@ -487,6 +508,13 @@ function show_map(map) {
 		trash: true,
 	});
 	map.addControl(layerSwitcher);
+	let scaleLine = new ol.control.ScaleLine({
+		//units: 'degrees',
+		//units: 'imperial',
+		units: 'metric',
+		bar: true,
+	});
+	map.addControl(scaleLine);
 
 	function styleOnClick(feature, resolution, dom) {
 		let style = commonClickStyle;
@@ -614,11 +642,10 @@ function handleStations({data, projection, map, displayProjection}) {
 	const formatJson = new ol.format.GeoJSON({
 		featureProjection: displayProjection,
 	});
-	let stationsProjection = projection;
 	const vectorSource = new ol.source.Vector({
 		features: formatJson.readFeatures(data),
 	});
-	vectorSource.setProperties({origProjection: stationsProjection});
+	vectorSource.setProperties({origProjection: projection});
 	const vectorLayer = new ol.layer.Vector({
 		title: 'tfl_stations',
 		source: vectorSource,
@@ -656,7 +683,7 @@ let jsonUrls = [
 ].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
 await fetchAll(jsonUrls, 'json', {map, displayProjection}).then(handleJson);
 
-show_map(map);
+show_map(map, displayProjection);
 
 window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole');
 window.sqlConsole.addSnippets({

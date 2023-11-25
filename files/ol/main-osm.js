@@ -123,7 +123,8 @@ const vector = new ol.layer.Vector({
   },
 });
 
-const key = 'Get your own API key at https://www.maptiler.com/cloud/';
+const key = maptiler_apikey;
+//const key = 'Get your own API key at https://www.maptiler.com/cloud/';
 const attributions =
   '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
   '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>';

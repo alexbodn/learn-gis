@@ -28,6 +28,22 @@ class SQLQuery {
 			from PRAGMA_database_list`,
 		attachDb: `
 			ATTACH DATABASE '/proj/proj.db' AS proj`,
+		createPoly: `WITH t1(x,y,n,color) AS (VALUES
+   (100,100,3,'red'),
+   (200,100,4,'orange'),
+   (300,100,5,'green'),
+   (400,100,6,'blue'),
+   (500,100,7,'purple'),
+   (100,200,8,'red'),
+   (200,200,10,'orange'),
+   (300,200,12,'green'),
+   (400,200,16,'blue'),
+   (500,200,20,'purple')
+)
+SELECT
+   geopoly_json(
+geopoly_regular(x,y,40,n))
+   FROM t1;`
 	};
 	
 	constructor(selector, db, thisName, snippets) {
@@ -170,7 +186,7 @@ class SQLQuery {
 	showResults(results, colnames, logRows=false) {
 		let target = document.querySelector(`${this.sqlQuerySelector} .sqlResults`);
 		target.textContent = '';
-		if (results) {
+		if (results.length) {
 			//let colnames = Object.keys(results[0]);
 			let columns = colnames
 				.map(col => `<th>${col}</th>`)
