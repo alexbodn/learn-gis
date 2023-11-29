@@ -1,4 +1,56 @@
 
+'use strict';
+
+class SelectHitTolerance {
+	formCode = `
+		<form>
+			<label>
+				Hit tolerance for selecting features:
+				<br />Area: &nbsp;
+				<canvas class="circle" width="22" height="22" style="vertical-align: middle;"></canvas>
+				&nbsp;
+				<select class="hitTolerance">
+					<option value="0" selected>0 Pixels</option>
+					<option value="5">5 Pixels</option>
+					<option value="10">10 Pixels</option>
+				</select>
+			</label>
+		</form>
+		`;
+	hitTolerance = 0;
+	
+	constructor(formElem) {
+		this.formElem = document.querySelector(formElem);
+		this.formElem.textContent = '';
+		this.formElem.insertAdjacentHTML('beforeend', this.formCode);
+		this.selectHitTolerance = this.formElem.querySelector('.hitTolerance');
+		this.circleCanvas = this.formElem.querySelector('.circle');
+		this.selectHitTolerance.addEventListener('change', e => {this.changeHitTolerance();});
+		this.changeHitTolerance();
+	}
+	
+	changeHitTolerance() {
+		this.hitTolerance = parseInt(
+			this.selectHitTolerance.value, 10);
+		
+		const size = 2 * this.hitTolerance + 2;
+		this.circleCanvas.width = size;
+		this.circleCanvas.height = size;
+		const ctx = this.circleCanvas.getContext('2d');
+		ctx.clearRect(0, 0, size, size);
+		ctx.beginPath();
+		ctx.arc(
+			this.hitTolerance + 1,
+			this.hitTolerance + 1,
+			this.hitTolerance + 0.5,
+			0,
+			2 * Math.PI
+		);
+		ctx.fill();
+		ctx.stroke();
+	}
+};
+
 function calcExtent(layers) {
 	let extent = ol.extent.createEmpty();
 	layers.forEach(layer => {
@@ -24,48 +76,61 @@ function calcExtent(layers) {
 	return extent;
 }
 
-const selectHitToleranceElement = document.getElementById('hitTolerance');
-const circleCanvas = document.getElementById('circle');
+function colorStyle(mainColor='orange', opacity=0.05) {
+	const dimColor = ol.color.asString(
+		ol.color.asArray(mainColor).slice(0, 3).concat(opacity));
+	return new ol.style.Style({
+		stroke: new ol.style.Stroke({
+			color: mainColor,
+			width: 1,
+		}),
+		fill: new ol.style.Fill({
+			color: dimColor,
+		}),
+		image: new ol.style.Circle({
+			fill: new ol.style.Fill({
+				color: dimColor,
+			}),
+			radius: 6,
+			stroke: new ol.style.Stroke({
+				color: mainColor,
+				width: 1,
+			}),
+		}),
+		text: new ol.style.Text({
+			//font: '50px Calibri',
+			text: 'your label',
+			//placement: 'line',
+			fill: new ol.style.Fill({
+				color: mainColor
+			}),
+			stroke: new ol.style.Stroke({
+				color: dimColor,
+				width: 3
+			})
+		}),
+	});
+}
 
-let hitTolerance = 0;
+let commonClickStyle = colorStyle('orange');
 
-const changeHitTolerance = function () {
-	hitTolerance = parseInt(selectHitToleranceElement.value, 10);
-	
-	const size = 2 * hitTolerance + 2;
-	circleCanvas.width = size;
-	circleCanvas.height = size;
-	const ctx = circleCanvas.getContext('2d');
-	ctx.clearRect(0, 0, size, size);
-	ctx.beginPath();
-	ctx.arc(
-		hitTolerance + 1,
-		hitTolerance + 1,
-		hitTolerance + 0.5,
-		0,
-		2 * Math.PI
-	);
-	ctx.fill();
-	ctx.stroke();
-};
-
-selectHitToleranceElement.onchange = changeHitTolerance;
-changeHitTolerance();
-
-
-function show_map(map, displayProjection) {
+function show_map(map, displayProjection, hitToleranceSelector) {
 	let mapView = new ol.View({
 		projection: displayProjection,
 		maxZoom: 28,
-		minZoom: 1
+		minZoom: 1,
+		center: [0, 0],
+		zoom: 2,
 	});
 	let extent = calcExtent(map.getLayers());
 	console.log(extent, map.getSize());
-	mapView.fit(extent, {
-		size: map.getSize(),
-		padding: [10, 10, 10, 10],
-		constrainResolution: false,
-	});
+	if (!ol.extent.isEmpty(extent)) {
+		mapView.fit(extent, {
+			size: map.getSize(),
+			padding: [10, 10, 10, 10],
+			//constrainResolution: false,
+		});
+	}
 	map.setView(mapView);
 	
 	let layerSwitcher = new ol.control.LayerSwitcher({
@@ -80,12 +145,14 @@ function show_map(map, displayProjection) {
 		bar: true,
 	});
 	map.addControl(scaleLine);
-
+	
 	function styleOnClick(feature, resolution, dom) {
 		let style = commonClickStyle;
 		style.getText().setText(feature.get("name"));
 		return style;
 	}
+	
+	let selectHitTolerance = new SelectHitTolerance(hitToleranceSelector);
 	
 	map.on('singleclick', (evt) => {
 		var coordinates = map.getEventCoordinate(evt.originalEvent);
@@ -117,10 +184,11 @@ function show_map(map, displayProjection) {
 					console.log(layerCoordinates, coordinates);
 					target.textContent = out;
 					hit = true;
+					console.log(feature.get('style'));
 				}
 			},
 			{
-				hitTolerance: hitTolerance
+				hitTolerance: selectHitTolerance.hitTolerance,
 			}
 		);
 	});

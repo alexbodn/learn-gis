@@ -28,30 +28,87 @@ class SQLQuery {
 			from PRAGMA_database_list`,
 		attachDb: `
 			ATTACH DATABASE '/proj/proj.db' AS proj`,
-		createPoly: `WITH t1(x,y,n,color) AS (VALUES
-   (100,100,3,'red'),
-   (200,100,4,'orange'),
-   (300,100,5,'green'),
-   (400,100,6,'blue'),
-   (500,100,7,'purple'),
-   (100,200,8,'red'),
-   (200,200,10,'orange'),
-   (300,200,12,'green'),
-   (400,200,16,'blue'),
-   (500,200,20,'purple')
-)
-SELECT
-   geopoly_json(
-geopoly_regular(x,y,40,n))
-   FROM t1;`
+		xyncolor: `
+			select null as x, null as y, null as n, null as color where 0
+			union all
+			VALUES
+			(100,100,3,'red'),
+			(200,100,4,'orange'),
+			(300,100,5,'green'),
+			(400,100,6,'blue'),
+			(500,100,7,'purple'),
+			(100,200,8,'red'),
+			(200,200,10,'orange'),
+			(300,200,12,'green'),
+			(400,200,16,'blue'),
+			(500,200,20,'purple')
+		`,
+		polygonGeometries: `
+			WITH t1 AS $(xyncolor)
+			SELECT
+				json_object(
+					'type', 'Polygon',
+					'coordinates',
+					json_array(json(
+						geopoly_json(
+							geopoly_regular(x,y,40,n)
+						)
+					))
+				) as feature,
+				json_object(
+					'fill-color', color,
+					'fill-opacity', 0.1,
+					'stroke-color', color,
+					'stroke-width', 2,
+					'text', 
+					json_object(
+						'text', cast (n as text)
+					--	'fill-color', color,
+					--	'stroke-color', color
+					)
+				) as style,
+				cast (n as text) as name
+			FROM t1
+		`,
+		polygonFeatures: `
+			WITH t1 AS $(polygonGeometries)
+			SELECT
+				json_object(
+					'type', 'Feature',
+					'geometry', json(Feature),
+					'properties',
+					json_object(
+						'name', name,
+						'style', json(style)
+					)
+				) as feature
+			FROM t1
+		`,
+		featuresCollection: `
+			WITH t1 AS $(polygonFeatures)
+			SELECT
+				json_object(
+					'type', 'FeatureCollection',
+					'crs',
+					json('{ "type": "name", "properties": { "name": "EPSG:900913" } }'),
+					'features',
+					json_group_array(
+						json(feature)
+					)
+				) as feature
+			FROM t1
+			`,
 	};
 	
-	constructor(selector, db, thisName, snippets) {
+	constructor(selector, db, thisName, snippets, map) {
 		this.sqlQuerySelector = selector;
 		this.db = db;
 		this.thisName = thisName;
 		if (snippets) {
 			this.snippets = snippets;
+		}
+		if (map) {
+			this.map = map;
 		}
 		this.buildForm();
 	}
@@ -176,14 +233,15 @@ geopoly_regular(x,y,40,n))
 		}
 	}
 	
-	runQuery(query) {
+	async runQuery(query) {
 		let params = this.buildParams();
 		let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
 		
-		this.sql(query || queryElem.value, params);
+		let [rows, cols] = await this.sql(query || queryElem.value, params);
+		this.showTable(rows, cols);
 	}
 	
-	showResults(results, colnames, logRows=false) {
+	showTable(results, colnames, logRows=false) {
 		let target = document.querySelector(`${this.sqlQuerySelector} .sqlResults`);
 		target.textContent = '';
 		if (results.length) {
@@ -199,8 +257,9 @@ geopoly_regular(x,y,40,n))
 				if (logRows) {
 					console.log(row);
 				}
-				row = row//colnames
+				row = colnames
 					//.map(col => `<td>${row[col]}</td>`)
+					.map(col => row[col])
 					.map(col => `<td>${typeof col === 'object' ? JSON.stringify(col) : col}</td>`)
 					.reduce((acc, curr) => acc + curr, '');
 				target.insertAdjacentHTML(
@@ -217,6 +276,113 @@ geopoly_regular(x,y,40,n))
 		}
 	}
 	
+	async addLayer(query) {
+		let params = this.buildParams();
+		let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
+		
+		let [rows, cols] = await this.sql(query || queryElem.value, params);
+		this.showLayer(rows);
+	}
+	
+	parseStyleRule = (key, value) => {
+		let ix = key.search('-');
+		if (ix >= 0) {
+			value = this.parseStyleRule(key.slice(ix+1), value);
+			key = key.slice(0, ix);
+		}
+		let parsed = {};
+		parsed[key] = value;
+		return parsed;
+	}
+	
+	mergeStyleRules = (rule, merged) => {
+		for (let [key, value] of Object.entries(rule)) {
+			if (key in merged && merged[key]) {
+				if (typeof merged[key] === 'object') {
+					this.mergeStyleRules(value, merged[key]);
+				}
+				else {
+					merged[key] = value;
+				}
+			}
+			else {
+				merged[key] = value;
+			}
+		}
+	}
+	
+	parseStyle(styleSource) {
+		let rules = Object.entries(styleSource)
+			.map(rule => this.parseStyleRule(...rule));
+		let merged = {};
+		for (let rule of rules) {
+			this.mergeStyleRules(rule, merged);
+		}
+		let style = {};
+		for (let key in merged) {
+			let cls = key.charAt(0).toUpperCase() +
+				key.substr(1).toLowerCase();
+			if (cls in ol.style) {
+				style[key] = new ol.style[cls](merged[key]);
+			}
+		}
+		return Object.keys(style).length
+			? new ol.style.Style(style) : null;
+	}
+	
+	showLayer(rows) {
+		let title = prompt(
+			'the layer title please',
+			'query layer',
+		);
+		let vectorSource = new ol.source.Vector();
+		let dataProjection = 'EPSG:900913';
+		let featureProjection = 'EPSG:3857';
+		const formatJson = new ol.format.GeoJSON();
+		for (let row of rows) {
+			let {feature, ...properties} = row;
+			let features2style = [feature];
+			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
+				feature = {
+					type: 'Feature',
+					properties,
+					geometry: feature,
+				}
+				features2style = [feature];
+			}
+			else if (feature.type == 'FeatureCollection') {
+				dataProjection = 
+					(feature?.crs?.properties?.name) || dataProjection;
+				features2style = feature.features;
+			}
+			for (let feat of features2style) {
+				let styleSource = feat?.properties?.style || {};
+				let style = this.parseStyle(styleSource);
+				if (!('properties' in feat)) {
+					feat.properties = {};
+				}
+				feat.properties.style = style;
+				//console.log(style, feat.getStyle());
+			}
+			let features = formatJson.readFeatures(feature, {
+				dataProjection: dataProjection,
+				featureProjection: featureProjection,
+			});
+			features[0].setProperties(properties);
+			vectorSource.addFeatures(features);
+		}
+		vectorSource.setProperties({
+			origProjection: dataProjection,
+		});
+		const vectorLayer = new ol.layer.Vector({
+			title: title,
+			source: vectorSource,
+			style: feature => feature.get('style'),
+		});
+		this.map.addLayer(vectorLayer);
+		show_map(this.map, featureProjection, '#hit-tolerance');
+	}
+	
 	delParam(_this) {
 		let tr = _this.closest('tr');
 		let ok = confirm(`delete ${tr.querySelector('.variable').value} ?`);
@@ -225,30 +391,50 @@ geopoly_regular(x,y,40,n))
 		}
 	}
 	
+	prepKeys(obj, query, label) {
+		let params = obj;
+		if (false) warn(label);
+		if (Array.isArray(obj)) {
+			return obj;
+		}
+		const snippetRe = /\$\((.*?)\)/g;
+		query = uncomment(query);
+		const replacer = (match, snippet) => {
+			let replaced = this.snippets[snippet].replace(snippetRe, replacer)
+			replaced = uncomment(replaced);
+			return `(
+				${replaced}
+			)`;
+		};
+		query = query.replace(snippetRe, replacer);
+		const paramRe = /:[a-z_A-Z][a-z_A-Z0-9]*/g;
+		if (typeof(obj) == 'object') {
+			params = {};
+			let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
+			let param;
+			while (param = paramRe.exec(query)) {
+				let val = obj[param[1]];
+				if (typeof(val) == 'undefined') {
+					throw new Error(
+						`parameter ${param[1]} not defined for ${label}.`);
+				}
+				params[param[0]] = val;
+			}
+		}
+		return [params, query];
+	}
+	
 	async sql(query, params={}) {
+		let [_params, _query] = this.prepKeys(params, query);
 		let cols = await this.db.exec(
-			//query
-		//{
-			//sql: 
-			query,
-			//bind: 
-			prepKeys(
-				params,
-				query),
-		//}
+			_query,
+			_params,
 		).get.cols;
 		let rows = await this.db.exec(
-			//query
-		//{
-			//sql: 
-			query,
-			//bind: 
-			prepKeys(
-				params,
-				query),
-		//}
-		).get.rows;
-		this.showResults(rows, cols);
+			_query,
+			_params,
+		).get.objs;
+		return [rows, cols];
 	}
 	
 	buildForm() {
@@ -258,6 +444,7 @@ geopoly_regular(x,y,40,n))
 				<button onclick="${this.thisName}.addParam()">add param</button>
 				<button onclick="${this.thisName}.makeParams()">make params</button>
 				<button onclick="${this.thisName}.runQuery()">run</button>
+				<button onclick="${this.thisName}.addLayer()">add layer</button>
 			</div>
 			<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
 			<table border="1"><tbody class="snippetsMenu"></tbody></table>
@@ -269,3 +456,4 @@ geopoly_regular(x,y,40,n))
 		this.buildSnippetsMenu();
 	}
 };
+

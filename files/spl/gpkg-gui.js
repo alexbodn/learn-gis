@@ -6,7 +6,7 @@ import * as SLDReader from './sld/sldreader.js';
 */
 import SPL from './dist/index.js';
 
-async function build_source(tableInfo, displayProjection) {
+async function build_source(db, tableInfo, displayProjection) {
 	let table_name = tableInfo.table_name;
 	let tableDataProjection = tableInfo.srs_id;
 	// Check if we have a definition for the data projection (SRS)
@@ -70,7 +70,7 @@ async function build_source(tableInfo, displayProjection) {
 	return vectorSource;
 }
 
-function colorStyle(mainColor='orange', opacity=0.05) {
+function _colorStyle(mainColor='orange', opacity=0.05) {
 	const dimColor = ol.color.asString(
 		ol.color.asArray(mainColor).slice(0, 3).concat(opacity));
 	return new ol.style.Style({
@@ -227,7 +227,7 @@ function init_sql() {
 
 async function spl_db() {
 	const spl = await SPL();
-	console.log('spl loaded');
+	//console.log('spl loaded');
 	
 	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString() 
 	const projdbArrayBuffer = await fetch(projdbUrl)
@@ -242,7 +242,7 @@ async function spl_db() {
 		])
 		.db()
 			.read(init_sql());
-	console.log('db loaded', db);
+	//console.log('db loaded', db);
 	
 	return db;
 }
@@ -366,7 +366,7 @@ async function read_gpkg(db, displayProjection) {
 		let table_name = tableInfo.table_name;
 		let tableDataProjection = tableInfo.srs_id;
 		
-		tableInfo.vectorSource = await build_source(tableInfo, displayProjection);
+		tableInfo.vectorSource = await build_source(db, tableInfo, displayProjection);
 		if (table_name in sldsFromGpkg) {
 			tableInfo.style = sldsFromGpkg[table_name];
 		}
@@ -414,28 +414,33 @@ function extent_layer(tableInfo, displayProjection) {
 		return extentLayer;
 }
 
-async function build_map(db, displayProjection) {
-	let featureTable = await read_gpkg(db, displayProjection);
+function osm_layer() {
 	let sourceOSM = new ol.source.OSM({
-			tileLoadFunction: function(imageTile, src) {
-				imageTile.getImage().src = src;
-			}
-		});
+		tileLoadFunction: function(imageTile, src) {
+			imageTile.getImage().src = src;
+		}
+	});
 	sourceOSM.set({
 		origProjection: sourceOSM.projection.code,
 	});
-	// Create Map canvas and View
-	let map = new ol.Map({
-		target: 'map',
-		layers: [
-			new ol.layer.Tile({
-				title: 'base layer (OSM)',
-				source: sourceOSM,
-			}),
-		],
+	return new ol.layer.Tile({
+		title: 'base layer (OSM)',
+		source: sourceOSM,
 	});
-	
+}
+
+function build_map(target='map') {
+	// Create Map canvas and View
+	return new ol.Map({
+		target: target,
+		layers: [],
+	});
+}
+
+async function gpkg_layers(db, displayProjection) {
+	let vectorLayers = [];
 	// For each table, extract geometry and other properties
+	let featureTable = await read_gpkg(db, displayProjection);
 	// (Note: becomes OpenLayers-specific from here)
 	for (let tableInfo of featureTable) {
 		let table_name = tableInfo.table_name;
@@ -443,7 +448,6 @@ async function build_map(db, displayProjection) {
 		
 		let label = `layer ${table_name}`;
 		console.time(label);
-		//let vectorSource = dataFromGpkg[table_name];
 		const vectorLayer = new ol.layer.Vector({
 			title: table_name,
 			source: tableInfo.vectorSource,
@@ -454,11 +458,11 @@ async function build_map(db, displayProjection) {
 		if ('style' in tableInfo) {
 			applySLD(vectorLayer, tableInfo.style);
 		}
-		map.addLayer(vectorLayer);
-		map.addLayer(extent_layer(tableInfo, displayProjection));
+		vectorLayers.push(vectorLayer);
+		vectorLayers.push(extent_layer(tableInfo, displayProjection));
 	}
 	
-	return map;
+	return vectorLayers;
 }
 
 function _calcExtent(layers) {
@@ -486,7 +490,7 @@ function _calcExtent(layers) {
 	return extent;
 }
 
-let commonClickStyle = colorStyle('orange');
+let _commonClickStyle = colorStyle('orange');
 
 function _show_map(map) {
 	let mapView = new ol.View({
@@ -671,21 +675,34 @@ const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toStri
 // Map View Projection
 const displayProjection = 'EPSG:3857';
 
-let db = await spl_loadgpkg(url);
-//let db = await spl_db();
-//console.log('db', db);
 
-let map = await build_map(db, displayProjection);
+async function london_gpkg() {
+	let db = await spl_loadgpkg(url);
+	let map = build_map('map');
+	map.addLayer(osm_layer());
+	let layers = await gpkg_layers(db, displayProjection);
+	for (let layer of layers) {
+		map.addLayer(layer);
+	}
+	
+	let jsonUrls = [
+		'tfl_lines.json',
+		'tfl_stations.json',
+	].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
+	await fetchAll(jsonUrls, 'json', {map, displayProjection}).then(handleJson);
+	
+	return [db, map];
+}
 
-let jsonUrls = [
-	'tfl_lines.json',
-	'tfl_stations.json',
-].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
-await fetchAll(jsonUrls, 'json', {map, displayProjection}).then(handleJson);
+let db = await spl_db();
+let map = build_map('map');
+map.addLayer(osm_layer());
 
-show_map(map, displayProjection);
+//let [db, map] = await london_gpkg();
 
-window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole');
+show_map(map, displayProjection, "#hit-tolerance");
+
+window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole', undefined, map);
 window.sqlConsole.addSnippets({
 	spatiaLiteVersion: `
 		SELECT spatialite_version()`,

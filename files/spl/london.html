@@ -25,7 +25,6 @@
 		<!--
 		-->
 		
-		
 		<script src="./lib/proj4.min.js"></script>
 		<style>
 			body {
@@ -45,51 +44,12 @@
 	<body>
 		<div id="sqlQuery"></div>
 		<div id="mouse-position"></div>
-		<div id="hit-tolerance">
-		<form>
-			<label for="hitTolerance">
-				Hit tolerance for selecting features:
-				<br />Area: &nbsp;
-				<canvas id="circle" width="22" height="22" style="vertical-align: middle;"></canvas>
-				&nbsp;
-			</label>
-			<select id="hitTolerance">
-				<option value="0" selected>0 Pixels</option>
-				<option value="5">5 Pixels</option>
-				<option value="10">10 Pixels</option>
-			</select>
-		</form>
-		</div>
+		<div id="hit-tolerance"></div>
 		<div id="map" class="map"></div>
 		<!--div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div-->
 		
 		<script src="./lib/sqlquery.js"></script>
 		<script src="./lib/map_show.js"></script>
-		<script>
-function prepKeys(obj, query, label) {
-	let ret = obj;
-	if (false) warn(label);
-	if (Array.isArray(obj)) {
-		return obj;
-	}
-	let paramRe = /:[a-z_A-Z][a-z_A-Z0-9]*/g;
-	if (typeof(obj) == 'object') {
-		ret = {};
-		let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
-		query = uncomment(query);
-		let param;
-		while (param = paramRe.exec(query)) {
-			let val = obj[param[1]];
-			if (typeof(val) == 'undefined') {
-				throw new Error(`parameter ${param[1]} not defined for ${label}.`);
-			}
-			ret[param[0]] = val;
-		}
-	}
-//console.log(obj, ret, query);
-	return ret;
-}
-		</script>
 		<script type="module" src="./gpkg-gui.js"></script>
 	</body>
 </html>
