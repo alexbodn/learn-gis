@@ -1,11 +1,6 @@
 
 'use strict';
 
-function uncomment(text) {
-	let commentRe = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)|(--.*)/g;
-	return text.replaceAll(commentRe, '');
-}
-
 class SQLQuery {
 	
 	fieldTypes = {
@@ -26,12 +21,61 @@ class SQLQuery {
 		allDbs: `
 			select * 
 			from PRAGMA_database_list`,
+		compileOptions: `
+			select * 
+			from PRAGMA_compile_options`,
 		attachDb: `
 			ATTACH DATABASE '/proj/proj.db' AS proj`,
+		generateSeries: `
+			SELECT value
+			FROM generate_series --(5,100,5)
+			where start=5 and stop=50 and step=5`,
+		pentagonPoints: `
+			with icons as $(pinpng)
+			SELECT
+				flatstyle, 
+				makepoint(
+					100+40 * sin(value * radians(360) / 5),
+					100+40 * cos(value * radians(360) / 5),
+					3857
+				) as feature
+			FROM generate_series as ctr
+			inner join icons on 1
+			where ctr.start=0 and ctr.stop=5`,
+		pinpng: `
+		select
+			json_object(
+				--'text-value', '',
+				'icon-color', '#8959A8',
+				'icon-cross-origin', 'anonymous',
+				'icon-src', 'data:'||pinpng
+				
+				--'circle-stroke-color', 'blue',
+				--'circle-stroke-width', 1,
+				--'circle-radius', 5
+			) as flatstyle
+		from (select 1)
+		inner join (
+			select 
+			'image/png;base64,
+			iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
+			AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
+			VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
+			yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
+			yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
+			sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
+			1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
+			D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
+			jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
+			aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
+			Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
+			7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
+			Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
+			' as pinpng) on 1=1
+			`,
 		xyncolor: `
-			select null as x, null as y, null as n, null as color where 0
-			union all
-			VALUES
+			with t1(x,y,n,color) as
+			(VALUES
 			(100,100,3,'red'),
 			(200,100,4,'orange'),
 			(300,100,5,'green'),
@@ -42,7 +86,9 @@ class SQLQuery {
 			(300,200,12,'green'),
 			(400,200,16,'blue'),
 			(500,200,20,'purple')
-		`,
+			)
+			select * from t1
+			`,
 		polygonGeometries: `
 			WITH t1 AS $(xyncolor)
 			SELECT
@@ -57,19 +103,14 @@ class SQLQuery {
 				) as feature,
 				json_object(
 					'fill-color', color,
-					'fill-opacity', 0.1,
+					'fill-opacity', 0.05,
 					'stroke-color', color,
 					'stroke-width', 2,
-					'text', 
-					json_object(
-						'text', cast (n as text)
-					--	'fill-color', color,
-					--	'stroke-color', color
-					)
-				) as style,
+					'text-value', cast (n as text)
+				) as flatstyle,
 				cast (n as text) as name
 			FROM t1
-		`,
+			`,
 		polygonFeatures: `
 			WITH t1 AS $(polygonGeometries)
 			SELECT
@@ -79,11 +120,11 @@ class SQLQuery {
 					'properties',
 					json_object(
 						'name', name,
-						'style', json(style)
+						'flatstyle', json(flatstyle)
 					)
 				) as feature
 			FROM t1
-		`,
+			`,
 		featuresCollection: `
 			WITH t1 AS $(polygonFeatures)
 			SELECT
@@ -98,12 +139,37 @@ class SQLQuery {
 				) as feature
 			FROM t1
 			`,
+		builtPolygons: `
+			WITH t1 AS $(xyncolor)
+			SELECT
+				json_object(
+					'fill-color', color,
+					'fill-opacity', 0.05,
+					'stroke-color', color,
+					'stroke-width', 2,
+					'text-value', cast (n as text)
+				) as flatstyle,
+				makepolygon(makeline(point)) as feature
+			from (
+				select
+					makepoint(
+						x + 40 * sin((value % n) * 2 * pi() / n),
+						y + 40 * cos((value % n) * 2 * pi() / n),
+						3857
+					) as point,
+					n,
+					color
+				FROM t1
+				inner join generate_series
+					on generate_series.start=0 and generate_series.stop=t1.n and generate_series.step=1
+			)
+			group by n, color
+			`
 	};
 	
-	constructor(selector, db, thisName, snippets, map) {
-		this.sqlQuerySelector = selector;
+	constructor(selector, db, snippets, map) {
+		this.sqlQuery = document.querySelector(selector);
 		this.db = db;
-		this.thisName = thisName;
 		if (snippets) {
 			this.snippets = snippets;
 		}
@@ -133,26 +199,31 @@ class SQLQuery {
 		let row = `
 			<tr>
 				<td style="width: 30%">
-					<input class="variable" onblur="${this.thisName}.buildParams(false)" type="text" value="${name}" placeholder="name" style="width: 100%" />
+					<input class="variable" type="text" value="${name}" placeholder="name" style="width: 100%" />
 				</td>
 				<td style="width: 30%">
-					<select class="type" style="width: 100%" onchange="${this.thisName}.paramType(this);">
+					<select class="type" style="width: 100%">
 						${typeOptions(this.fieldTypes)}
 					</select>
 				</td>
 				<td style="width: 30%">
-					<input class="value" onblur="${this.thisName}.buildParams()" pattern="/^$/" disabled="disabled" value="" placeholder="null" style="width: 100%" />
+					<input class="value" pattern="/^$/" disabled="disabled" value="" placeholder="null" style="width: 100%" />
 				</td>
-				<td style="width: 10%"><button onclick="${this.thisName}.delParam(this)">del</button></td>
+				<td style="width: 10%"><button class="del-param">del</button></td>
 			</tr>
 			`;
-		let params = document.querySelector(this.sqlQuerySelector + ' .sqlParams');
+		let params = this.sqlQuery.querySelector('.sqlParams');
 		params.insertAdjacentHTML('beforeend', row);
-		params.querySelector('tr:last-child input.variable').focus();
+		let newVar = params.querySelector('tr:last-child');
+		newVar.querySelector('input.variable').addEventListener('blur', e => {this.buildParams(false);});
+		newVar.querySelector('select.type').addEventListener('change', e => {this.paramType(e.currentTarget);});
+		newVar.querySelector('input.value').addEventListener('blur', e => {this.buildParams();});
+		newVar.querySelector('button.del-param').addEventListener('click', e => {this.delParam(e.currentTarget);});
+		newVar.querySelector('input.variable').focus();
 	}
 	
 	buildParams(testValues=true) {
-		let paramsDiv = document.querySelector(this.sqlQuerySelector + ' .sqlParams');
+		let paramsDiv = this.sqlQuery.querySelector('.sqlParams');
 		let rows = paramsDiv.querySelectorAll('tr');
 		let params = {};
 		const nameRegex = /^[a-z_A-Z][a-z_A-Z0-9]*$/;
@@ -186,7 +257,7 @@ class SQLQuery {
 	
 	makeParams() {
 		let params = this.buildParams(false);
-		let query = document.querySelector(this.sqlQuerySelector + ' .query').value;
+		let query = this.sqlQuery.querySelector('.query').value;
 		let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
 		let param;
 		while (param = paramRe.exec(query)) {
@@ -197,52 +268,116 @@ class SQLQuery {
 		}
 	}
 	
-	addSnippets(snippets) {
+	addSnippets = (snippets) => {
 		for (let [name, query] of Object.entries(snippets)) {
 			this.snippets[name] = query;
 		}
 		this.buildSnippetsMenu();
 	}
 	
-	buildSnippetsMenu() {
+	buildSnippetsMenu = () => {
 		let snippets = Object.keys(this.snippets)
 			.map(
 				name => 
 				`<tr>
-				<td>${name}</td>
-				<td><button onclick="${this.thisName}.pasteSnippet('${name}');">paste</button></td>
-				<td><button onclick="${this.thisName}.runSnippet('${name}');">run</button></td>
+				<td class="snippet-name">${name}</td>
+				<td><button class="snippet-paste">paste</button></td>
+				<td><button class="snippet-copy">cp</button></td>
+				<td><button class="snippet-pp">pp</button></td>
+				<td><button class="snippet-run">run</button></td>
+				<td><button class="snippet-map">map</button></td>
 				</tr>`
 			)
 			.reduce((a, b) => a + b, '');
-		let target = document.querySelector(`${this.sqlQuerySelector} .snippetsMenu`);
+		let target = this.sqlQuery.querySelector('.snippetsMenu');
 		target.textContent = '';
 		target.insertAdjacentHTML('beforeend', snippets);
+		target.querySelectorAll('button.snippet-paste').forEach(
+			button => button.addEventListener('click', e => {this.pasteSnippet(null, e.currentTarget);}));
+		target.querySelectorAll('button.snippet-copy').forEach(
+			button => button.addEventListener('click', e => {this.copySnippet(null, e.currentTarget);}));
+		target.querySelectorAll('button.snippet-pp').forEach(
+			button => button.addEventListener('click', e => {this.unfoldSnippet(null, e.currentTarget);}));
+		target.querySelectorAll('button.snippet-run').forEach(
+			button => button.addEventListener('click', e => {this.runSnippet(null, e.currentTarget);}));
+		target.querySelectorAll('button.snippet-map').forEach(
+			button => button.addEventListener('click', e => {this.mapSnippet(null, e.currentTarget);}));
 	}
 	
-	pasteSnippet(snippet) {
+	snippetQuery(snippet, preprocessed=false) {
+		let query = this.snippets[snippet];
+		if (preprocessed) {
+			query = this.prepQuery(query);
+		}
+		if (query) {
+			query = query.replace(/\n\s+/g, '\n');
+		}
+	}
+	
+	currentSnippet(snippet, currentTarget) {
+		if (!snippet) {
+			snippet = currentTarget
+				.closest('tr')
+				.querySelector('td.snippet-name')
+				.textContent;
+		}
+		return snippet;
+	}
+	
+	pasteSnippet(snippet, currentTarget) {
+		snippet = this.currentSnippet(snippet, currentTarget);
 		if (snippet in this.snippets) {
-			let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
+			let queryElem = this.sqlQuery.querySelector('.query');
 			queryElem.value = this.snippets[snippet].replace(/\n\s+/g, '\n');
 		}
 	}
 	
-	runSnippet(snippet) {
+	copySnippet(snippet, currentTarget, data) {
+		snippet = this.currentSnippet(snippet, currentTarget);
+		let query = data || this.snippets[snippet].replace(/\n\s+/g, '\n');
+		navigator.clipboard.writeText(query).then(
+			() => {
+				//alert('clipboard successfully set');
+			},
+			() => {
+				alert('clipboard write failed');
+			},
+		);
+	}
+	
+	unfoldSnippet(snippet, currentTarget) {
+		snippet = this.currentSnippet(snippet, currentTarget);
+		let query = this.snippets[snippet];
+		query = this.prepQuery(query);
+		return this.copySnippet(
+			snippet, currentTarget,
+			query.replace(/\n\s+/g, '\n'));
+	}
+	
+	runSnippet(snippet, currentTarget) {
+		snippet = this.currentSnippet(snippet, currentTarget);
 		if (snippet in this.snippets) {
 			return this.runQuery(this.snippets[snippet]);
 		}
 	}
 	
+	mapSnippet(snippet, currentTarget) {
+		snippet = this.currentSnippet(snippet, currentTarget);
+		if (snippet in this.snippets) {
+			return this.mapQuery(this.snippets[snippet]);
+		}
+	}
+	
 	async runQuery(query) {
 		let params = this.buildParams();
-		let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
+		let queryElem = this.sqlQuery.querySelector('.query');
 		
 		let [rows, cols] = await this.sql(query || queryElem.value, params);
 		this.showTable(rows, cols);
 	}
 	
 	showTable(results, colnames, logRows=false) {
-		let target = document.querySelector(`${this.sqlQuerySelector} .sqlResults`);
+		let target = this.sqlQuery.querySelector('.sqlResults');
 		target.textContent = '';
 		if (results.length) {
 			//let colnames = Object.keys(results[0]);
@@ -276,58 +411,16 @@ class SQLQuery {
 		}
 	}
 	
-	async addLayer(query) {
+	async mapQuery(query) {
 		let params = this.buildParams();
-		let queryElem = document.querySelector(`${this.sqlQuerySelector} .query`);
+		let queryElem = this.sqlQuery.querySelector('.query');
 		
 		let [rows, cols] = await this.sql(query || queryElem.value, params);
+		if (!cols.includes('feature')) {
+			console.error('provide a geojson column named "feature"');
+			return;
+		}
 		this.showLayer(rows);
-	}
-	
-	parseStyleRule = (key, value) => {
-		let ix = key.search('-');
-		if (ix >= 0) {
-			value = this.parseStyleRule(key.slice(ix+1), value);
-			key = key.slice(0, ix);
-		}
-		let parsed = {};
-		parsed[key] = value;
-		return parsed;
-	}
-	
-	mergeStyleRules = (rule, merged) => {
-		for (let [key, value] of Object.entries(rule)) {
-			if (key in merged && merged[key]) {
-				if (typeof merged[key] === 'object') {
-					this.mergeStyleRules(value, merged[key]);
-				}
-				else {
-					merged[key] = value;
-				}
-			}
-			else {
-				merged[key] = value;
-			}
-		}
-	}
-	
-	parseStyle(styleSource) {
-		let rules = Object.entries(styleSource)
-			.map(rule => this.parseStyleRule(...rule));
-		let merged = {};
-		for (let rule of rules) {
-			this.mergeStyleRules(rule, merged);
-		}
-		let style = {};
-		for (let key in merged) {
-			let cls = key.charAt(0).toUpperCase() +
-				key.substr(1).toLowerCase();
-			if (cls in ol.style) {
-				style[key] = new ol.style[cls](merged[key]);
-			}
-		}
-		return Object.keys(style).length
-			? new ol.style.Style(style) : null;
 	}
 	
 	showLayer(rows) {
@@ -355,15 +448,6 @@ class SQLQuery {
 					(feature?.crs?.properties?.name) || dataProjection;
 				features2style = feature.features;
 			}
-			for (let feat of features2style) {
-				let styleSource = feat?.properties?.style || {};
-				let style = this.parseStyle(styleSource);
-				if (!('properties' in feat)) {
-					feat.properties = {};
-				}
-				feat.properties.style = style;
-				//console.log(style, feat.getStyle());
-			}
 			let features = formatJson.readFeatures(feature, {
 				dataProjection: dataProjection,
 				featureProjection: featureProjection,
@@ -377,7 +461,21 @@ class SQLQuery {
 		const vectorLayer = new ol.layer.Vector({
 			title: title,
 			source: vectorSource,
-			style: feature => feature.get('style'),
+			style: (feature, resolution) => {
+				let style;
+				if (!feature.get('styled')) {
+					let flatstyle = feature.get('flatstyle') || {};
+					let parsingContext = ol.expr.expression.newParsingContext();
+					style = ol.render.canvas.style.buildStyle(flatstyle, parsingContext)();
+					//style = ol.render.canvas.style.flatStylesToStyleFunction(
+					//	[flatstyle], feature, resolution);
+					//console.log('Style', style);
+					feature.setStyle(style);
+					feature.set('styled', true);
+				}
+				style = feature.getStyle();
+				return style;
+			},
 		});
 		this.map.addLayer(vectorLayer);
 		show_map(this.map, featureProjection, '#hit-tolerance');
@@ -391,22 +489,38 @@ class SQLQuery {
 		}
 	}
 	
-	prepKeys(obj, query, label) {
-		let params = obj;
-		if (false) warn(label);
-		if (Array.isArray(obj)) {
-			return obj;
-		}
+	uncomment(text) {
+		let commentRe = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)|(--.*)/g;
+		return text.replaceAll(commentRe, '');
+	}
+	
+	prepQuery(query, uncomment=false) {
 		const snippetRe = /\$\((.*?)\)/g;
-		query = uncomment(query);
+		if (uncomment) {
+			query = this.uncomment(query);
+		}
 		const replacer = (match, snippet) => {
 			let replaced = this.snippets[snippet].replace(snippetRe, replacer)
-			replaced = uncomment(replaced);
+			if (uncomment) {
+				replaced = this.uncomment(replaced);
+			}
 			return `(
 				${replaced}
 			)`;
 		};
-		query = query.replace(snippetRe, replacer);
+		return query.replace(snippetRe, replacer);
+	}
+	
+	prepKeys(obj, query, label) {
+		let params = obj;
+		if (false) warn(label);
+		if (!query) {
+			throw new Error('the query is empty');
+		}
+		query = this.prepQuery(query, true);
+		if (Array.isArray(obj)) {
+			return [params, query];
+		}
 		const paramRe = /:[a-z_A-Z][a-z_A-Z0-9]*/g;
 		if (typeof(obj) == 'object') {
 			params = {};
@@ -425,15 +539,10 @@ class SQLQuery {
 	}
 	
 	async sql(query, params={}) {
-		let [_params, _query] = this.prepKeys(params, query);
-		let cols = await this.db.exec(
-			_query,
-			_params,
-		).get.cols;
-		let rows = await this.db.exec(
-			_query,
-			_params,
-		).get.objs;
+		[params, query] = this.prepKeys(params, query);
+		let rs = this.db.exec(query, params).get;
+		let cols = await rs.cols;
+		let rows = await rs.objs;
 		return [rows, cols];
 	}
 	
@@ -441,19 +550,22 @@ class SQLQuery {
 		let html = `
 			<table border="0"><tbody class="sqlParams"></tbody></table>
 			<div>
-				<button onclick="${this.thisName}.addParam()">add param</button>
-				<button onclick="${this.thisName}.makeParams()">make params</button>
-				<button onclick="${this.thisName}.runQuery()">run</button>
-				<button onclick="${this.thisName}.addLayer()">add layer</button>
+				<button class="add-param">add param</button>
+				<button class="make-params">make params</button>
+				<button class="run-query">run</button>
+				<button class="map-query">map</button>
 			</div>
 			<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
 			<table border="1"><tbody class="snippetsMenu"></tbody></table>
 			<table border="1"><tbody class="sqlResults"></tbody></table>
 		`;
-		let target = document.querySelector(this.sqlQuerySelector);
-		target.textContent = '';
-		target.insertAdjacentHTML('beforeend', html);
+		this.sqlQuery.textContent = '';
+		this.sqlQuery.insertAdjacentHTML('beforeend', html);
 		this.buildSnippetsMenu();
+		this.sqlQuery.querySelector('button.add-param').addEventListener('click', e => {this.addParam();});
+		this.sqlQuery.querySelector('button.make-params').addEventListener('click', e => {this.makeParams();});
+		this.sqlQuery.querySelector('button.run-query').addEventListener('click', e => {this.runQuery();});
+		this.sqlQuery.querySelector('button.map-query').addEventListener('click', e => {this.mapQuery();});
 	}
 };
 

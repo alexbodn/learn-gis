@@ -257,15 +257,15 @@ function fetchAll(urls, method='text', options={}) {
 	)
 }
 
-async function spl_loadgpkg(gpkgUrl) {
+async function spl_loadgpkg(gpkgUrl, fileName) {
 	const spl = await SPL(
-		[],
 		{
-			autoGeoJSON: 1 ? false : {
+			autoGeoJSON: 0 ? false : {
 				precision: 6,
 				options: 0,
 			},
 		},
+		[],
 	);
 	//console.log('spl loaded');
 	
@@ -290,10 +290,10 @@ async function spl_loadgpkg(gpkgUrl) {
 			{ name: 'proj.db', data: projdbArrayBuffer }
 		])
 		.mount('data', [
-			{ name: 'london_boroughs.gpkg', data: gpkgArrayBuffer }
+			{ name: fileName, data: gpkgArrayBuffer }
 		])
 		//.db()
-		//	.load('file:data/london_boroughs.gpkg?immutable=1')
+		//	.load(`file:data/${fileName}?immutable=1`)
 		.db(gpkgArrayBuffer)
 			.read(init_sql());
 	//console.log('db loaded', db);
@@ -676,10 +676,8 @@ const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toStri
 const displayProjection = 'EPSG:3857';
 
 
-async function london_gpkg() {
-	let db = await spl_loadgpkg(url);
-	let map = build_map('map');
-	map.addLayer(osm_layer());
+async function london_gpkg(map) {
+	let db = await spl_loadgpkg(url, 'london_boroughs.gpkg');
 	let layers = await gpkg_layers(db, displayProjection);
 	for (let layer of layers) {
 		map.addLayer(layer);
@@ -691,19 +689,20 @@ async function london_gpkg() {
 	].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
 	await fetchAll(jsonUrls, 'json', {map, displayProjection}).then(handleJson);
 	
-	return [db, map];
+	return db;
 }
 
-let db = await spl_db();
 let map = build_map('map');
 map.addLayer(osm_layer());
 
-//let [db, map] = await london_gpkg();
+//let db = await london_gpkg(map);
+let db = await spl_db();
+
 
 show_map(map, displayProjection, "#hit-tolerance");
 
-window.sqlConsole = new SQLQuery('div#sqlQuery', db, 'sqlConsole', undefined, map);
-window.sqlConsole.addSnippets({
+let sqlConsole = new SQLQuery('div#sqlQuery', db, undefined, map);
+sqlConsole.addSnippets({
 	spatiaLiteVersion: `
 		SELECT spatialite_version()`,
 	projVersion: `
@@ -712,6 +711,7 @@ window.sqlConsole.addSnippets({
 		SELECT *
 		FROM gpkg_contents`,
 	transform_point: `
+		with icons as $(pinpng)
 		select 
 		--aswkt (
 		st_transform(
@@ -719,7 +719,11 @@ window.sqlConsole.addSnippets({
 		MakePoint (-22562.401432422717, 6730934.887787993, 3857)
 		, 27700)
 		, 3857)
-		--)`,
+		--)
+		as feature,
+		style
+		from icons
+		`,
 	gpkg_spatial_ref_sys: `
 		select *
 		from gpkg_spatial_ref_sys;`,
