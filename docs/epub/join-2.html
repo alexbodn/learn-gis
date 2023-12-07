@@ -1,0 +1,318 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #3:</b><br class="calibre12"/>
+<b class="calibre9">More about JOIN</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"join-1.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="views.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="views.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">SQL supports<p class="calibre1"></p>
+<p class="calibre1">another alternative syntax to represent JOIN ops.<br class="calibre12"/>
+More or less both implementations are strictly equivalent, so using</p>
+<p class="calibre1">the one or the other simply is matter of personal taster in the</p>
+<p class="calibre1">majority of cases.<br class="calibre12"/>
+Anyway, this second method supports some really interesting further</p>
+<p class="calibre1">feature that is otherwise unavailable.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">lc.lc_id AS lc_id,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS lc_name,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id AS county_id,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county_name,</b><br class="calibre12"/>
+<b class="calibre9">  c.car_plate_code AS car_plate_code,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id AS region_id,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS region_name</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc,</b><br class="calibre12"/>
+<b class="calibre9">  counties AS c,</b><br class="calibre12"/>
+<b class="calibre9">  regions AS r</b><br class="calibre12"/>
+<b class="calibre9">WHERE lc.county_id = c.county_id</b><br class="calibre12"/>
+<b class="calibre9">  AND c.region_id = r.region_id;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You now feel a strong <i class="calibre11"><b class="calibre9">deja vu</b></i> sensation: and that's<p class="calibre1"></p>
+<p class="calibre1">more than appropriate, because you have already encountered this</p>
+<p class="calibre1">query in the previous example.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">lc.lc_id AS lc_id,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS lc_name,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id AS county_id,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county_name,</b><br class="calibre12"/>
+<b class="calibre9">  c.car_plate_code AS car_plate_code,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id AS region_id,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS region_name</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (</b><br class="calibre12"/>
+<b class="calibre9">  lc.county_id = c.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.region_id = r.region_id);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+All right, this one is the same identical query rewritten</p>
+<p class="calibre1">accordingly to alternative syntax rules:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">using the <div class="calibre33"><b class="calibre9">JOIN ... ON<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(...)</b></span> clause makes more explicit what's going on.</p></li>
+<li class="calibre22">and <span class="calibre33"><b class="calibre9">JOIN</b></span>
+conditions are now directly expressed within the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ON (...)</b></span> term:<br class="calibre12"/>
+this way the query statement is better structured and more</p>
+<p class="calibre1">readable.</p></li>
+<li class="calibre22">anyway, all this simply is <i class="calibre11"><b class="calibre9">syntactic sugar</b></i>:<br class="calibre12"/>
+there is no difference at all between the above two queries in<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">functional</b></i> terms.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">r.region_name AS region,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS local_council,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population</b><br class="calibre12"/>
+<b class="calibre9">FROM regions AS r</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.region_id = r.region_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN local_councils AS lc ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id = lc.county_id</b><br class="calibre12"/>
+<b class="calibre9">  AND lc.population &gt; 100000)</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY r.region_name,</b><br class="calibre12"/>
+<b class="calibre9">  county_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">region</td>
+<td class="calibre13">county</td>
+<td class="calibre13">local_council</td>
+<td class="calibre13">population</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ABRUZZO</td>
+<td class="calibre13">PESCARA</td>
+<td class="calibre13">PESCARA</td>
+<td class="ce">116286</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CALABRIA</td>
+<td class="calibre13">REGGIO DI CALABRIA</td>
+<td class="calibre13">REGGIO DI CALABRIA</td>
+<td class="ce">180353</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CAMPANIA</td>
+<td class="calibre13">NAPOLI</td>
+<td class="calibre13">NAPOLI</td>
+<td class="ce">1004500</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CAMPANIA</td>
+<td class="calibre13">SALERNO</td>
+<td class="calibre13">SALERNO</td>
+<td class="ce">138188</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">EMILIA-ROMAGNA</td>
+<td class="calibre13">BOLOGNA</td>
+<td class="calibre13">BOLOGNA</td>
+<td class="ce">371217</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+There is nothing strange or new in this query:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">we simply introduced a further <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">ON (... AND lc.population &lt;</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">100000)</b></span> clause, so to exclude any small populated Local</p>
+<p class="calibre1">Council.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">r.region_name AS region,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS local_council,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population</b><br class="calibre12"/>
+<b class="calibre9">FROM regions AS r</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.region_id = r.region_id)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN local_councils AS lc ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id = lc.county_id</b><br class="calibre12"/>
+<b class="calibre9">  AND lc.population &gt; 100000)</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY r.region_name,</b><br class="calibre12"/>
+<b class="calibre9">  county_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">region</td>
+<td class="calibre13">county</td>
+<td class="calibre13">local_council</td>
+<td class="calibre13">population</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ABRUZZO</td>
+<td class="calibre13">CHIETI</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ABRUZZO</td>
+<td class="calibre13">L'AQUILA</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ABRUZZO</td>
+<td class="calibre13">PESCARA</td>
+<td class="calibre13">PESCARA</td>
+<td class="ce">116286</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ABRUZZO</td>
+<td class="calibre13">TERAMO</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">BASILICATA</td>
+<td class="calibre13">MATERA</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">BASILICATA</td>
+<td class="calibre13">POTENZA</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+Apparently this query is the same as the latest one.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+But a remarkable difference exists:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this time we've used a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LEFT JOIN</b></span> clause:<br class="calibre12"/>
+and the result-set now looks very different from the previous</p>
+<p class="calibre1">one.</p></li>
+<li class="calibre22">a plain <span class="calibre33"><b class="calibre9">JOIN</b></span>
+clause will include into the result-set only rows for which both<p class="calibre1"></p>
+<p class="calibre1">the <i class="calibre11"><b class="calibre9">left-sided</b></i> and the <i class="calibre11"><b class="calibre9">right-sided</b></i>
+terms has been positively resolved.</p></li>
+<li class="calibre22">but the most sophisticated <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LEFT JOIN</b></span> clause will</p>
+<p class="calibre1">include into the result-set any row having an unresolved</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">right-sided</b></i> term:<br class="calibre12"/>
+and in this case any <i class="calibre11"><b class="calibre9">right-sided</b></i> member assumes a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> value.</p></li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">There is a striking<p class="calibre1"></p>
+<p class="calibre1">difference between a plain <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> and a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LEFT JOIN</b></span>.<br class="calibre12"/>
+Coming back to previous example, using a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LEFT JOIN</b></span> clause ensures</p>
+<p class="calibre1">that any Region and any County will now be inserted into the</p>
+<p class="calibre1">result-set, even the ones failing to satisfy the imposed population</p>
+<p class="calibre1">limit for Local Councils.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"join-1.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="views.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="views.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

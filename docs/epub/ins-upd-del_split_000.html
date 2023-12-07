@@ -1,0 +1,376 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #7:</b><br class="calibre12"/>
+<b class="calibre9">Insert, Update and Delete</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"new-geom.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="constraints_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="constraints_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">Since now we've<p class="calibre1"></p>
+<p class="calibre1">mainly examined how to query tables.<br class="calibre12"/>
+SQL isn't obviously a <i class="calibre11">read-only</i> language: inserting new</p>
+<p class="calibre1">rows, deleting existing rows and updating values is supported in</p>
+<p class="calibre1">the most flexible way.<br class="calibre12"/>
+<br class="calibre12"/>
+It's now time to examine such topics in deeper detail.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE test_geom (</b><br class="calibre12"/>
+<b class="calibre9">  id INTEGER NOT NULL</b><br class="calibre12"/>
+<b class="calibre9">    PRIMARY KEY AUTOINCREMENT,</b><br class="calibre12"/>
+<b class="calibre9">  name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  measured_value DOUBLE NOT NULL);</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn('test_geom', 'the_geom',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Nothing new in this: it's exactly the same table we've already</p>
+<p class="calibre1">created in the previous example.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO test_geom</b><br class="calibre12"/>
+<b class="calibre9">    (id, name, measured_value,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">the_geom)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (NULL, 'first point', 1.23456,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(1.01 2.02)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">test_geom</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (NULL, 'second point', 2.34567,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(2.02 3.03)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">test_geom</b><br class="calibre12"/>
+<b class="calibre9">    (id, name, measured_value,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">the_geom)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (10, 'tenth point', 10.123456789,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText ('POINT(10.01 10.02)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">test_geom</b><br class="calibre12"/>
+<b class="calibre9">    (the_geom, measured_value, name,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">id)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (GeomFromText('POINT(11.01 11.02)',</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326),</b><br class="calibre12"/>
+<b class="calibre9">    11.123456789, 'eleventh point',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">NULL);</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">test_geom</b><br class="calibre12"/>
+<b class="calibre9">    (id, measured_value, the_geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">name)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (NULL, 12.123456789, NULL, 'twelfth</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">point');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+The <span class="calibre33"><b class="calibre9">INSERT INTO (...) VALUES</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">(...)</b></span> statement does exactly what its name states:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the first list enumerates the column names</li>
+<li class="calibre22">and the second list contains the values to be inserted:<p class="calibre1"></p>
+<p class="calibre1">correspondences between columns and values are established <i class="calibre11">by</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">position</i>.</p></li>
+<li class="calibre22">you can simply suppress the column-names list (<i class="calibre11">please, see<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">the second</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>
+<i class="calibre11">statement</i>):<br class="calibre12"/>
+anyway this one isn't a good practice, because such statement</p>
+<p class="calibre1">implicitly relies upon some <i class="calibre11">default</i> column order, and that's</p>
+<p class="calibre1">not at all a safe assumption.</p></li>
+<li class="calibre22">another interesting point; this table declares a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRIMARY KEY AUTOINCREMENT</b></span>:</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">as a general rule we've passed a corresponding <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">NULL</b></span> value, so to allow</p>
+<p class="calibre1">SQLite autogenerating a unique value.</p></li>
+<li class="calibre22">but in the third <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span> we've set an explicit</p>
+<p class="calibre1">value (<i class="calibre11">please, check in the following paragraph what really</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">happens in this case</i>).</p></li>
+</ul>
+</li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM test_geom;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">id</td>
+<td class="calibre13">name</td>
+<td class="calibre13">measured_value</td>
+<td class="calibre13">the_geom</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">first point</td>
+<td class="ce">1.234560</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">second point</td>
+<td class="ce">2.345670</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">10</td>
+<td class="calibre13">tenth point</td>
+<td class="ce">10.123457</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">11</td>
+<td class="calibre13">eleventh point</td>
+<td class="ce">11.123457</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">12</td>
+<td class="calibre13">twelfth point</td>
+<td class="ce">12.123457</td>
+<td class="calibre13">NULL</td>
+</tr>
+</tbody></table>
+Just a quick check before going further on ...<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO test_geom</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (2, 'POINT #2', 2.2,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(2.22 3.33)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This further <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span> will</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">loudly</b></i> fail, raising a <span class="calibre17"><b class="calibre9">constraint</b></span></p><span class="calibre17"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">failed</b></span> exception.<br class="calibre12"/>
+Accounting for this isn't too much difficult: a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRIMARY KEY</b></span> always enforces</p>
+<p class="calibre1">a <i class="calibre11"><b class="calibre9">uniqueness constraint</b></i>.<br class="calibre12"/>
+And actually one row of <b class="calibre9">id = 2</b> already exists into this</p>
+<p class="calibre1">table.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">OR IGNORE INTO test_geom</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (2, 'POINT #2', 2.2,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(2.22 3.33)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+By specifying an <span class="calibre33"><b class="calibre9">OR</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">IGNORE</b></span> clause this statement will now</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">silently</b></i> fail (<i class="calibre11">same reason as before</i>).<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">OR REPLACE INTO test_geom</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (2, 'POINT #2', 2.2,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(2.22 3.33)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+There is a further variant: i.e. specifying an <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">OR REPLACE</b></span> clause this</p>
+<p class="calibre1">statement will actually act like an <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UPDATE</b></span><br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">REPLACE INTO test_geom</b><br class="calibre12"/>
+<b class="calibre9">    (id, name, measured_value,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">the_geom)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (3, 'POINT #3', 3.3,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(3.33 4.44)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">REPLACE INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">test_geom</b><br class="calibre12"/>
+<b class="calibre9">    (id, name, measured_value,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">the_geom)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (11, 'POINT #11', 11.11,</b><br class="calibre12"/>
+<b class="calibre9">    GeomFromText('POINT(11.33 11.44)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And yet another syntactic alternative is supported, i.e. simply</p>
+<p class="calibre1">using <span class="calibre33"><b class="calibre9">REPLACE</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">INTO</b></span>:<br class="calibre12"/>
+but this latter simply is an <i class="calibre11">alias</i> for <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT OR REPLACE</b></span>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM test_geom;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">id</td>
+<td class="calibre13">name</td>
+<td class="calibre13">measured_value</td>
+<td class="calibre13">the_geom</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">first point</td>
+<td class="ce">1.234560</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">POINT #2</td>
+<td class="ce">2.200000</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">POINT #3</td>
+<td class="ce">3.300000</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">10</td>
+<td class="calibre13">tenth point</td>
+<td class="ce">10.123457</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">11</td>
+<td class="calibre13">POINT #11</td>
+<td class="ce">11.110000</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">12</td>
+<td class="calibre13">twelfth point</td>
+<td class="ce">12.123457</td>
+<td class="calibre13">NULL</td>
+</tr>
+</tbody></table>
+Just another quick check ...</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">UPDATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">test_geom SET</b><br class="calibre12"/>
+<b class="calibre9">  name = 'point-3',</b><br class="calibre12"/>
+<b class="calibre9">  measured_value = 0.003</b><br class="calibre12"/>
+<b class="calibre9">WHERE id = 3;</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">UPDATE test_geom<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">SET</b><br class="calibre12"/>
+<b class="calibre9">  measured_value = measured_value +</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">1000000.0</b><br class="calibre12"/>
+<b class="calibre9">WHERE id &gt; 10;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+updating values isn't much more complex ...<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">DELETE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">FROM test_geom</b><br class="calibre12"/>
+<b class="calibre9">WHERE (id % 2) = 0;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+and the same is for deleting rows.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+i.e. this <span class="calibre33"><b class="calibre9">DELETE</b></span>
+statement will affect every <i class="calibre11">even</i> <b class="calibre9">id</b> value.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM test_geom;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">id</td>
+<td class="calibre13">name</td>
+<td class="calibre13">measured_value</td>
+<td class="calibre13">the_geom</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">first point</td>
+<td class="ce">1.234560</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">point-3</td>
+<td class="ce">0.003000</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">11</td>
+<td class="calibre13">POINT #11</td>
+<td class="ce">1000011.110000</td>
+<td class="calibre13">BLOB sz=60 GEOMETRY</td>
+</tr>
+</tbody></table>
+A last final quick check ...<p class="calibre1"></p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+</body></html>

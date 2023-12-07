@@ -1,0 +1,366 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<p class="calibre1">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">The problem</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">Obviously each Local Council shares a common boundary with a<p class="calibre1"></p>
+<p class="calibre1">neighbour:<br class="calibre12"/>
+[<i class="calibre11">not an absolute rule, anyway: e.g. small islands are</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">self-contained</i>].</p></li>
+<li class="calibre22">We'll use Spatial SQL to identify every adjacent couple of<p class="calibre1"></p>
+<p class="calibre1">Local Councils.</p></li>
+<li class="calibre22">Just to add some further complexity, we'll specifically focus<p class="calibre1"></p>
+<p class="calibre1">our attention on the Tuscany region boundaries.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">Tuscan Local Council</td>
+<td class="calibre13">Tuscan County</td>
+<td class="calibre13">Neighbour LC</td>
+<td class="calibre13">County</td>
+<td class="calibre13">Region</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ANGHIARI</td>
+<td class="calibre13">AREZZO</td>
+<td class="calibre13">CITERNA</td>
+<td class="calibre13">PERUGIA</td>
+<td class="calibre13">UMBRIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">AREZZO</td>
+<td class="calibre13">AREZZO</td>
+<td class="calibre13">MONTE SANTA MARIA TIBERINA</td>
+<td class="calibre13">PERUGIA</td>
+<td class="calibre13">UMBRIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">BIBBIENA</td>
+<td class="calibre13">AREZZO</td>
+<td class="calibre13">BAGNO DI ROMAGNA</td>
+<td class="calibre13">FORLI' - CESENA</td>
+<td class="calibre13">EMILIA-ROMAGNA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CHIUSI DELLA VERNA</td>
+<td class="calibre13">AREZZO</td>
+<td class="calibre13">BAGNO DI ROMAGNA</td>
+<td class="calibre13">FORLI' - CESENA</td>
+<td class="calibre13">EMILIA-ROMAGNA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CHIUSI DELLA VERNA</td>
+<td class="calibre13">AREZZO</td>
+<td class="calibre13">VERGHERETO</td>
+<td class="calibre13">FORLI' - CESENA</td>
+<td class="calibre13">EMILIA-ROMAGNA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc1.lc_name AS "Local Council",</b><br class="calibre12"/>
+<b class="calibre9">  lc2.lc_name AS "Neighbour"</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc1,</b><br class="calibre12"/>
+<b class="calibre9">  local_councils AS lc2</b><br class="calibre12"/>
+<b class="calibre9">WHERE ST_Touches(lc1.geometry,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">lc2.geometry);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This first query is really simple:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">ST_Touches(<i class="calibre11">geom1</i>,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9"><i class="calibre11">geom2</i>)</b></span> function is used to evaluates the spatial relationship existing between couples of Local Councils.</p></li>
+<li class="calibre22">the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_council</b></span> table is</p>
+<p class="calibre1">scanned twice, so to implement a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span>;<br class="calibre12"/>
+in other words this simply allows to evaluate each Local Council</p>
+<p class="calibre1">against any other, in a combinatory/permutative fashion.</p></li>
+<li class="calibre22">obviously this may cause ambiguity.<br class="calibre12"/>
+We have to set an appropriate <i class="calibre11">alias</i> name (<span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AS lc1</b></span> / <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AS lc2</b></span>) so to uniquely</p>
+<p class="calibre1">identify each one of the two table instances.</p></li>
+</ul>
+Anyway, a so simplistic approach implies several (<i class="calibre11">strong,<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">severe</i>) issues:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this query surely will return the correct answer: but the<p class="calibre1"></p>
+<p class="calibre1">process time will be very long.<br class="calibre12"/>
+[<i class="calibre11">actually, so long to be absolutely not usable for any practical</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">purpose</i>].</p></li>
+<li class="calibre22">explaining all this is really easy: evaluating <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Touches()</b></span> implies lots of complex calculations, so this one is a really heavy (<i class="calibre11">and</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">lengthy</i>) step.</p></li>
+<li class="calibre22">following a pure combinatorial logic creates many million<p class="calibre1"></p>
+<p class="calibre1">couples requiring to be evaluated.</p></li>
+<li class="calibre22"><span class="calibre17">conclusion:</span> iterating many million times a lengthy<p class="calibre1"></p>
+<p class="calibre1">operation is a sure recipe for disaster.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc1.lc_name AS "Local Council",</b><br class="calibre12"/>
+<b class="calibre9">  lc2.lc_name AS "Neighour"</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc1,</b><br class="calibre12"/>
+<b class="calibre9">  local_councils AS lc2</b><br class="calibre12"/>
+<b class="calibre9">WHERE lc2.ROWID IN (</b><br class="calibre12"/>
+<b class="calibre9">  SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_local_councils_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">      MbrMinY(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">      MbrMaxX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+</div><p class="calibre1"><span class="calibre33"><b class="calibre9">      MbrMaxY(lc1.geometry)));</b><br class="calibre12"/>
+</span></p></td>
+</tr>
+</tbody></table>
+Happily enough, we can perform such Spatial queries in a really<p class="calibre1"></p>
+<p class="calibre1">fast and efficient way:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">we have to use a <b class="calibre9">Spatial Index</b> [aka<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">R*Tree</b></i>]</p></li>
+<li class="calibre22">this will add some further complexity to the SQL statement, but<p class="calibre1"></p>
+<p class="calibre1">will achieve a ludicrous speed enhancement.</p></li>
+<li class="calibre22"><span class="calibre17">how it works:</span> the <i class="calibre11"><b class="calibre9">R*Tree</b></i> is checked first,<p class="calibre1"></p>
+<p class="calibre1">so to evaluate <i class="calibre11">Minimum Bounding Rectangles</i> [<b class="calibre9">MBR</b>s] of both Geometries.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">This one is a very quick step to be evaluated, and allows<p class="calibre1"></p>
+<p class="calibre1">discarding lots of couples that surely cannot share a common</p>
+<p class="calibre1">boundary.</p></li>
+<li class="calibre22">So the number of times <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Touches()</b></span> will then be</p>
+<p class="calibre1">actually called will be dramatically reduced.</p></li>
+<li class="calibre22">And all this strongly reduces the overall processing time.</li>
+</ul>
+</li>
+<li class="calibre22">At <span class="calibre17">SQL syntax level</span> using the Spatial Index simply<p class="calibre1"></p>
+<p class="calibre1">requires to implement a <b class="calibre9">sub-query</b>:</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">the <i class="calibre11"><b class="calibre9">R*Tree Spatial Index</b></i> in SQLite actually is a<p class="calibre1"></p>
+<p class="calibre1">separate table.</p></li>
+<li class="calibre22">table names are strictly related: the Spatial Index<p class="calibre1"></p>
+<p class="calibre1">corresponding to table <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">myTbl</b></span> and geometry column</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">myGeom</b></span> always is expected to be named as <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">idx_myTbl_myGeom</b></span>.</p></li>
+<li class="calibre22">the <div class="calibre33"><b class="calibre9">MATCH<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">RTreeIntersects()</b></span> clause is used to quickly retrieve any interesting Geometry simply evaluating its own MBR.</p></li>
+<li class="calibre22"><b class="calibre9">MbrMinX()</b> and alike are used to identify the extreme<p class="calibre1"></p>
+<p class="calibre1">points of the <i class="calibre11">filtering</i> MBR.</p></li>
+</ul>
+</li>
+</ul>
+Just to explain better what's going on, you can imagine that this<p class="calibre1"></p>
+<p class="calibre1">SQL query is processed using the following steps:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a Geometry is picked up from the first <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> instance:</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">lc1.geometry</b></span></p></li>
+<li class="calibre22">then the <i class="calibre11">R*Tree Spatial Index</i> is scanned, so to identify<p class="calibre1"></p>
+<p class="calibre1">any other Geometry from the second <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> instance:</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">lc2.geometry</b></span></p></li>
+<li class="calibre22">Only Geometries satisfying an <b class="calibre9">intersecting MBR</b>
+constraint will be fetched <i class="calibre11">via Spatial Index</i>.</li>
+<li class="calibre22">and finally <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Touches()</b></span> will be</p>
+<p class="calibre1">evaluated: but this will affect only a very limited few carefully pre-filtered Geometries.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc1.lc_name AS "Tuscan Local Council",</b><br class="calibre12"/>
+<b class="calibre9">  c1.county_name AS "Tuscan County",</b><br class="calibre12"/>
+<b class="calibre9">  lc2.lc_name AS "Neighbour LC",</b><br class="calibre12"/>
+<b class="calibre9">  c2.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r2.region_name AS Region</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc1,</b><br class="calibre12"/>
+<b class="calibre9">  local_councils AS lc2,</b><br class="calibre12"/>
+<b class="calibre9">  counties AS c1,</b><br class="calibre12"/>
+<b class="calibre9">  counties AS c2,</b><br class="calibre12"/>
+<b class="calibre9">  regions AS r1,</b><br class="calibre12"/>
+<b class="calibre9">  regions AS r2</b><br class="calibre12"/>
+<b class="calibre9">WHERE c1.county_id = lc1.county_id</b><br class="calibre12"/>
+<b class="calibre9">  AND c2.county_id = lc2.county_id</b><br class="calibre12"/>
+<b class="calibre9">  AND r1.region_id = c1.region_id</b><br class="calibre12"/>
+<b class="calibre9">  AND r2.region_id = c2.region_id</b><br class="calibre12"/>
+<b class="calibre9">  AND r1.region_name LIKE 'toscana'</b><br class="calibre12"/>
+<b class="calibre9">  AND r1.region_id &lt;&gt; r2.region_id</b><br class="calibre12"/>
+<b class="calibre9">  AND ST_Touches(lc1.geometry, lc2.geometry)</b><br class="calibre12"/>
+<b class="calibre9">  AND lc2.ROWID IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_local_councils_geometry</b><br class="calibre12"/>
+<b class="calibre9">      WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">        MbrMinX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">        MbrMinY(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">        MbrMaxX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">        MbrMaxY(lc1.geometry)))</b><br class="calibre12"/>
+</p>
+</div><p class="calibre1"><span class="calibre33"><b class="calibre9">ORDER BY c1.county_name, lc1.lc_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+All right, once we have resolved the Spatial Index stuff writing<p class="calibre1"></p>
+<p class="calibre1">the whole SQL query isn't so difficult.<br class="calibre12"/>
+Anyway this one is a rather complex query, so some further</p>
+<p class="calibre1">explanation is surely welcome:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">we have to resolve <b class="calibre9">JOIN</b> relations connecting <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> to</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span>, and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span> to</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">regions</b></span></p></li>
+<li class="calibre22">anyway we used two different instances for <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span>, so we need to resolve <b class="calibre9">JOIN</b> relations separately for each one</p>
+<p class="calibre1">instance.</p></li>
+<li class="calibre22">setting the <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">r1.region_name LIKE</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">'toscana'</b></span> clause only Tuscan Local Councils will be</p>
+<p class="calibre1">evaluated for the <i class="calibre11">homeland</i> side.</p></li>
+<li class="calibre22">and setting the <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">r1.region_id &lt;&gt;</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">r2.region_id</b></span> clause ensures that only not-Tuscan Local Councils will be evaluated for the <i class="calibre11">foreigner</i> side.</p></li>
+<li class="calibre22">only Tuscan Local Councils sharing a common boundary with<p class="calibre1"></p>
+<p class="calibre1">not-Tuscan Local Councils will be extracted by this query.</p></li>
+</ul>
+<hr class="calibre23"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc1.lc_name AS "Tuscan Local Council",</b><br class="calibre12"/>
+<b class="calibre9">  c1.county_name AS "Tuscan County",</b><br class="calibre12"/>
+<b class="calibre9">  lc2.lc_name AS "Neighbour LC",</b><br class="calibre12"/>
+<b class="calibre9">  c2.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r2.region_name AS Region</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc1,</b><br class="calibre12"/>
+<b class="calibre9">  local_councils AS lc2</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c1</b><br class="calibre12"/>
+<b class="calibre9">  ON (c1.county_id = lc1.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c2</b><br class="calibre12"/>
+<b class="calibre9">  ON (c2.county_id = lc2.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r1</b><br class="calibre12"/>
+<b class="calibre9">  ON (r1.region_id = c1.region_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r2</b><br class="calibre12"/>
+<b class="calibre9">  ON (r2.region_id = c2.region_id)</b><br class="calibre12"/>
+<b class="calibre9">WHERE r1.region_name LIKE 'toscana'</b><br class="calibre12"/>
+<b class="calibre9">  AND r1.region_id &lt;&gt; r2.region_id</b><br class="calibre12"/>
+<b class="calibre9">  AND ST_Touches(lc1.geometry, lc2.geometry)</b><br class="calibre12"/>
+<b class="calibre9">  AND lc2.ROWID IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_local_councils_geometry</b><br class="calibre12"/>
+<b class="calibre9">      WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">        MbrMinX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">        MbrMinY(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">        MbrMaxX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">        MbrMaxY(lc1.geometry)))</b><br class="calibre12"/>
+</p>
+</div><p class="calibre1"><span class="calibre33"><b class="calibre9">ORDER BY c1.county_name, lc1.lc_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Obviously you can this query adopting the alternative syntax for<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">JOIN</b>s: the difference simply is syntactic.<br class="calibre12"/>
+And doesn't implies any difference at functional or performance</p>
+<p class="calibre1">levels.<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">Performing<p class="calibre1"></p>
+<p class="calibre1">sophisticated Spatial Analysis not necessarily is an easy and plain task.<br class="calibre12"/>
+Mastering complex SQL queries is a little bit difficult (<i class="calibre11">but not</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">at all impossible</i>).<br class="calibre12"/>
+Optimizing such complex SQL, so to get fast answers surely requires</p>
+<p class="calibre1">some extra-care and attention.<br class="calibre12"/>
+<br class="calibre12"/>
+But Spatial SQL supports you in the most effective (<i class="calibre11">and</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">flexible</i>) way: the results you can get simply are</p>
+<p class="calibre1">fantastic.<br class="calibre12"/>
+After all <b class="calibre9">the game surely is worth the candle</b>.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"guinness.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="islands_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="islands_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

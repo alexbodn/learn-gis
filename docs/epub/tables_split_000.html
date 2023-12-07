@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #5:</b><br class="calibre12"/>
+<b class="calibre9">Creating a new table (and related paraphernalia)</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"views.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="new-geom_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="new-geom_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">You are now well<p class="calibre1"></p>
+<p class="calibre1">conscious that SQL overall performance and efficiency strongly</p>
+<p class="calibre1">depend on the underlying <b class="calibre9">database layout</b>, i.e. the following</p>
+<p class="calibre1">design choices are critical:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">defining <b class="calibre9">tables</b> (and <b class="calibre9">columns</b>) in the most<p class="calibre1"></p>
+<p class="calibre1">appropriate way.</p></li>
+<li class="calibre22">identifying <b class="calibre9">relations</b> connection different tables.</li>
+<li class="calibre22">supporting often-used relations with an appropriate<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">index</b>.</p></li>
+<li class="calibre22">identifying useful <b class="calibre9">constraints</b>, so to preserve data<p class="calibre1"></p>
+<p class="calibre1">consistency and correctness as much as possible.</p></li>
+</ul>
+It's now time to examine in deeper detail such topics.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Pedantic note:</b></span> in <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DBMS/SQL</b></span> own jargon all this</p>
+<p class="calibre1">is collectively defined as <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DDL</b></span> [<i class="calibre11">Data Definition</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Language</i>], and is intended as opposed to <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DML</b></span> [<i class="calibre11">Data Manipulation</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Language</i>], i.e. <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SELECT</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span> and so on.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE peoples (</b><br class="calibre12"/>
+<b class="calibre9">  first_name TEXT,</b><br class="calibre12"/>
+<b class="calibre9">  last_name TEXT,</b><br class="calibre12"/>
+<b class="calibre9">  age INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">  gender TEXT,</b><br class="calibre12"/>
+<b class="calibre9">  phone TEXT);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This statement will create a very simple <b class="calibre9">table</b> named</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">peoples</b></span>:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">each individual <b class="calibre9">column</b> definition must at least specify<p class="calibre1"></p>
+<p class="calibre1">the corresponding <b class="calibre9">data-type</b>, such as <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TEXT</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INTEGER</b></span></p></li>
+<li class="calibre22"><span class="calibre17">please note:</span> data-type handling in SQLite strongly<p class="calibre1"></p>
+<p class="calibre1">differs from others DMBS implementations:<br class="calibre12"/>
+but we'll see this in more detail later.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">TABLE peoples2 (</b><br class="calibre12"/>
+<b class="calibre9">  id INTEGER NOT NULL</b><br class="calibre12"/>
+<b class="calibre9">    PRIMARY KEY AUTOINCREMENT,</b><br class="calibre12"/>
+<b class="calibre9">  first_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  last_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  age INTEGER</b><br class="calibre12"/>
+<b class="calibre9">    CONSTRAINT age_verify</b><br class="calibre12"/>
+<b class="calibre9">      CHECK (age BETWEEN 18 AND</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">90),</b><br class="calibre12"/>
+<b class="calibre9">  gender TEXT</b><br class="calibre12"/>
+<b class="calibre9">    CONSTRAINT gender_verify</b><br class="calibre12"/>
+<b class="calibre9">      CHECK (gender IN ('M',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'F')),</b><br class="calibre12"/>
+<b class="calibre9">  phone TEXT);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This one is more sophisticated version of the same table:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">we have added an <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">id</b></span> column, declared as</p>
+</li>
+</ul>
+</body></html>

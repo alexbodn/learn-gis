@@ -1,0 +1,233 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #9:</b><br class="calibre12"/>
+<b class="calibre9">ACIDity: undestranding Transactions</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"constraints.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="rtree_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="rtree_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><b class="calibre9">ACID</b> has<p class="calibre1"></p>
+<p class="calibre1">nothing to do with chemistry (<i class="calibre11"><b class="calibre9">pH</b></i>, <i class="calibre11">hydrogen and hydroxide ions and so on</i>).<br class="calibre12"/>
+In the DBMS context this one is an acronym meaning:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><b class="calibre9">A</b><i class="calibre11">tomicity</i></li>
+<li class="calibre22"><b class="calibre9">C</b><i class="calibre11">onsistency</i></li>
+<li class="calibre22"><b class="calibre9">I</b><i class="calibre11">nsulation</i></li>
+<li class="calibre22"><b class="calibre9">D</b><i class="calibre11">urability</i></li>
+</ul>
+Very simply explained:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a DBMS is designed to store complex data: sophisticated<p class="calibre1"></p>
+<p class="calibre1">relations and constraints have to be carefully checked and</p>
+<p class="calibre1">validated.<br class="calibre12"/>
+Data self-consistency has to be strongly preserved anyway.</p></li>
+<li class="calibre22">each time an <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UPDATE</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DELETE</b></span> statement is</p>
+<p class="calibre1">performed, data self-consistency is at risk.<br class="calibre12"/>
+If one single change fails (<i class="calibre11">for any reason</i>), this may leave the whole DB in an inconsistent state.</p></li>
+<li class="calibre22">any properly <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ACID</b></span> compliant DBMS</p>
+<p class="calibre1">brilliantly resolves any such potential issue.</p></li>
+</ul>
+The underlying concept is based on a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>-based approach: </p><ul class="calibre21"><li class="calibre22">a <span class="calibre33"><b class="calibre9">TRANSACTION</b></span>
+encloses an arbitrary group of SQL statements.</li>
+<li class="calibre22">a <span class="calibre33"><b class="calibre9">TRANSACTION</b></span>
+is granted to be performed as an <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">atomic</b></span> unit, adopting an <b class="calibre9">all-or-nothing</b> approach.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">if any statement enclosed within a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> successfully completes, than the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> itself can successfully complete.</p></li>
+<li class="calibre22">but if a single statement fails, then the whole <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> will fail: and the DB will be left exactly in the previous state, as it was before the <span class="calibre33"><b class="calibre9">TRASACTION</b></span>
+started.</p></li>
+</ul>
+</li>
+<li class="calibre22">that's not all: any change occurred in a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> context is absolutely invisible to any other DBMB connection, because a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">TRANSACTION</b></span>
+defines an <i class="calibre11">insulated</i> private context.</p></li>
+</ul>
+Anyway, performing some direct test surely is the simplest way to understand <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>s.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BEGIN;</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">CREATE TABLE test<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(</b><br class="calibre12"/>
+<b class="calibre9">  num INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">  string TEXT);</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO test (num,<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">string)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (1, 'aaaa');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO test (num,<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">string)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (2, 'bbbb');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO test (num,<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">string)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES (3, 'cccc');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+The <span class="calibre33"><b class="calibre9">BEGIN</b></span>
+statement will start a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">after this declaration, any subsequent statement will be<p class="calibre1"></p>
+<p class="calibre1">handled within the current <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> context.</p></li>
+<li class="calibre22">you can also use the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BEGIN TRANSACTION</b></span>
+<i class="calibre11">alias</i>, but this is redundantly verbose, and not often</p>
+<p class="calibre1">used.</p></li>
+<li class="calibre22">SQLite forbids multiple <i class="calibre11">nested transactions</i>: you can<p class="calibre1"></p>
+<p class="calibre1">simply declare an unique pending <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> at each</p>
+<p class="calibre1">time.</p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM test;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You can now check your work: there is nothing odd in this, isn't ?<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+Absolutely anything looks as expected.<p class="calibre1"></p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">Anyway, some<p class="calibre1"></p>
+<p class="calibre1">relevant consequence arises from the initial <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BEGIN</b></span> declaration:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">now you have a still pending (<i class="calibre11">unfinished</i>, <i class="calibre11">not<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">completed</i>) <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span></p></li>
+<li class="calibre22">you can perform a first simple check:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">open a second <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> instance, connecting the same DB</p></li>
+<li class="calibre22">are you able to see the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">test</b></span> table ?</p></li>
+<li class="calibre22">NO: because this table has been created in the private<p class="calibre1"></p>
+<p class="calibre1">(<i class="calibre11">insulated</i>) context of the first <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> instance, and so for any other different connection this table simply <i class="calibre11"><span class="calibre17">does not yet exists</span></i>.</p></li>
+</ul>
+</li>
+<li class="calibre22">and than you can perform a second check:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">quit both <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span>
+instances.</p></li>
+<li class="calibre22">then launch again <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span>.</p></li>
+<li class="calibre22">there is no <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">test</b></span> table at all: it seems disappeared, completely vanishing.</p></li>
+<li class="calibre22">but all this is easily explained: the corresponding <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> was never</p>
+<p class="calibre1">confirmed.</p></li>
+<li class="calibre22">and when the holding connection terminated, then SQLite<p class="calibre1"></p>
+<p class="calibre1">invalidated any operation within this <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>, so to leave the DB exactly in the previous state.</p></li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">COMMIT;</b></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ROLLBACK;</b></span></p></td>
+</tr>
+</tbody></table>
+Once you <span class="calibre33"><b class="calibre9">BEGIN</b></span> a <span class="calibre33"><b class="calibre9">TRANSACTION</b></span>, any subsequent statement will be left in a <i class="calibre11">pending</i>
+(<i class="calibre11">uncommitted</i>) state.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+Before or after you are expected to:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">close positively the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>
+(<i class="calibre11">confirm</i>), by declaring a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">COMMIT</b></span> statement.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">any change applied to the DB will be confirmed and consolidated in a definitive way.</li>
+<li class="calibre22">such changes will become immediately visible to other<p class="calibre1"></p>
+<p class="calibre1">connections.</p></li>
+</ul>
+</li>
+<li class="calibre22">close negatively the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>
+(<i class="calibre11">invalidate</i>), by declaring a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ROLLBACK</b></span> statement.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">any change applied to the DB will be rejected: the DB will be reverted to the previous state.</li>
+</ul>
+</li>
+<li class="calibre22">if you omit declaring neither <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">COMMIT</b></span> nor <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ROLLBACK</b></span>, then SQLite</p>
+<p class="calibre1">prudentially assumes that the still pending <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> is an invalid one, and a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ROLLBACK</b></span> will be implicitly performed.</p></li>
+<li class="calibre22">if any error or exception is encountered within a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> context, than the whole <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> is invalidated, and a <span class="calibre33"><b class="calibre9">ROLLBACK</b></span> is implicitly performed.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+</body></html>

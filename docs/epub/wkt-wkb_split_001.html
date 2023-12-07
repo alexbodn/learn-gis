@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre51">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">Common pitfalls</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11">"I've declared a <span class="calibre32">
+</span></i></p><p class="calibre1"><i class="calibre11"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span>-type Geometry</i></p><i class="calibre11">
+<p class="calibre1">column;<br class="calibre12"/>
+now I absolutely have to insert a simple <span class="calibre32">
+</span></p></i><p class="calibre1"><i class="calibre11"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span> into this table,<br class="calibre12"/>
+but I get a <b class="calibre9">constraint failed</b> error ..."</i><br class="calibre12"/>
+<br class="calibre12"/>
+Any <span class="calibre33"><b class="calibre9">MULTIxxxxx</b></span>
+type can store a single elementary item: you simply have to use the</p>
+<p class="calibre1">appropriate <span class="calibre33"><b class="calibre9">WKT</b></span>
+syntax.<br class="calibre12"/>
+And anyway several useful <i class="calibre11"><b class="calibre9">type casting</b></i> functions</p>
+<p class="calibre1">exist.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_GeometryType(ST_GeomFromText('MULTIPOINT(1.2345</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">2.3456)'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_AsText(CastToMultiLineString(ST_GeomFromText('LINESTRING(1.2345</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">2.3456, 12.3456 23.4567)')));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING((1.2345 2.3456, 12.3456</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">23.4567))</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_AsText(CastToXYZM(ST_GeomFromText('POINT(1.2345</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">2.3456)')));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><div class="calibre33"><b class="calibre9">POINT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ZM(1.2345 2.3456 0 0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_AsText(CastToXY(ST_GeomFromText('POINT ZM(1.2345 2.3456 10</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">20)')));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT(1.2345 2.3456)</b></span></p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"first-spatial.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#common"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="metadata.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="metadata.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

@@ -1,0 +1,500 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">Network foundations</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">You cannot assume that any generic <i class="calibre11">road layer</i> corresponds to</p>
+<p class="calibre1">a network.<br class="calibre12"/>
+A <i class="calibre11"><b class="calibre9">real network</b></i> must satisfy several specific</p>
+<p class="calibre1">prerequisites, i.e. it has to be a <b class="calibre9">graph</b>.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">Graph theory</b> is a wide and complex branch of</p>
+<p class="calibre1">mathematics;<br class="calibre12"/>
+if you are interested in this, here you can get some further</p>
+<p class="calibre1">details:<br class="calibre12"/>
+<a href="http://en.wikipedia.org/wiki/Graph_theory">Graph</a></p><a href="http://en.wikipedia.org/wiki/Graph_theory">
+</a><p class="calibre1"><a href="http://en.wikipedia.org/wiki/Graph_theory">Theory</a><br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://en.wikipedia.org/wiki/Shortest_path_problem"&gt;Shortest Path</a></p><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">Problem</a><br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm"&gt;Dijkstra's</a></p><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">Algorithm</a><br class="calibre12"/>
+<a href="http://en.wikipedia.org/wiki/A*_search_algorithm">A*</a></p><a href="http://en.wikipedia.org/wiki/A*_search_algorithm">
+</a><p class="calibre1"><a href="http://en.wikipedia.org/wiki/A*_search_algorithm">Algorithm</a><br class="calibre12"/>
+<br class="calibre12"/>
+<a href="http://en.wikipedia.org/wiki/File:6n-graf.svg"><img src="&lt;/p" class="calibre14"/>
+</a></p><p class="calibre1"><a href="http://en.wikipedia.org/wiki/File:6n-graf.svg">"../img/graph.png" alt="Graph example" /&gt;</a><br class="calibre12"/>
+<br class="calibre12"/>
+Very shortly explained:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a <b class="calibre9">network</b> is a collection of <b class="calibre9">arcs</b></li>
+<li class="calibre22">each single arc connects two <b class="calibre9">nodes</b></li>
+<li class="calibre22">each arc has an unique <b class="calibre9">direction</b>:<br class="calibre12"/>
+i.e. the arc going from <b class="calibre9">A-</b>node to <b class="calibre9">B-</b>node is not<p class="calibre1"></p>
+<p class="calibre1">necessarily the same one going from <b class="calibre9">B</b> to <b class="calibre9">A</b></p></li>
+<li class="calibre22">each arc has a well known <b class="calibre9">cost</b> (e.g. <i class="calibre11">length, travel<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">time, capacity</i>, ...)</p></li>
+<li class="calibre22">both arcs and nodes must expose some explicitly defined<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">unique identifier</b>.</p></li>
+<li class="calibre22">geometries of arcs and nodes must satisfy a strong<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">topological consistency</b>.</p></li>
+</ul>
+Starting from a <b class="calibre9">network</b> <i class="calibre11">aka</i> <b class="calibre9">graph</b> both<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">Dijkstra's</b> and <b class="calibre9">A*</b> algorithms can then identify the</p>
+<p class="calibre1"><b class="calibre9">shortest path</b> (<i class="calibre11">minimal cost connection</i>) connecting</p>
+<p class="calibre1">any arbitrary couple of nodes.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><a id="&lt;/p">
+</a><p class="calibre1"><a>"osm"&gt;There</a> are several sources distributing network-like</p>
+<p class="calibre1">data.<br class="calibre12"/>
+One of the most renowned and widely used is <b class="calibre9">OSM</b> [<i class="calibre11">Open</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Street Map</i>], a completely free worldwide dataset.<br class="calibre12"/>
+There are several download sites distributing OSM; just to mention</p>
+<p class="calibre1">the main ones:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><a href="http://www.openstreetmap.org/"><span lang="en-US" _="" p="">
+</span></a><p class="calibre1"><a href="http://www.openstreetmap.org/">xml:lang="en-US"&gt;http://www.openstreetmap.org/</a></p></li>
+<li class="calibre22"><a href="http://download.geofabrik.de/osm/"><span lang="en-US" _="" p="">
+</span></a><p class="calibre1"><a href="http://download.geofabrik.de/osm/">xml:lang="en-US"&gt;http://download.geofabrik.de/osm/</a></p></li>
+<li class="calibre22"><a href="http://downloads.cloudmade.com/"><span lang="en-US" _="" p="">
+</span></a><p class="calibre1"><a href="http://downloads.cloudmade.com/">xml:lang="en-US"&gt;http://downloads.cloudmade.com/</a></p></li>
+</ul>
+Anyway in the following example we'll download the required OSM<p class="calibre1"></p>
+<p class="calibre1">dataset from: <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://download.gfoss.it/osm/osm/regioni/"&gt;www.gfoss.it</a><br class="calibre12"/>
+Most precisely we'll download the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TOSCANA.osm.bz2</b></span>
+dataset.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<span class="calibre17"><b class="calibre9">Step 1:</b></span> you must uncompress the OSM dataset.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+This file is compressed using the <b class="calibre9">bzip2</b> algorithm, widely<p class="calibre1"></p>
+<p class="calibre1">supported by many open source tools.<br class="calibre12"/>
+e.g. you can use <b class="calibre9">7-zip</b> to unzip this file. <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.7-zip.org/"&gt;www.7-zip.org</a><br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Step 2:</b></span> any <a>
+</a></p><p class="calibre1"><a>"spatialite_osm_net"&gt;OSM</a> dataset simply is an <b class="calibre9">XML</b>
+file<br class="calibre12"/>
+(<i class="calibre11">you can open this file using any ordinary text editor at your</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">choice</i>).<br class="calibre12"/>
+SpatiaLite supports a specific CLI tool allowing to load an OSM</p>
+<p class="calibre1">dataset into a DB: <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_osm_net</b></span><br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">&gt;spatialite_osm_net -o TOSCANA.osm -d</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">tuscany.sqlite -T tuscany -m</b><br class="calibre12"/>
+<b class="calibre9">SQLite version: 3.7.4</b><br class="calibre12"/>
+<b class="calibre9">SpatiaLite version: 2.4.0-RC5</b><br class="calibre12"/>
+<b class="calibre9">using IN-MEMORY database</b><br class="calibre12"/>
+<b class="calibre9">Loading OSM nodes ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  Loaded 1642867 OSM nodes</b><br class="calibre12"/>
+<b class="calibre9">Verifying OSM ways ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  Verified 60893 OSM ways</b><br class="calibre12"/>
+<b class="calibre9">Disambiguating OSM nodes ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  Found 40 duplicate OSM nodes - fixed !!!</b><br class="calibre12"/>
+<b class="calibre9">Loading network ARCs ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  Loaded 121373 network ARCs</b><br class="calibre12"/>
+<b class="calibre9">Dropping temporary table 'osm_tmp_nodes' ... wait please</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">  Dropped table 'osm_tmp_nodes'</b><br class="calibre12"/>
+<b class="calibre9">Dropping index 'from_to' ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  Dropped index 'from_to'</b><br class="calibre12"/>
+<b class="calibre9">exporting IN_MEMORY database ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  IN_MEMORY database succesfully exported</b><br class="calibre12"/>
+<b class="calibre9">VACUUMing the DB ... wait please ...</b><br class="calibre12"/>
+<b class="calibre9">  All done: OSM graph was succesfully loaded</b><br class="calibre12"/>
+<b class="calibre9">&gt;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Very briefly explained:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><div class="calibre33"><b class="calibre9">-o<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TOSCANA.osm</b></span> selects the input OSM dataset to be</p>
+<p class="calibre1">loaded.</p></li>
+<li class="calibre22"><div class="calibre33"><b class="calibre9">-d<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">tuscany.sqlite</b></span> selects the output DB to be created and</p>
+<p class="calibre1">populated.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">-T tuscany</b></span>
+will create the Geometry Table storing the OSM dataset</li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">-m</b></span> an<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17">in-memory database</span></i> will be used, so to perform data</p>
+<p class="calibre1">import in the shortest time.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM tuscany;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">id</td>
+<td class="calibre13">osm_id</td>
+<td class="calibre13">class</td>
+<td class="calibre13">node_from</td>
+<td class="calibre13">node_to</td>
+<td class="calibre13">name</td>
+<td class="calibre13">oneway_from_to</td>
+<td class="calibre13">oneway_to_from</td>
+<td class="calibre13">length</td>
+<td class="calibre13">cost</td>
+<td class="calibre13">geometry</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2393</td>
+<td class="calibre13">8079944</td>
+<td class="calibre13">tertiary</td>
+<td class="calibre13">659024545</td>
+<td class="calibre13">659024546</td>
+<td class="calibre13">Via Cavour</td>
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="ce">7.468047</td>
+<td class="ce">0.537699</td>
+<td class="calibre13">BLOB sz=80 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2394</td>
+<td class="calibre13">8079944</td>
+<td class="calibre13">tertiary</td>
+<td class="calibre13">659024546</td>
+<td class="calibre13">156643876</td>
+<td class="calibre13">Via Cavour</td>
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="ce">12.009911</td>
+<td class="ce">0.864714</td>
+<td class="calibre13">BLOB sz=96 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2395</td>
+<td class="calibre13">8083989</td>
+<td class="calibre13">motorway</td>
+<td class="calibre13">31527668</td>
+<td class="calibre13">319386487</td>
+<td class="calibre13">Autostrada del Sole</td>
+<td class="calibre13">1</td>
+<td class="calibre13">0</td>
+<td class="ce">424.174893</td>
+<td class="ce">13.882087</td>
+<td class="calibre13">BLOB sz=80 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2396</td>
+<td class="calibre13">8083990</td>
+<td class="calibre13">motorway</td>
+<td class="calibre13">31527665</td>
+<td class="calibre13">31527668</td>
+<td class="calibre13">Autostrada del Sole</td>
+<td class="calibre13">1</td>
+<td class="calibre13">0</td>
+<td class="ce">130.545183</td>
+<td class="ce">4.272388</td>
+<td class="calibre13">BLOB sz=112 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+Just a quick check:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a single <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Tuscany</b></span> table exists into</p>
+<p class="calibre1">the DB created by <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_osm_net</b></span></p></li>
+<li class="calibre22">each row in this table corresponds to a single <b class="calibre9">network<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">arc</b></p></li>
+<li class="calibre22">the nodes connected by each arc are identified by <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">node_from</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">node_to</b></span></p></li>
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">oneway_from_to</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">oneway_to_from</b></span>
+determine if the arc can be walked in both directions or not.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">length</b></span> is the<p class="calibre1"></p>
+<p class="calibre1">geometric length of the arc (measured in <b class="calibre9">meters</b>).</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">cost</b></span> is the<p class="calibre1"></p>
+<p class="calibre1">estimated travel time (expressed in <b class="calibre9">seconds</b>).</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">geometry</b></span> is<p class="calibre1"></p>
+<p class="calibre1">the <span class="calibre33"><b class="calibre9">LINESTRING</b></span>
+representation corresponding to the arc.</p></li>
+</ul>
+<span class="calibre17"><b class="calibre9">Please note #1:</b></span> there is no separate representation<p class="calibre1"></p>
+<p class="calibre1">for <b class="calibre9">nodes</b>, simply because they can be indirectly retrieved</p>
+<p class="calibre1">starting from the corresponding arcs.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note #2:</b></span> this one surely is a <i class="calibre11"><b class="calibre9">real</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">network</b></i>, but in this form cannot yet support <b class="calibre9">routing</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">queries</b>.<br class="calibre12"/>
+A further step is still required, i.e. creating a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VirtualNetwork</b></span> table.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="net.png" alt="building network" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+We'll use <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> to create the</p>
+<p class="calibre1">VirtualNetwork table.<br class="calibre12"/>
+Anyway the same operation is supported as well by the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_network</b></span> CLI</p>
+<p class="calibre1">tool<br class="calibre12"/>
+(<i class="calibre11">and this CLI tool supports an extended diagnostic capability,</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">useful to identify any eventual problem</i>).<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM tuscany_net</b><br class="calibre12"/>
+<b class="calibre9">WHERE NodeFrom = 267209305</b><br class="calibre12"/>
+<b class="calibre9">  AND NodeTo = 267209702;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">Algorithm</td>
+<td class="calibre13">ArcRowid</td>
+<td class="calibre13">NodeFrom</td>
+<td class="calibre13">NodeTo</td>
+<td class="calibre13">Cost</td>
+<td class="calibre13">Geometry</td>
+<td class="calibre13">Name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">267209305</td>
+<td class="calibre13">267209702</td>
+<td class="ce">79.253170</td>
+<td class="calibre13">BLOB sz=272 GEOMETRY</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">11815</td>
+<td class="calibre13">267209305</td>
+<td class="calibre13">250254381</td>
+<td class="ce">11.170037</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Via Guelfa</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">11816</td>
+<td class="calibre13">250254381</td>
+<td class="calibre13">250254382</td>
+<td class="ce">8.583739</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Via Guelfa</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">11817</td>
+<td class="calibre13">250254382</td>
+<td class="calibre13">250254383</td>
+<td class="ce">12.465016</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Via Guelfa</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">16344</td>
+<td class="calibre13">250254383</td>
+<td class="calibre13">256636073</td>
+<td class="ce">15.638407</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Via Cavour</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">67535</td>
+<td class="calibre13">256636073</td>
+<td class="calibre13">270862435</td>
+<td class="ce">3.147105</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Piazza San Marco</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">25104</td>
+<td class="calibre13">270862435</td>
+<td class="calibre13">271344268</td>
+<td class="ce">5.175379</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Piazza San Marco</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">25105</td>
+<td class="calibre13">271344268</td>
+<td class="calibre13">82591712</td>
+<td class="ce">3.188657</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Piazza San Marco</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">11802</td>
+<td class="calibre13">82591712</td>
+<td class="calibre13">267209666</td>
+<td class="ce">4.978328</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Piazza San Marco</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dijkstra</td>
+<td class="calibre13">20773</td>
+<td class="calibre13">267209666</td>
+<td class="calibre13">267209702</td>
+<td class="ce">14.906501</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">Via Giorgio La Pira</td>
+</tr>
+</tbody></table>
+And finally you can now test your first routing query:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you simply have to set the <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">WHERE NodeFrom = ... AND NodeTo =</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">...</b></span> clause.</p></li>
+<li class="calibre22">and a result-set representing the <b class="calibre9">shortest path</b> solution<p class="calibre1"></p>
+<p class="calibre1">will be returned.</p></li>
+<li class="calibre22">the <i class="calibre11"><span class="calibre17">first row</span></i> of this result-set summarizes the<p class="calibre1"></p>
+<p class="calibre1">whole path, and contains the corresponding geometry.</p></li>
+<li class="calibre22">any <i class="calibre11"><span class="calibre17">subsequent row</span></i> represents a single arc to be<p class="calibre1"></p>
+<p class="calibre1">traversed, following the appropriate sequence, so to go from origin</p>
+<p class="calibre1">to destination.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">UPDATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">tuscany_net SET Algorithm = 'A*';</b></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">UPDATE tuscany_net SET<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">Algorithm = 'Dijkstra';</b></span></p></td>
+</tr>
+</tbody></table>
+SpatiaLite's <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VirtualNetwork</b></span> tables</p>
+<p class="calibre1">support two alternative algorithms:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><i class="calibre11"><b class="calibre9">Dijkstra's shortest path</b></i> is a <i class="calibre11">classic</i>
+routing algorithm, based on thorough mathematical assumptions, and<p class="calibre1"></p>
+<p class="calibre1">will surely identify the optimal solution.</p></li>
+<li class="calibre22"><b class="calibre9">A*</b> is an alternative algorithm based on<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17">heuristic</span></i> assumptions:<br class="calibre12"/>
+it is usually faster than Dijkstra's, but under some odd condition</p>
+<p class="calibre1">may eventually fail, or may return a sub-optimal solution.</p></li>
+<li class="calibre22">anyway switching from the one to the other is really<p class="calibre1"></p>
+<p class="calibre1">simple.</p></li>
+<li class="calibre22">using the Dijksta's algorithm is the default selection.</li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">A <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VirtualNetwork</b></span> table simply</p>
+<p class="calibre1">represents a <i class="calibre11"><span class="calibre17">staticized snapshot</span></i> of the underlying</p>
+<p class="calibre1">network.<br class="calibre12"/>
+This allows to adopt an highly efficient binary representation</p>
+<p class="calibre1">(<i class="calibre11">in other words, allows to produce solutions in a very quick</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">time</i>), but obviously doesn't supports dynamic changes.<br class="calibre12"/>
+<br class="calibre12"/>
+Each time the underlying network changes the corresponding</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">VirtualNetwork</b></span>
+must be <span class="calibre33"><b class="calibre9">DROP</b></span>ped</p>
+<p class="calibre1">and then created again, so to correctly reflect the latest network</p>
+<p class="calibre1">state.<br class="calibre12"/>
+<br class="calibre12"/>
+In many cases this isn't an issue at all: but on some <i class="calibre11"><span class="calibre17">highly</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">dynamic scenario</span></i> this may be a big annoyance.<br class="calibre12"/>
+<b class="calibre9">Be well conscious of this limitation</b>.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"sp-view.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="system.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="system.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

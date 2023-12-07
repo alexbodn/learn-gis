@@ -1,0 +1,543 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<p class="calibre1">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">The problem</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">We'll use once again the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">railways</b></span> dataset.<br class="calibre12"/>
+But this really is an <i class="calibre11"><b class="calibre9">hot spiced</b></i> recipe: be prepared</p>
+<p class="calibre1">to taste <i class="calibre11"><span class="calibre17"><b class="calibre9">very</b></span></i> strong flavors.<br class="calibre12"/>
+As you can now easily image by yourself, computing distances</p>
+<p class="calibre1">between a railway line and Populated Places isn't so</p>
+<p class="calibre1">difficult.<br class="calibre12"/>
+So this problem introduces a further degree of complexity (<i class="calibre11">just</i></p><i class="calibre11">
+<p class="calibre1">to escape from boredom and to keep your mind active and</p>
+</i><p class="calibre1"><i class="calibre11">interested</i>).<br class="calibre12"/>
+<br class="calibre12"/>
+Image that for any good reason the following classification exists:</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre47"><b class="calibre9">Class</b></td>
+<td class="calibre47"><b class="calibre9">Min. distance</b></td>
+<td class="calibre47"><b class="calibre9">Max. distance</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">A-class</td>
+<td class="calibre42">0 Km</td>
+<td class="calibre42">1 Km</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">B-class</td>
+<td class="calibre42">1 Km</td>
+<td class="calibre42">2.5 Km</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">C-class</td>
+<td class="calibre42">2.5 Km</td>
+<td class="calibre42">5 Km</td>
+</tr>
+<tr valign="top" class="calibre5">
+<td class="calibre40">D-class</td>
+<td class="calibre42">5 Km</td>
+<td class="calibre42">10 Km</td>
+</tr>
+<tr valign="top" class="calibre5">
+<td class="calibre40">E-class</td>
+<td class="calibre42">10 Km</td>
+<td class="calibre42">20 Km</td>
+</tr>
+</tbody></table>
+The problem you are faced to resolve is:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">identify any Populated Place laying within a distance radius of<p class="calibre1"></p>
+<p class="calibre1">20 Km from a Railway.</p></li>
+<li class="calibre22">identify the corresponding distance Class for each one of such<p class="calibre1"></p>
+<p class="calibre1">Populated Places.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">Railway</td>
+<td class="calibre13">PopulatedPlace</td>
+<td class="calibre13">A class [&lt; 1Km]</td>
+<td class="calibre13">B class [&lt; 2.5Km]</td>
+<td class="calibre13">C class [&lt; 5Km]</td>
+<td class="calibre13">D class [&lt; 10Km]</td>
+<td class="calibre13">E class [&lt; 20Km]</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Ferrovia Adriatica</td>
+<td class="calibre13">Zapponeta</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="ce">1</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Ferrovia Adriatica</td>
+<td class="calibre13">Villamagna</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="ce">1</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Ferrovia Adriatica</td>
+<td class="calibre13">Villalfonsina</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="ce">1</td>
+<td class="ce">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Ferrovia Adriatica</td>
+<td class="calibre13">Vasto</td>
+<td class="ce">1</td>
+<td class="ce">0</td>
+<td class="ce">0</td>
+<td class="ce">0</td>
+<td class="ce">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">rw.name AS Railway,</b><br class="calibre12"/>
+<b class="calibre9">  pp_e.name AS PopulatedPlace,</b><br class="calibre12"/>
+<b class="calibre9">  (ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_a.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0)</b><br class="calibre12"/>
+<b class="calibre9">      AS "A class [&lt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1Km]",</b><br class="calibre12"/>
+<b class="calibre9">  (ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_b.geometry, 23032)) &gt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0)</b><br class="calibre12"/>
+<b class="calibre9">      AS "B class [&lt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">2.5Km]",</b><br class="calibre12"/>
+<b class="calibre9">  (ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_c.geometry, 23032)) &gt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">2500.0)</b><br class="calibre12"/>
+<b class="calibre9">      AS "C class [&lt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">5Km]",</b><br class="calibre12"/>
+<b class="calibre9">  (ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_d.geometry, 23032)) &gt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">5000.0)</b><br class="calibre12"/>
+<b class="calibre9">      AS "D class [&lt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">10Km]",</b><br class="calibre12"/>
+<b class="calibre9">  (ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_e.geometry, 23032)) &gt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">10000.0)</b><br class="calibre12"/>
+<b class="calibre9">      AS "E class [&lt;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">20Km]"</b><br class="calibre12"/>
+<b class="calibre9">FROM railways AS rw</b><br class="calibre12"/>
+<b class="calibre9">JOIN populated_places AS pp_e ON (</b><br class="calibre12"/>
+<b class="calibre9">  ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_e.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">20000.0</b><br class="calibre12"/>
+<b class="calibre9">  AND pp_e.id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_populated_places_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4236)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)))))</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_d ON (</b><br class="calibre12"/>
+<b class="calibre9">  pp_e.id = pp_d.id</b><br class="calibre12"/>
+<b class="calibre9">  AND ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_d.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">10000.0</b><br class="calibre12"/>
+<b class="calibre9">  AND pp_d.id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_populated_places_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4236)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)))))</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_c ON (</b><br class="calibre12"/>
+<b class="calibre9">  pp_d.id = pp_c.id</b><br class="calibre12"/>
+<b class="calibre9">  AND ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_c.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">5000.0</b><br class="calibre12"/>
+<b class="calibre9">  AND pp_c.id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_populated_places_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4236)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)))))</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_b ON (</b><br class="calibre12"/>
+<b class="calibre9">  pp_c.id = pp_b.id</b><br class="calibre12"/>
+<b class="calibre9">  AND ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_b.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">2500.0</b><br class="calibre12"/>
+<b class="calibre9">  AND pp_b.id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_populated_places_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4236)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)))))</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_a ON (</b><br class="calibre12"/>
+<b class="calibre9">  pp_b.id = pp_a.id</b><br class="calibre12"/>
+<b class="calibre9">  AND ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_a.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0</b><br class="calibre12"/>
+<b class="calibre9">  AND pp_a.id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_populated_places_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4236)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326)))));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Yes, this one really looks like a complex and intimidating<p class="calibre1"></p>
+<p class="calibre1">query.<br class="calibre12"/>
+Anyway, complexity is much more apparent than real.<br class="calibre12"/>
+You already know the trick: you simply have to break down this</p>
+<p class="calibre1">statement into several smallest chunks. And then you'll soon</p>
+<p class="calibre1">discover that there isn't nothing really difficult and</p>
+<p class="calibre1">complex.<br class="calibre12"/>
+<br class="calibre12"/>
+Let us examine the main framework:</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">rw.name AS Railway, ...</b><br class="calibre12"/>
+<b class="calibre9">FROM railways AS rw</b><br class="calibre12"/>
+<b class="calibre9">JOIN populated_places AS pp_e ON (...)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_d ON (...)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_c ON (...)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_b ON (...)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN populated_places AS pp_a ON</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(...);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+</p><ul class="calibre21">
+<li class="calibre22">we'll simply <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">railways AS rw</b></span> and the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">populated_places AS</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">pp_e</b></span> tables: and there is nothing strange in this, isn't</p>
+<p class="calibre1">?</p></li>
+<li class="calibre22">then we'll <div class="calibre33"><b class="calibre9">LEFT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span> the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">populated_places AS pp_d</b></span>
+table a second time: and you surely remember that <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LEFT JOIN</b></span> inserts a valid</p>
+<p class="calibre1">row into the result-set even when the <i class="calibre11"><b class="calibre9">right-sided</b></i>
+term evaluates to <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">NULL</b></span>.</p></li>
+<li class="calibre22">and finally we'll repeat <b class="calibre9">LEFT JOIN</b> for <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">pp_c</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">pp_b</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">pp_a</b></span>.</p></li>
+<li class="calibre22">we'll obviously start by checking the biggest distance, because<p class="calibre1"></p>
+<p class="calibre1">if this one fails any other comparison will surely fail as</p>
+<p class="calibre1">well.<br class="calibre12"/>
+And so on, following the <i class="calibre11"><b class="calibre9">decreasing</b></i> distance</p>
+<p class="calibre1">sequence.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">JOIN populated_places AS pp_e ON (</b><br class="calibre12"/>
+<b class="calibre9">  ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_e.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">20000.0</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<ul class="calibre21">
+<li class="calibre22">each <span class="calibre33"><b class="calibre9">JOIN</b></span> (or<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">LEFT JOIN</b></span>) simply</p>
+<p class="calibre1">evaluates the distance intercurring between the Railway line and</p>
+<p class="calibre1">the Populated Place, checking if this one falls within the expected</p>
+<p class="calibre1">threshold for the corresponding Class.</p></li>
+<li class="calibre22">using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Transform()</b></span> is required</p>
+<p class="calibre1">because the railway is in the <b class="calibre9">23032</b> SRID, whilst the</p>
+<p class="calibre1">populated place is in the <b class="calibre9">4326</b> SRID.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">...<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">AND pp_e.id IN (</b><br class="calibre12"/>
+<b class="calibre9">  SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">  FROM idx_populated_places_geometry</b><br class="calibre12"/>
+<b class="calibre9">  WHERE pkid MATCH RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">    MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">      Transform(</b><br class="calibre12"/>
+<b class="calibre9">        ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">    MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">      Transform(</b><br class="calibre12"/>
+<b class="calibre9">        ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326)),</b><br class="calibre12"/>
+<b class="calibre9">    MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">      Transform(</b><br class="calibre12"/>
+<b class="calibre9">        ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4236)),</b><br class="calibre12"/>
+<b class="calibre9">    MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">      Transform(</b><br class="calibre12"/>
+<b class="calibre9">        ST_Envelope(rw.geometry),</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326)))</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<ul class="calibre21">
+<li class="calibre22">using the usual Spatial Index handling stuff is required<p class="calibre1"></p>
+<p class="calibre1">anyway, so to support fast filtering of Populated Places</p>
+<p class="calibre1">geometries.</p></li>
+<li class="calibre22">and obviously we have to apply <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Transform()</b></span>, so to reproject</p>
+<p class="calibre1">the railway geometry into the <b class="calibre9">4326</b> SRID (<i class="calibre11">the one used by</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Populated Places</i>).</p></li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">Please note well</b></span>: applying a coordinate's<p class="calibre1"></p>
+<p class="calibre1">transformation to a single <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span> can be considered a</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">light-weight</b></i> op;<br class="calibre12"/>
+but transforming (<i class="calibre11">many and many times</i> …) some complex</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">LINESTRING</b></span> or</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">POLYGON</b></span> is much</p>
+<p class="calibre1">more an <i class="calibre11"><b class="calibre9">heavy-weight</b></i> op.<br class="calibre12"/>
+So we'll smartly use <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Envelope()</b></span> in order to</p>
+<p class="calibre1">strongly simplify any geometry requiring transformation.</p></li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">All right, now the<p class="calibre1"></p>
+<p class="calibre1">main framework of the complex query is absolutely clear:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the first <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> will include into the</p>
+<p class="calibre1">result-set any Populated Place falling within <b class="calibre9">20 Km</b> from the</p>
+<p class="calibre1">railway line.</p></li>
+<li class="calibre22">any other <div class="calibre33"><b class="calibre9">LEFT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span> will then test decreasing distances, accordingly to</p>
+<p class="calibre1">the imposed Class boundaries.</p></li>
+<li class="calibre22">and each <b class="calibre9">LEFT JOIN</b> carefully checks if the Populated<p class="calibre1"></p>
+<p class="calibre1">Place ID is the same of the previous successfully identified Class,</p>
+<p class="calibre1">as in: <span class="calibre33"><b class="calibre9">pp_d.id =</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">pp_c.id</b></span></p></li>
+<li class="calibre22">each time one such <div class="calibre33"><b class="calibre9">LEFT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span> will fail, then corresponding <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">NULL</b></span>-values will be inserted</p>
+<p class="calibre1">into the result-set.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">rw.name AS Railway,</b><br class="calibre12"/>
+<b class="calibre9">  pp_e.name AS PopulatedPlace,</b><br class="calibre12"/>
+<b class="calibre9">  (ST_Distance(rw.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp_a.geometry, 23032)) &lt;=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0)</b><br class="calibre12"/>
+<b class="calibre9">      AS "A class [&lt;</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">1Km]",</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Just a latest element to be shortly explained:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">consider a distance of e.g. <b class="calibre9">3.8 Km</b>: this requires<p class="calibre1"></p>
+<p class="calibre1">inclusion in <b class="calibre9">C-class</b>. But this condition satisfies</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">LEFT JOIN</b></span>
+matching criteria for <b class="calibre9">D-class</b> and <b class="calibre9">E-class</b> as</p>
+<p class="calibre1">well.</p></li>
+<li class="calibre22">we have obviously to perform a further check.</li>
+<li class="calibre22">happily SQL is a really smart language. Any selected column to<p class="calibre1"></p>
+<p class="calibre1">be returned into the result-set may represent any appropriate</p>
+<p class="calibre1">arbitrary expression.</p></li>
+<li class="calibre22">and in SQL a logical expression evaluates as:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22"><b class="calibre9">0</b> [<i class="calibre11">FALSE</i>]</li>
+<li class="calibre22"><b class="calibre9">1</b> [<i class="calibre11">TRUE</i>]</li>
+<li class="calibre22">or <b class="calibre9">NULL</b>, if anyone of the evaluated operands was<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">NULL</b>.</p></li>
+</ul>
+</li>
+<li class="calibre22">and that's really all.</li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">You can now play by<p class="calibre1"></p>
+<p class="calibre1">yourself, performing further tests on this query.<br class="calibre12"/>
+i.e you can add some smart <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ORDER BY</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WHERE</b></span> clause and so on:</p>
+<p class="calibre1">that's really easy now, isn't ?</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"railways-lc.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"railways-buf.html"&gt;Next Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

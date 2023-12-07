@@ -1,0 +1,339 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre6">
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 36pt" color="#FFFFC0"&gt;using</span></p><span class="calibre8">
+</span><p class="calibre1"><span class="calibre8"><b class="calibre9">SpatiaLite</b></span></p>
+<p class="calibre7"><span class="calibre10">
+</span></p><p class="calibre1"><span class="calibre10">"#FFFFC0"&gt;a fast and simple practical <i class="calibre11"><b class="calibre9">how-to</b></i> for</span></p><span class="calibre10">
+</span><p class="calibre1"><span class="calibre10">absolute beginners</span><br class="calibre12"/>
+<br class="calibre12"/></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+</tbody></table>
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Introduction / <a href="#toc">Table of</a></b></span></p><span class="calibre15"><b class="calibre9"><a href="#toc">
+</a></b></span><p class="calibre1"><span class="calibre15"><b class="calibre9"><a href="#toc">Contents</a></b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><span class="calibre17"><b class="calibre9">Manifest<p class="calibre1"></p>
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">declaration:</b></span> in Computing there are two ill-fated words:</p>
+<p class="calibre1"><b class="calibre9">database</b> and <b class="calibre9">SQL</b>.<br class="calibre12"/>
+<br class="calibre12"/>
+Both terms share a long-established and deeply consolidated bad</p>
+<p class="calibre1">reputation:<br class="calibre12"/>
+simply pronouncing their name will immediately cause strong</p>
+<p class="calibre1">negative reactions:<br class="calibre12"/>
+"<i class="calibre11">too much complicated</i>", "<i class="calibre11">I'll never be able to understand</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">all this</i>", "<i class="calibre11">nerds oddities</i>" and so on ...<br class="calibre12"/>
+<br class="calibre12"/>
+If all this is indisputably true for <i class="calibre11">plain basic</i> SQL, what's</p>
+<p class="calibre1">about the most exotic <b class="calibre9">Spatial SQL</b> ?<br class="calibre12"/>
+Obviously, this sounds by far much more complex and</p>
+<p class="calibre1">intimidating:<br class="calibre12"/>
+for sure only very few specially trained and highly qualified gurus</p>
+<p class="calibre1">can cope with Spatial SQL, isn't ?<br class="calibre12"/>
+</p><p class="calibre18"><span class="calibre19"><b class="calibre9">Forget all this, and be</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">open-minded !</b></span><br class="calibre12"/>
+(<i class="calibre11">I was quite going to write</i>: <b class="calibre9">Bullshit !</b> <i class="calibre11">but I</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">don't feel using abusive words could mark a good style start</i>
+...)</p>
+<p class="calibre1"></p>
+<p class="calibre1">I suppose all the above prejudices simply are the sad consequence</p>
+<p class="calibre1">of long standing marketing policies.<br class="calibre12"/>
+For many years the DB market was dominated by highly-priced</p>
+<p class="calibre1">proprietary software:<br class="calibre12"/>
+and the Spatial DB simply represented a narrowest specialized</p>
+<p class="calibre1">segment (<i class="calibre11">even more exaggeratedly expensive</i>) within</p>
+<p class="calibre1">mainstream DB market.<br class="calibre12"/>
+So the intimidating <i class="calibre11">sacral aura</i> surrounding DB technologies</p>
+<p class="calibre1">was much more a cover-up story to justify abnormally high prices</p>
+<p class="calibre1">than an objective technical fact.<br class="calibre12"/>
+Happily the actual truth is quite different from this: any normally</p>
+<p class="calibre1"><i class="calibre11">computer-skilled</i> professional people can easily learn and</p>
+<p class="calibre1">successfully use both SQL and Spatial SQL;<br class="calibre12"/>
+there is absolutely nothing difficult, obscure or much more complex</p>
+<p class="calibre1">in using them.<br class="calibre12"/>
+<br class="calibre12"/>
+And when I say <b class="calibre9">professional people</b> I don't necessarily</p>
+<p class="calibre1">intend <i class="calibre11">developers</i>, <i class="calibre11">computer engineers</i> or <i class="calibre11">GIS</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">professionals</i>:<br class="calibre12"/>
+I'm personally well aware that lots of <i class="calibre11">ecologists</i>,</p>
+<p class="calibre1"><i class="calibre11">traffic engineers</i>, <i class="calibre11">botanicians</i>, <i class="calibre11">environmental</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">engineers</i>, <i class="calibre11">zoologists</i>, <i class="calibre11">public administration</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">officers</i>, <i class="calibre11">geologists</i>, <i class="calibre11">geographers</i>,</p>
+<p class="calibre1"><i class="calibre11">archeologists</i> (and many others) successfully use Spatial SQL</p>
+<p class="calibre1">on their daily activities.<br class="calibre12"/>
+<br class="calibre12"/>
+So you can now get a sophisticated, standard and really effective</p>
+<p class="calibre1">Spatial DB absolutely for free and in the easiest and painless</p>
+<p class="calibre1">way.<br class="calibre12"/>
+And that's not all: SpatiaLite is strongly integrated into the</p>
+<p class="calibre1"><span class="calibre17"><i class="calibre11">open source ecosystem</i></span>.<br class="calibre12"/>
+So you can immediately connect any SpatiaLite's DB using e.g.</p>
+<p class="calibre1"><b class="calibre9">QGIS</b> (a well known and widespread desktop GIS app).</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+You don't believe to my assertions ? Well, try by yourself: come</p>
+<p class="calibre1">touching with your hands and seeing with your eyes.<br class="calibre12"/>
+What could be better than this approach to get a first-hand</p>
+<p class="calibre1">neutral, objective and unbiased experience ?<br class="calibre12"/>
+<br class="calibre12"/>
+Following this tutorial will approximately take about an hour or</p>
+<p class="calibre1">two of your precious time:<br class="calibre12"/>
+that's not a too much demanding task, and you are not required to</p>
+<p class="calibre1">perform any exceptional effort.<br class="calibre12"/>
+<br class="calibre12"/>
+SpatiaLite is absolutely <i class="calibre11">free</i> (in both meanings: it's</p>
+<p class="calibre1"><i class="calibre11">free as free beer</i>, and it's <i class="calibre11">free as free speech</i>): so you can get a quick glance at latest state-of-the-art Spatial SQL</p>
+<p class="calibre1">technologies in the easiest and simplest way.<br class="calibre12"/>
+And once you've got your own opinion on the basis of your direct</p>
+<p class="calibre1">first-hand experience, you can then decide by yourself if Spatial</p>
+<p class="calibre1">SQL can be useful (one way or the other) for your daily</p>
+<p class="calibre1">activities.<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20"><span class="calibre17"><b class="calibre9">How this<p class="calibre1"></p>
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">tutorial is structured:</b></span> think of some</p>
+<p class="calibre1"><b class="calibre9"><i class="calibre11">Cookbook</i></b>. At first you are expected to simply acquire some limited and basic knowledge about:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">pottery and kitchen tools: <i class="calibre11">pans, bowls, pots, knives,<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">spoons, whisks</i> ....</p></li>
+<li class="calibre22">commonly used ingredients: <i class="calibre11">eggs, fish, meat, vegetables,<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">spices, seasonings</i> ...</p></li>
+<li class="calibre22">elementary cooking techniques: <i class="calibre11">boiling, grilling, roasting,<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">deep-frying, creaming</i> ...</p></li>
+</ul>
+Once you have acquired such basic notions you are ready to confront<p class="calibre1"></p>
+<p class="calibre1">yourself with simple but nutrient and tasty recipes: we can name</p>
+<p class="calibre1">this level as <i class="calibre11"><b class="calibre9">family cooking</b></i><br class="calibre12"/>
+For many people this is their best effort: that's enough for them,</p>
+<p class="calibre1">and they'll quit at this point.<br class="calibre12"/>
+<br class="calibre12"/>
+But many other will probably discover that after all cooking is</p>
+<p class="calibre1">funny and really interesting: so they'll surely ask for something</p>
+<p class="calibre1">much more sophisticated.<br class="calibre12"/>
+Any good cookbook will certainly end introducing several complex</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">haute cuisine</b></i> recipes.<br class="calibre12"/>
+May well be you'll never become a real <i class="calibre11"><b class="calibre9">chef de</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">cuisine</b></i>, but you will amuse yourself anyway, and feel proud of your cooking skills.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3" width="100%" cellpadding="4" cellspacing="0">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre13">
+<table class="calibre3" width="100%" cellpadding="4" cellspacing="0">
+<tbody class="calibre4"><tr class="calibre5">
+<td colspan="2" width="100%" class="calibre24">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">SpatiaLite Cookbook</b><br class="calibre12"/>
+<b class="calibre9"><a id="toc">Table of</a></b></span></p><span class="calibre15"><b class="calibre9"><a>
+</a></b></span><p class="calibre1"><span class="calibre15"><b class="calibre9"><a>contents</a></b></span><br class="calibre12"/></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p><hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><div class="calibre8"><b class="calibre9">Kitchen tools and cooking<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre8"><b class="calibre9">techniques</b></span>
+</p><ul class="calibre21">
+<li class="calibre22"><a href="tech-intro.html">quick technical intro</a></li>
+<li class="calibre22"><a href="start_split_000.html">getting started [installing the<p class="calibre1"></p>
+</a><p class="calibre1"><a href="start_split_000.html">software]</a></p></li>
+<li class="calibre22"><a href="first-db.html">building your first Spatial<p class="calibre1"></p>
+</a><p class="calibre1"><a href="first-db.html">Database</a></p></li>
+<li class="calibre22"><a href="shapefile.html">what's a Shapefile ?</a></li>
+<li class="calibre22"><a href="shapefile.html">what's a Virtual Shapefile ? (and<p class="calibre1"></p>
+</a><p class="calibre1"><a href="shapefile.html">Virtual Tables ...)</a></p></li>
+<li class="calibre22"><a href="charset.html">what's a Charset encoding ? (and<p class="calibre1"></p>
+</a><p class="calibre1"><a href="charset.html">why the hell have I to take care of such nasty things ?)</a></p></li>
+<li class="calibre22"><a href="srid.html">what's this SRID stuff ? ... I've<p class="calibre1"></p>
+</a><p class="calibre1"><a href="srid.html">never heard this term before now ...</a></p></li>
+<li class="calibre22"><a href="first-sql.html">executing your first SQL<p class="calibre1"></p>
+</a><p class="calibre1"><a href="first-sql.html">queries</a></p></li>
+<li class="calibre22"><a href="basic-sql.html">basics about SQL queries</a></li>
+<li class="calibre22"><a href="aggregate.html">understanding aggregate<p class="calibre1"></p>
+</a><p class="calibre1"><a href="aggregate.html">functions</a></p></li>
+</ul>
+</td>
+<td class="calibre13"><a href="&lt;/p">
+<p class="calibre1">"http://commons.wikimedia.org/wiki/File:Toepfe_fcm.jpg"&gt;<img src="&lt;/p" class="calibre14"/>
+</p></a><p class="calibre1"><a href="&lt;/p">"img/kitchen-tools.jpg" alt="kitchen tools" /&gt;</a></p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><a id="common"><div class="calibre8"><b class="calibre9">Commonly used<p class="calibre1"></p>
+</b></div></a><p class="calibre1"><a><span class="calibre8"><b class="calibre9">ingredients</b></span></a>
+</p><ul class="calibre21">
+<li class="calibre22"><a href="first-spatial.html">your first Spatial SQL<p class="calibre1"></p>
+</a><p class="calibre1"><a href="first-spatial.html">queries</a></p></li>
+<li class="calibre22"><a href="wkt-wkb_split_000.html">more about Spatial SQL: WKT and<p class="calibre1"></p>
+</a><p class="calibre1"><a href="wkt-wkb_split_000.html">WKB</a></p></li>
+<li class="calibre22"><a href="metadata.html">Spatial MetaData Tables</a></li>
+<li class="calibre22"><a href="qgis.html">viewing SpatiaLite layers in<p class="calibre1"></p>
+</a><p class="calibre1"><a href="qgis.html">QGIS</a></p></li>
+</ul>
+</td>
+<td class="calibre13"><a href="&lt;/p">
+<p class="calibre1">"http://en.wikibooks.org/wiki/File:NCI_meatpile.jpg"&gt;<img src="&lt;/p" class="calibre14"/>
+</p></a><p class="calibre1"><a href="&lt;/p">"img/meat.jpg" alt="meat" /&gt;</a></p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><a id="family"><div class="calibre8"><b class="calibre9">Family<p class="calibre1"></p>
+</b></div></a><p class="calibre1"><a><span class="calibre8"><b class="calibre9">cooking</b></span></a>
+</p><ul class="calibre21">
+<li class="calibre22"><a href="create-db_split_000.html">recipe #1: creating a well<p class="calibre1"></p>
+</a><p class="calibre1"><a href="create-db_split_000.html">designed DB</a></p></li>
+<li class="calibre22"><a href="join-1_split_000.html">recipe #2: your first JOIN<p class="calibre1"></p>
+</a><p class="calibre1"><a href="join-1_split_000.html">queries</a></p></li>
+<li class="calibre22"><a href="join-2.html">recipe #3: more about JOIN</a></li>
+<li class="calibre22"><a href="views.html">recipe #4: about VIEW</a></li>
+<li class="calibre22"><a href="tables_split_000.html">recipe #5: creating a new table (and<p class="calibre1"></p>
+</a><p class="calibre1"><a href="tables_split_000.html">related paraphernalia)</a></p></li>
+<li class="calibre22"><a href="new-geom_split_000.html">recipe #6: creating a new Geometry<p class="calibre1"></p>
+</a><p class="calibre1"><a href="new-geom_split_000.html">column</a></p></li>
+<li class="calibre22"><a href="ins-upd-del_split_000.html">recipe #7: Insert, Update and<p class="calibre1"></p>
+</a><p class="calibre1"><a href="ins-upd-del_split_000.html">Delete</a></p></li>
+<li class="calibre22"><a href="constraints_split_000.html">recipe #8: understanding<p class="calibre1"></p>
+</a><p class="calibre1"><a href="constraints_split_000.html">Constraints</a></p></li>
+<li class="calibre22"><a href="acid_split_000.html">recipe #9: ACIDity: undestranding<p class="calibre1"></p>
+</a><p class="calibre1"><a href="acid_split_000.html">Transactions</a></p></li>
+<li class="calibre22"><a href="rtree_split_000.html">recipe #10: wonderful R*Tree Spatial<p class="calibre1"></p>
+</a><p class="calibre1"><a href="rtree_split_000.html">Index</a></p></li>
+</ul>
+</td>
+<td class="calibre13"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://commons.wikimedia.org/wiki/File:Fettuccine_al_rag%C3%B9_modified.JPG"&gt;
+<img src="fettuccine.jpg" alt="fettuccine" class="calibre14"/></a></p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><a id="haute_cuisine"><span class="calibre25">
+</span></a><p class="calibre1"><a><span class="calibre25">"6"&gt;<b class="calibre9">Haute cuisine</b></span></a>
+</p><ul class="calibre21">
+<li class="calibre22"><a href="guinness.html">recipe #11: Guinness Book of<p class="calibre1"></p>
+</a><p class="calibre1"><a href="guinness.html">Records</a></p></li>
+<li class="calibre22"><a href="neighbours_split_000.html">recipe #12: Neighbours</a></li>
+<li class="calibre22"><a href="islands_split_000.html">recipe #13: Isolated<p class="calibre1"></p>
+</a><p class="calibre1"><a href="islands_split_000.html">Islands</a></p></li>
+<li class="calibre22"><a href="pop-places_split_000.html">recipe #14: Populated Places vs<p class="calibre1"></p>
+</a><p class="calibre1"><a href="pop-places_split_000.html">Local Councils</a></p></li>
+<li class="calibre22"><a href="pp-adjacent_split_000.html">recipe #15: Tightly bounded<p class="calibre1"></p>
+</a><p class="calibre1"><a href="pp-adjacent_split_000.html">Populated Places</a></p></li>
+<li class="calibre22"><a href="railways-lc_split_000.html">recipe #16: Railways vs Local<p class="calibre1"></p>
+</a><p class="calibre1"><a href="railways-lc_split_000.html">Councils</a></p></li>
+<li class="calibre22"><a href="railways-pp_split_000.html">recipe #17: Railways vs<p class="calibre1"></p>
+</a><p class="calibre1"><a href="railways-pp_split_000.html">Populated Places</a></p></li>
+<li class="calibre22"><a href="railways-buf_split_000.html">recipe #18: Railway Zones as<p class="calibre1"></p>
+</a><p class="calibre1"><a href="railways-buf_split_000.html">Buffers</a></p></li>
+<li class="calibre22"><a href="union_split_000.html">recipe #19: merging Local Councils<p class="calibre1"></p>
+</a><p class="calibre1"><a href="union_split_000.html">into Counties and so on ...</a></p></li>
+<li class="calibre22"><a href="sp-view.html">recipe #20: Spatial Views</a></li>
+<li class="calibre22"><a href="dijkstra_split_000.html">Fine dining experience: Chez<p class="calibre1"></p>
+</a><p class="calibre1"><a href="dijkstra_split_000.html">Dijkstra</a></p></li>
+</ul>
+</td>
+<td class="calibre13"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://en.wikipedia.org/wiki/File:Terrine_de_saumon_au_basilic.JPG"&gt;
+<img src="terrine.jpg" alt="terrine de saumon" class="calibre14"/></a></p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><a id="desserts"><div class="calibre8"><b class="calibre9">Desserts,<p class="calibre1"></p>
+</b></div></a><p class="calibre1"><a><span class="calibre8"><b class="calibre9">spirits, tea and coffee</b></span></a>
+</p><ul class="calibre21">
+<li class="calibre22"><a href="system.html">System level performace<p class="calibre1"></p>
+</a><p class="calibre1"><a href="system.html">hints</a></p></li>
+<li class="calibre22"><a href="impexp.html">Importing/Exporting Shapefiles (DBF,<p class="calibre1"></p>
+</a><p class="calibre1"><a href="impexp.html">TXT ...)</a></p></li>
+<li class="calibre22"><a href="lang_split_000.html">Language bindings: [C/C++, Java,<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_000.html">Python, PHP ...]</a></p></li>
+</ul>
+</td>
+<td class="calibre13"><a href="&lt;/p">
+<p class="calibre1">"http://commons.wikimedia.org/wiki/File:Fried_banana.jpg"&gt;<img src="&lt;/p" class="calibre14"/>
+</p></a><p class="calibre1"><a href="&lt;/p">"img/banana.jpg" alt="fried banana" /&gt;</a></p></td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="4" class="calibre13"><img src="the-author.jpg" alt="The author" _="" p="" class="calibre14"/>
+<p class="calibre1">height="125" /&gt;</p></td>
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

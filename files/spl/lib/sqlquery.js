@@ -24,7 +24,7 @@ class SQLQuery {
 		compileOptions: `
 			select * 
 			from PRAGMA_compile_options`,
-		attachDb: `
+		attachMountedDb: `
 			ATTACH DATABASE '/proj/proj.db' AS proj`,
 		generateSeries: `
 			SELECT value
@@ -35,57 +35,58 @@ class SQLQuery {
 			SELECT
 				flatstyle, 
 				makepoint(
-					100+40 * sin(value * radians(360) / 5),
-					100+40 * cos(value * radians(360) / 5),
+					100 + 40 * sin(value * radians(360) / 5),
+					100 + 40 * cos(value * radians(360) / 5),
 					3857
 				) as feature
 			FROM generate_series as ctr
 			inner join icons on 1
 			where ctr.start=0 and ctr.stop=5`,
 		pinpng: `
-		select
-			json_object(
-				--'text-value', '',
-				'icon-color', '#8959A8',
-				'icon-cross-origin', 'anonymous',
-				'icon-src', 'data:'||pinpng
-				
-				--'circle-stroke-color', 'blue',
-				--'circle-stroke-width', 1,
-				--'circle-radius', 5
-			) as flatstyle
-		from (select 1)
-		inner join (
-			select 
-			'image/png;base64,
-			iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-			AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
-			VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
-			yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
-			yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
-			sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
-			1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
-			D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
-			jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
-			aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
-			Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
-			7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
-			Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
-			' as pinpng) on 1=1
+			select
+				json_object(
+					--'text-value', '',
+					'icon-color', '#8959A8',
+					'icon-cross-origin', 'anonymous',
+					'icon-src', 'data:'||pinpng
+					
+					--'circle-stroke-color', 'blue',
+					--'circle-stroke-width', 1,
+					--'circle-radius', 5
+				) as flatstyle
+			from (select 1)
+			inner join (
+				select 
+					'image/png;base64,
+					iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
+					AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
+					VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
+					yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
+					yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
+					sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
+					1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
+					D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
+					jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
+					aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
+					Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
+					7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
+					Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
+					' as pinpng
+				) on 1=1
 			`,
 		xyncolor: `
 			with t1(x,y,n,color) as
 			(VALUES
-			(100,100,3,'red'),
-			(200,100,4,'orange'),
-			(300,100,5,'green'),
-			(400,100,6,'blue'),
-			(500,100,7,'purple'),
-			(100,200,8,'red'),
-			(200,200,10,'orange'),
-			(300,200,12,'green'),
-			(400,200,16,'blue'),
-			(500,200,20,'purple')
+				(100,100,3,'red'),
+				(200,100,4,'orange'),
+				(300,100,5,'green'),
+				(400,100,6,'blue'),
+				(500,100,7,'purple'),
+				(100,200,8,'red'),
+				(200,200,10,'orange'),
+				(300,200,12,'green'),
+				(400,200,16,'blue'),
+				(500,200,20,'purple')
 			)
 			select * from t1
 			`,

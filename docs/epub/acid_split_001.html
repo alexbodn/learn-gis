@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">Performance Hints</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">Handling <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>s seems too much complex to you ? so you are thinking "<i class="calibre11">I'll simply ignore all this ...</i>"<br class="calibre12"/>
+Well, carefully consider that SQLite is a full <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ACID DBMS</b></span>, so it's purposely designed to handle <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>s. And that's not all.<br class="calibre12"/>
+SQLite actually is completely unable to operate outside a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">TRANSACTION</b></span>
+context.<br class="calibre12"/>
+Each time you miss to explicitly declare some <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BEGIN / COMMIT</b></span>, then SQLite implicitly enters the so called <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AUTOCOMMIT</b></span> mode:<br class="calibre12"/>
+each single statement will be handled as a self-standing</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">TRANSACTION</b></span>.<br class="calibre12"/>
+</p>
+<p class="calibre1"><br class="calibre12"/>
+i.e. when you declare e.g. some simple <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT INTO ...</b></span> statement, then SQLite silently translates this into:<br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">BEGIN;</b></span><br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">INSERT INTO</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">...;</b></span><br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">COMMIT;</b></span><br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note well</b></span>: this is absolutely safe and</p>
+<p class="calibre1">acceptable when you are inserting few rows <i class="calibre11">by</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">hand-writing</i>.<br class="calibre12"/>
+But when some C / C++ / Java / Python process attempts to</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">INSERT</b></span> many and many rows (maybe many <i class="calibre11"><span class="calibre17"><b class="calibre9">million</b></span></i> rows), this will impose an unacceptable overhead.<br class="calibre12"/>
+In other words, your process will perform very poorly, taking an unneeded long time to complete: and all this is simply caused by <b class="calibre9">not declaring</b> an explicit <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span>.<br class="calibre12"/>
+<br class="calibre12"/>
+The <i class="calibre11"><span class="calibre17">strongly suggested</span></i> way to perform fast</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">INSERT</b></span>s</p>
+<p class="calibre1">(<span class="calibre33"><b class="calibre9">UPDATE</b></span>,</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">DELETE</b></span> ...) is the following one:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">explicitly start a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> (<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BEGIN</b></span>)</p></li>
+<li class="calibre22">loop on <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span> as long as</p>
+<p class="calibre1">required.</p></li>
+<li class="calibre22">confirm the pending <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> (<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">COMMIT</b></span>).</p></li>
+</ul>
+And this simple trick will grant you very brilliant<p class="calibre1"></p>
+<p class="calibre1">performances.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre18"><b class="calibre9">Connectors oddities (<i class="calibre11">true life</i></b></p><b class="calibre9"><i class="calibre11">
+</i></b><p class="calibre1"><b class="calibre9"><i class="calibre11">tales</i>)</b></p>
+<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">Developers, be warned:</b> <i class="calibre11">different languages, different connectors, different default settings</i> ...<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">C / C++</b> developers will directly use the SQLite's API: in this environment the developer is expected to explicitly declare <b class="calibre9">TRANSACTION</b>s as required, by calling:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre33"><b class="calibre9">sqlite3_exec (db_handle, "BEGIN", NULL, NULL, &amp;err_msg);</b></span></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">sqlite3_exec (db_handle, "COMMIT", NULL, NULL, &amp;err_msg);</b></span></li>
+</ul>
+<hr class="calibre23"/>
+<b class="calibre9">Java / JDBC</b> connectors more or less follow the same<p class="calibre1"></p>
+<p class="calibre1">approach: the developer is expected to explicitly quit the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">AUTOCOMMIT</b></span> mode, then declaring a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">COMMIT</b></span> when required and appropriate:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">conn.setAutoCommit(false);</b></span></p></li>
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">conn.commit();</b></span></p></li>
+</ul>
+Shortly said: in C / C++ and Java the developer is required to<p class="calibre1"></p>
+<p class="calibre1">start a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TRANSACTION</b></span> in order to perform fast DB <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>s.<br class="calibre12"/>
+Omitting this step will cause very slow performance. But at least any change will surely affect the underlying DB.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<b class="calibre9">Python</b> follows a completely different approach: a<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">TRANSACTION</b></span> is silently active at each time.<br class="calibre12"/>
+Performance always is optimal.<br class="calibre12"/>
+But forgetting to explicitly call <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">conn.commit()</b></span> before</p>
+<p class="calibre1">quitting, any applied change will be lost forever immediately after terminating the connection.<br class="calibre12"/>
+And this may really be puzzling for beginners, I suppose.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"constraints.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="rtree_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="rtree_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free<p class="calibre1"></p>
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

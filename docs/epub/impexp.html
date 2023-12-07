@@ -1,0 +1,507 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Importing / Exporting Shapefiles (DBF, TXT</b></span></p><span class="calibre15"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre15"><b class="calibre9">...)</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"system.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#desserts"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="lang_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">There are several<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17">data formats</span></i> that are absolutely widespread in the</p>
+<p class="calibre1">GIS professional world.<br class="calibre12"/>
+All them are <i class="calibre11"><span class="calibre17">open formats</span></i> (i.e. they are not</p>
+<p class="calibre1">specifically bounded to any specific proprietary software, they are not patent covered, and they are publicly documented).<br class="calibre12"/>
+<br class="calibre12"/>
+Not at all surprisingly, such formats are universally supported by</p>
+<p class="calibre1">any GIS-related software, and can be safely used for data</p>
+<p class="calibre1">interchange purposes between different platforms and systems.</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <b class="calibre9">ESRI Shapefile</b> format represents the <i class="calibre11">de-facto</i>
+universal format for GIS data exchange.</li>
+<li class="calibre22">the <b class="calibre9">DBF</b> format was introduced in the very early days of<p class="calibre1"></p>
+<p class="calibre1">personal computing by <b class="calibre9">dBase</b> (<i class="calibre11">the first DBMS-like software to gain universal popularity</i>):<br class="calibre12"/>
+a <i class="calibre11">DBF</i> file is included in every <i class="calibre11">Shapefile</i> but is</p>
+<p class="calibre1">quite common finding <i class="calibre11"><span class="calibre17">naked DBF</span></i> files simply used to ship <i class="calibre11">flat tables</i>.</p></li>
+<li class="calibre22">the <b class="calibre9">TXT/CSV</b> format simply identifies any<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17">structured text file</span></i> (usually, <i class="calibre11"><span class="calibre17">tab separated</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">values</span></i> or <i class="calibre11"><span class="calibre17">comma separated values</span></i> are the most often found variants).</p></li>
+</ul>
+SpatiaLite supports all the above formats for import and/or<p class="calibre1"></p>
+<p class="calibre1">export.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note well:</b></span> other data formats are very popular</p>
+<p class="calibre1">and widespread. e.g. the following ones:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">Microsoft Excel spreadsheets (<b class="calibre9">.xls</b>)</li>
+<li class="calibre22">Microsoft Access database (<b class="calibre9">.mdb</b>)</li>
+<li class="calibre22">and many, many others.</li>
+</ul>
+All them are <i class="calibre11"><span class="calibre17">closed (proprietary) formats</span></i>.<br class="calibre12"/>
+i.e. some specific proprietary software or operating system is<p class="calibre1"></p>
+<p class="calibre1">strictly required, there is no publicly available documentation,</p>
+<p class="calibre1">and/or they are patent covered.<br class="calibre12"/>
+And all this easily explains why SpatiaLite (as many others open</p>
+<p class="calibre1">source packages) cannot support such <i class="calibre11"><span class="calibre17">closed</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">formats</span></i>.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre18"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Shapefiles</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">SpatiaLite supports both import and export for Shapefiles:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you can directly access any external Shapefile via SQL as a<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">VirtualShapefile</b> table</p></li>
+<li class="calibre22">you can import any Shapefile into a DB Table:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you'll find a <span class="calibre33"><b class="calibre9">Load Shapefile</b></span>
+item in the main menu and in the toolbar.</p></li>
+<li class="calibre22">using the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite</b></span> CLI front-end you can use the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">.loadshp</b></span> macro</p></li>
+<li class="calibre22">or you can use the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_tool</b></span> shell</p>
+<p class="calibre1">command</p></li>
+</ul>
+</li>
+<li class="calibre22">you can export any Geometry Table as a Shapefile:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you'll find an <span class="calibre33"><b class="calibre9">Export As</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">Shapefile</b></span> item on the context menu corresponding to any Geometry column within the main tree-view.</p></li>
+<li class="calibre22">using the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite</b></span> CLI front-end you can use the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">.dumpshp</b></span> macro</p></li>
+<li class="calibre22">or you can use the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_tool</b></span> shell</p>
+<p class="calibre1">command</p></li>
+</ul>
+</li>
+</ul>
+<img src="shpimp.png" alt="shapefile import" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:<p class="calibre1"></p>
+<p class="calibre1">Shapefile import<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="shpexp.png" alt="shapefile export" class="calibre14"/><br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:</p>
+<p class="calibre1">Shapefile export<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><span class="calibre45">
+</span><p class="calibre1"><span class="calibre45">"#808080"&gt;<b class="calibre9">&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;spatialite counties.sqlite</span></b><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#808080"&gt;<b class="calibre9">SpatiaLite version ..: 2.4.0-RC5 Supported Extensions:</b><br class="calibre12"/>
+<b class="calibre9">        -</b></span></p><div class="calibre32"><b class="calibre9">
+<p class="calibre1">'VirtualShape'        [direct</p>
+</b><p class="calibre1"><b class="calibre9">Shapefile access]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualDbf'          [direct</p>
+</b><p class="calibre1"><b class="calibre9">DBF access]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualText'         [direct</p>
+</b><p class="calibre1"><b class="calibre9">CSV/TXT access]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualNetwork'      [Dijkstra</p>
+</b><p class="calibre1"><b class="calibre9">shortest path]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'RTree'               [Spatial</p>
+</b><p class="calibre1"><b class="calibre9">Index - R*Tree]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'MbrCache'            [Spatial</p>
+</b><p class="calibre1"><b class="calibre9">Index - MBR cache]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualFDO'          [FDO-OGR</p>
+</b><p class="calibre1"><b class="calibre9">interoperability]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'SpatiaLite'          [Spatial</p>
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">SQL - OGC]</b><br class="calibre12"/>
+<b class="calibre9">PROJ.4 version ......: Rel. 4.7.1, 23 September 2009</b><br class="calibre12"/>
+<b class="calibre9">GEOS version ........: 3.3.0-CAPI-1.7.0</b><br class="calibre12"/>
+<b class="calibre9">SQLite version ......: 3.7.4</b><br class="calibre12"/>
+<b class="calibre9">Enter ".help" for instructions</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;.loadshp prov2010_s counties CP1252</span></b></p><b class="calibre9"><span _="" p="" class="calibre33">
+</span></b><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">23032</span></b><span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#808080"&gt;<b class="calibre9">the SPATIAL_REF_SYS table already contains some</b></span></p><div class="calibre45"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">row(s)</b><br class="calibre12"/>
+<b class="calibre9">========</b><br class="calibre12"/>
+<b class="calibre9">Loading shapefile at 'prov2010_s' into SQLite table</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'counties'</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">BEGIN;</b><br class="calibre12"/>
+<b class="calibre9">CREATE TABLE counties (</b><br class="calibre12"/>
+<b class="calibre9">PK_UID INTEGER PRIMARY KEY AUTOINCREMENT,</b><br class="calibre12"/>
+<b class="calibre9">"OBJECTID" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"COD_PRO" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"NOME_PRO" TEXT,</b><br class="calibre12"/>
+<b class="calibre9">"SIGLA" TEXT);</b><br class="calibre12"/>
+<b class="calibre9">SELECT AddGeometryColumn('counties', 'Geometry', 23032,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">'MULTIPOLYGON', 'XY');</b><br class="calibre12"/>
+<b class="calibre9">COMMIT;</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">Inserted 110 rows into 'counties' from SHAPEFILE</b><br class="calibre12"/>
+<b class="calibre9">========</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;.headers on</span></b><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color=</span></p><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"#808080"&gt;<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span class="calibre32">
+</span></b></p><p class="calibre1"><b class="calibre9"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;SELECT * FROM counties</span></b></p><b class="calibre9"><span class="calibre32">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre32">LIMIT 5;</span></b><span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#808080"&gt;<b class="calibre9">PK_UID|OBJECTID|COD_PRO|NOME_PRO|SIGLA|Geometry</b><br class="calibre12"/>
+</span></p><span class="calibre45">
+</span><p class="calibre1"><span class="calibre45"><b class="calibre9">1|1|1|Torino|TO|</b><br class="calibre12"/>
+<b class="calibre9">2|2|2|Vercelli|VC|</b><br class="calibre12"/>
+<b class="calibre9">3|3|3|Novara|NO|</b><br class="calibre12"/>
+<b class="calibre9">4|4|4|Cuneo|CN|</b><br class="calibre12"/>
+<b class="calibre9">5|5|5|Asti|AT|</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">spatialite</b></span> CLI</p>
+<p class="calibre1">front-end: shapefile import<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><span class="calibre45">
+</span><p class="calibre1"><span class="calibre45">"#808080"&gt;<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span class="calibre32">
+</span></b></p><p class="calibre1"><b class="calibre9"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;.dumpshp counties Geometry exported_counties CP1252</span></b><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#808080"&gt;<b class="calibre9">========</b><br class="calibre12"/>
+<b class="calibre9">Dumping SQLite table 'counties' into shapefile at</b></span></p><div class="calibre32"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'exported_counties'</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">SELECT * FROM "counties" WHERE GeometryAliasType("Geometry") =</b></p><b class="calibre9">
+<p class="calibre1">'POLYGON'<br class="calibre12"/>
+OR GeometryAliasType("Geometry") = 'MULTIPOLYGON' OR "Geometry" IS</p>
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">NULL;</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">Exported 110 rows into SHAPEFILE</b><br class="calibre12"/>
+<b class="calibre9">========</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;.quit</span></b><span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;<br class="calibre12"/></span> <span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#808080"&gt;<br class="calibre12"/>
+&gt;</span><br class="calibre12"/></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">spatialite</b></span> CLI</p>
+<p class="calibre1">front-end: shapefile export<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#808080"&gt;<b class="calibre9">&gt; <span class="calibre45">
+</span></b></p><p class="calibre1"><b class="calibre9"><span class="calibre45">"#FFFFFF"&gt;<b class="calibre9">spatialite_tool -i -shp prov2010_s -d db.sqlite -t</b></span></b></p><b class="calibre9"><div class="calibre45"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">counties -c CP1252 -s 23032</b><br class="calibre12"/>
+<span class="calibre61"><b class="calibre9">SQLite</b></span></p><div class="calibre61"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">version: 3.7.4</b><br class="calibre12"/>
+<b class="calibre9">SpatiaLite version: 2.4.0-RC5</b><br class="calibre12"/>
+<b class="calibre9">Inserted 110 rows into 'counties' from</b></p><b class="calibre9">
+</b></div></div></b></div><p class="calibre1"><span class="calibre45"><b class="calibre9"><span class="calibre45"><span class="calibre61"><b class="calibre9">'prov2010_s.shp'</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">&gt;</b><br class="calibre12"/></span></span></b></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">spatialite_tool</b></span>
+shell command: shapefile import<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#808080"&gt;<b class="calibre9">&gt; <span class="calibre45">
+</span></b></p><p class="calibre1"><b class="calibre9"><span class="calibre45">"#FFFFFF"&gt;<b class="calibre9">spatialite_tool -e -shp exported_counties -d db.sqlite -t counties -g Geometry -c CP1252</b><br class="calibre12"/>
+<span class="calibre61"><b class="calibre9">SQLite</b></span></span></b></p><b class="calibre9"><div class="calibre45"><div class="calibre61"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">version: 3.7.4</b><br class="calibre12"/>
+<b class="calibre9">SpatiaLite version: 2.4.0-RC5</b><br class="calibre12"/>
+<b class="calibre9">Exported 110 rows into 'exported_counties.shp' from</b></p><b class="calibre9">
+</b></div></div></b></div><p class="calibre1"><span class="calibre45"><b class="calibre9"><span class="calibre45"><span class="calibre61"><b class="calibre9">'counties'</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">&gt;</b><br class="calibre12"/></span></span></b></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">spatialite_tool</b></span>
+shell command: shapefile export<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">DBF files</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">SpatiaLite simply supports import for DBF files:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you can directly access any external DBF file via SQL as a<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">VirtualDbf</b> table</p></li>
+<li class="calibre22">you can import any DBF file into a DB Table:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you'll find a <span class="calibre33"><b class="calibre9">Load DBF</b></span> item in the main menu and in the toolbar.</p></li>
+<li class="calibre22">using the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite</b></span> CLI front-end you can use the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">.loaddbf</b></span> macro</p></li>
+<li class="calibre22">or you can use the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_tool</b></span> CLI</p>
+<p class="calibre1">command</p></li>
+</ul>
+</li>
+</ul>
+<img src="dbfimp.png" alt="DBF import" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:<p class="calibre1"></p>
+<p class="calibre1">DBF import<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><span class="calibre45">
+</span><p class="calibre1"><span class="calibre45">"#808080"&gt;<b class="calibre9">&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;spatialite</span></b></p><b class="calibre9"><span _="" p="" class="calibre33">
+</span></b><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">local_councils.sqlite</span></b><span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;<br class="calibre12"/></span> <span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#808080"&gt;<b class="calibre9">SpatiaLite version ..: 2.4.0-RC5 Supported</b></span></p><div _="" p="" class="calibre33"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Extensions:</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualShape'        [direct</p>
+</b><p class="calibre1"><b class="calibre9">Shapefile access]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualDbf'          [direct</p>
+</b><p class="calibre1"><b class="calibre9">DBF access]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualText'         [direct</p>
+</b><p class="calibre1"><b class="calibre9">CSV/TXT access]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualNetwork'      [Dijkstra</p>
+</b><p class="calibre1"><b class="calibre9">shortest path]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'RTree'               [Spatial</p>
+</b><p class="calibre1"><b class="calibre9">Index - R*Tree]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'MbrCache'            [Spatial</p>
+</b><p class="calibre1"><b class="calibre9">Index - MBR cache]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'VirtualFDO'          [FDO-OGR</p>
+</b><p class="calibre1"><b class="calibre9">interoperability]</b><br class="calibre12"/>
+<b class="calibre9">        -</b></p><b class="calibre9">
+<p class="calibre1">'SpatiaLite'          [Spatial</p>
+</b></div><p class="calibre1"><span _="" p="" class="calibre33"><b class="calibre9">SQL - OGC]</b><br class="calibre12"/>
+<b class="calibre9">PROJ.4 version ......: Rel. 4.7.1, 23 September 2009</b><br class="calibre12"/>
+<b class="calibre9">GEOS version ........: 3.3.0-CAPI-1.7.0</b><br class="calibre12"/>
+<b class="calibre9">SQLite version ......: 3.7.4</b><br class="calibre12"/>
+<b class="calibre9">Enter ".help" for instructions</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;.loaddbf com2010_s.dbf local_councils</span></b></p><b class="calibre9"><span _="" p="" class="calibre33">
+</span></b><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">CP1252</span></b><span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#808080"&gt;<b class="calibre9">========</b><br class="calibre12"/>
+<b class="calibre9">Loading DBF at 'com2010_s.dbf' into SQLite table</b></span></p><div class="calibre45"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'local_councils'</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">BEGIN;</b><br class="calibre12"/>
+<b class="calibre9">CREATE TABLE local_councils (</b><br class="calibre12"/>
+<b class="calibre9">PK_UID INTEGER PRIMARY KEY AUTOINCREMENT,</b><br class="calibre12"/>
+<b class="calibre9">"OBJECTID" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"COD_REG" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"COD_PRO" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"COD_COM" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"PRO_COM" INTEGER,</b><br class="calibre12"/>
+<b class="calibre9">"NOME_COM" TEXT,</b><br class="calibre12"/>
+<b class="calibre9">"NOME_ITA" TEXT,</b><br class="calibre12"/>
+<b class="calibre9">"NOME_TED" TEXT);</b><br class="calibre12"/>
+<b class="calibre9">COMMIT;</b><br class="calibre12"/>
+<br class="calibre12"/>
+Inserted 8094 rows into 'local_councils' from DBF</p>
+</div><p class="calibre1"><span class="calibre45"><b class="calibre9">========</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;.headers on</span></b><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color=</span></p><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"#808080"&gt;<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span class="calibre32">
+</span></b></p><p class="calibre1"><b class="calibre9"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;SELECT * FROM</span></b></p><b class="calibre9"><span class="calibre32">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre32">local_councils LIMIT 5 OFFSET 5000;</span></b><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#FFFFFF"&gt;<br class="calibre12"/></span> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color=</span></p><div class="calibre32">
+<p class="calibre1">"#808080"&gt;<b class="calibre9">PK_UID|OBJECTID|COD_REG|COD_PRO|COD_COM|PRO_COM|NOME_COM|NOME_ITA|NOME_TED</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">5001|4958|12|58|54|58054|Manziana|Manziana|</b><br class="calibre12"/>
+<b class="calibre9">5002|4959|12|58|55|58055|Marano Equo|Marano Equo|</b><br class="calibre12"/>
+<b class="calibre9">5003|4960|12|58|56|58056|Marcellina|Marcellina|</b><br class="calibre12"/>
+<b class="calibre9">5004|4961|12|58|57|58057|Marino|Marino|</b><br class="calibre12"/>
+<b class="calibre9">5005|4962|12|58|58|58058|Mazzano Romano|Mazzano</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">Romano|</b><br class="calibre12"/>
+<b class="calibre9">spatialite&gt;</b></span> <b class="calibre9"><span _="" p="" class="calibre33">
+</span></b></p><p class="calibre1"><b class="calibre9"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;.quit</span></b><span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#FFFFFF"&gt;<br class="calibre12"/></span> <span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#808080"&gt;<br class="calibre12"/>
+&gt;</span><br class="calibre12"/></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">spatialite</b></span> CLI</p>
+<p class="calibre1">front-end: DBF import<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#808080"&gt;<b class="calibre9">&gt; <span class="calibre45">
+</span></b></p><p class="calibre1"><b class="calibre9"><span class="calibre45">"#FFFFFF"&gt;<b class="calibre9">spatialite_tool -i -dbf com2010_s -d db.sqlite -t</b></span></b></p><b class="calibre9"><div class="calibre45"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils -c CP1252</b><br class="calibre12"/>
+<span class="calibre61"><b class="calibre9">SQLite</b></span></p><div class="calibre61"><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">version: 3.7.4</b><br class="calibre12"/>
+<b class="calibre9">SpatiaLite version: 2.4.0-RC5</b><br class="calibre12"/>
+<b class="calibre9">Inserted 8094 rows into 'local_councils' from</b></p><b class="calibre9">
+</b></div></div></b></div><p class="calibre1"><span class="calibre45"><b class="calibre9"><span class="calibre45"><span class="calibre61"><b class="calibre9">'com2010_s.dbf'</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">&gt;</b><br class="calibre12"/></span></span></b></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">spatialite_tool</b></span>
+shell command: DBF import<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">TXT/CSV files</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">SpatiaLite supports both import and export for TXT/CSV files:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you can directly access any external TXT/CSV file via SQL as<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">VirtualText</b> table</p></li>
+<li class="calibre22">you can import any TXT/CSV file into a DB Table:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you'll find a <span class="calibre33"><b class="calibre9">Load TXT/CSV</b></span> item in the main menu and in the toolbar.</p></li>
+</ul>
+</li>
+<li class="calibre22">you can export any Table as a TXT/CSV file:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you'll find an <span class="calibre33"><b class="calibre9">Export As</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">TXT/CSV</b></span> item on the context menu corresponding to any</p>
+<p class="calibre1">Table within the main tree-view.</p></li>
+</ul>
+</li>
+</ul>
+<img src="txtimp.png" alt="TXT/CSV import" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:<p class="calibre1"></p>
+<p class="calibre1">TXT/CSV import<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="txtexp.png" alt="TXT/CSV export" class="calibre14"/><br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:</p>
+<p class="calibre1">TXT/CSV export<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Other supported export formats</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">Using <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you can also export your data as:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">HTML web pages</li>
+<li class="calibre22">PNG images (Geometries only)</li>
+<li class="calibre22">PDF documents (Geometries only)</li>
+<li class="calibre22">SVG vector graphics (Geometries only)</li>
+</ul>
+<img src="htmlexp.png" alt="HTML export" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:<p class="calibre1"></p>
+<p class="calibre1">HTML export<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="html.png" alt="HTML sample" class="calibre14"/><br class="calibre12"/>
+HTML export sample<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="mapexp.png" alt="MAP export 1" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:<p class="calibre1"></p>
+<p class="calibre1">PNG / PDF / SVG export (1)<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="mapexp2.png" alt="MAP export 2" class="calibre14"/><br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">spatialite_gui</b></span>:</p>
+<p class="calibre1">PNG / PDF / SVG export (2)<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="png.png" alt="PNG sample" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+PNG export sample<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="pdf.png" alt="PDF sample" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+PDF export sample<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="svg.png" alt="SVG sample" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+SVG export sample<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"system.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#desserts"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="lang_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

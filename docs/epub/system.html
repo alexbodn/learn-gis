@@ -1,0 +1,364 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">System level performace hints</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"dijkstra.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#desserts"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="impexp.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="impexp.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">We have examined<p class="calibre1"></p>
+<p class="calibre1">since now several optimization related topics: but all this mainly</p>
+<p class="calibre1">was to be intended as “<i class="calibre11">smartly writing well designed</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">queries</i>”.<br class="calibre12"/>
+<br class="calibre12"/>
+Although defining a properly planned SQL query surely represents</p>
+<p class="calibre1">the main factor to achieve optimal performances, this isn't</p>
+<p class="calibre1">enough.<br class="calibre12"/>
+A second level of performance optimization (<i class="calibre11">fine tuning</i>)</p>
+<p class="calibre1">exist, i.e. the one concerning interactions between the DBMS and</p>
+<p class="calibre1">the underlying <i class="calibre11"><b class="calibre9">Operating System</b></i> / <i class="calibre11"><b class="calibre9">File</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">System</b></i>.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre18"><b class="calibre9">DB pages / page cache</b></p>
+<p class="calibre1"></p>
+<p class="calibre1">Any SQLite DB simply is a single monolithic file: any data and</p>
+<p class="calibre1">related info is stored within this files.<br class="calibre12"/>
+As in many others DBMS, disk space isn't allocated at random, but</p>
+<p class="calibre1">is properly structured:<br class="calibre12"/>
+the <i class="calibre11">atomic</i> allocation unit is defined as a <b class="calibre9">page</b>, so a</p>
+<p class="calibre1">DB file simply is a well organized collection of</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">pages</b></i>.<br class="calibre12"/>
+All pages within the same DB must have the same identical size</p>
+<p class="calibre1">(typically <span class="calibre33"><b class="calibre9">1KB</b></span>
+i.e. <span class="calibre33"><b class="calibre9">1024 bytes</b></span>):</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">adopting a bigger page size may actually reduce the I/O<p class="calibre1"></p>
+<p class="calibre1">traffic, but may impose to waste a significant amount of unused</p>
+<p class="calibre1">space.</p></li>
+<li class="calibre22">adopting a smaller page size is strongly discouraged, because<p class="calibre1"></p>
+<p class="calibre1">will surely imply a much more sustained I/O traffic.</p></li>
+<li class="calibre22">so the <i class="calibre11">default</i> page size of <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">1KB</b></span> represents a <i class="calibre11">mean</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">case</i> well fitted for the vast majority of real world</p>
+<p class="calibre1">situations.</p></li>
+</ul>
+Reading and writing from disk a single page at each time surely<p class="calibre1"></p>
+<p class="calibre1">isn't an efficient process;<br class="calibre12"/>
+so SQLite maintains an internal <i class="calibre11"><b class="calibre9">page cache</b></i> (<i class="calibre11">stored</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">in RAM</i>), supporting fast access to the most often accessed</p>
+<p class="calibre1">pages.<br class="calibre12"/>
+Quite intuitively, adopting a bigger page cache can strongly reduce</p>
+<p class="calibre1">the overall I/O traffic;<br class="calibre12"/>
+and consequently an higher throughput can be achieved.<br class="calibre12"/>
+<br class="calibre12"/>
+By default SQLite adopts a very conservative approach, so to</p>
+<p class="calibre1">require a light-weight memory footprint;<br class="calibre12"/>
+the initial page cache will simply store <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">2000 pages</b></span> (corresponding to</p>
+<p class="calibre1">a total allocation of only <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">20MB</b></span>).<br class="calibre12"/>
+<br class="calibre12"/>
+But a so small default page cache surely isn't enough to properly</p>
+<p class="calibre1">support an <i class="calibre11"><b class="calibre9">huge DB</b></i>, (<i class="calibre11">may be one ranging in the</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11"><b class="calibre9">many-GB</b> size</i>);<br class="calibre12"/>
+this will easily become a real <i class="calibre11"><b class="calibre9">bottleneck</b></i>, causing</p>
+<p class="calibre1">very poor global performances.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_size;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">1024</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_count;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">31850</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">freelist_count;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">12326</b></span></p></td>
+</tr>
+</tbody></table>
+You can use several <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRAGMA</b></span>s to check the page</p>
+<p class="calibre1">status for the currently connected DB:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_size;</b></span> will report the currently set page size.</p></li>
+<li class="calibre22"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_count;</b></span> will report the total number of allocated</p>
+<p class="calibre1">pages.</p></li>
+<li class="calibre22"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">freelist_count;</b></span> will report the total number of unused</p>
+<p class="calibre1">pages.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22"><span class="calibre17">please note</span>: each time you perform lots of <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DELETE</b></span>s or some <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DROP</b></span> [<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span> | <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INDEX</b></span>] statement, then</p>
+<p class="calibre1">several unused pages will be left in the DB.</p></li>
+</ul>
+</li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_size = 4096;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_size;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">1024</b></span></p></td>
+</tr>
+</tbody></table>
+You can call a <div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_size</b></span> so to set a different page size<br class="calibre12"/>
+(you must specify a <i class="calibre11"><b class="calibre9">power of two</b></i> size argument,</p>
+<p class="calibre1">ranging from <span class="calibre33"><b class="calibre9">512</b></span>
+to <span class="calibre33"><b class="calibre9">65536</b></span>):</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">anyway, the page size still remains unchanged.</li>
+<li class="calibre22">this is because a complete DB reorganization is required in<p class="calibre1"></p>
+<p class="calibre1">order to make such change to actually materialize.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VACUUM;</b></span></p></td>
+</tr>
+</tbody></table>
+Performing a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VACUUM</b></span> implies the following</p>
+<p class="calibre1">actions to be performed:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the whole DB will be checked and completely rewritten from<p class="calibre1"></p>
+<p class="calibre1">scratch.</p></li>
+<li class="calibre22">any structural change (<i class="calibre11">e.g. changing the current page<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">size</i>) will now be applied.</p></li>
+<li class="calibre22">any unused page will be discarded, so the DB will be<p class="calibre1"></p>
+<p class="calibre1">effectively compacted.</p></li>
+<li class="calibre22"><span class="calibre17">please note</span>: <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VACUUM</b></span>ing a large DB may</p>
+<p class="calibre1">require a long time.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_size;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">4096</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">page_count;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50">
+<p lang="zxx" class="calibre1"><span class="calibre60"><span class="calibre32">
+</span></span></p><p class="calibre1"><span class="calibre60"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">5197</b></span></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">freelist_count;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">0</b></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Just a quick check: immediately after performing <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VACUUM</b></span> the new page size has</p>
+<p class="calibre1">been effectively applied, and there are no unused pages at all.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">cache_size;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">1000</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">cache_size = 1000000;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">cache_size;</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">1000000</b></span></p></td>
+</tr>
+</tbody></table>
+You can use <div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">cache_size</b></span> in order to query or set the page cache:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre17"><b class="calibre9">please note</b></span>: the size is measured as the<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17">number of pages</span></i> to be stored into the cache:<br class="calibre12"/>
+so the corresponding memory allocation (<i class="calibre11">in bytes</i>) will be</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">page_size *</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">cache_size</b></span></p></li>
+<li class="calibre22">requesting a bigger cache size usually implies better<p class="calibre1"></p>
+<p class="calibre1">performances.<br class="calibre12"/>
+Anyway carefully consider that:</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">an exaggeratedly big cache is completely useless: you'll simply<p class="calibre1"></p>
+<p class="calibre1">waste a lot of precious RAM for nothing.</p></li>
+<li class="calibre22">when the memory allocation required by the page cache exceed<p class="calibre1"></p>
+<p class="calibre1">the amount of physically available RAM, performance will then be</p>
+<p class="calibre1">catastrophically impaired, because this will actually cause an</p>
+<p class="calibre1">enormous I/O traffic due to <i class="calibre11"><b class="calibre9">memory-to-disk</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">swapping</b></i>.</p></li>
+<li class="calibre22">on 32bit platforms a further limit exist: on such platforms any<p class="calibre1"></p>
+<p class="calibre1">process cannot allocate more than 4GB memory.<br class="calibre12"/>
+But for practical reasons this limit is more likely to be as low as</p>
+<p class="calibre1">1.5GB.</p></li>
+</ul>
+</li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre51">Requesting a very generously (<i class="calibre11">but<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">wisely</i>) dimensioned page cache usually will grant a great</p>
+<p class="calibre1">performance boost, most notably when you are processing a very</p>
+<p class="calibre1">large DB.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">You can modify<p class="calibre1"></p>
+<p class="calibre1">other important settings using the appropriate <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRAGMA</b></span>s supported by SQLite:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ignore_check_constraint</b></span> can be used to query, enable or</p>
+<p class="calibre1">disable <span class="calibre33"><b class="calibre9">CHECK</b></span>
+constraints<br class="calibre12"/>
+(<i class="calibre11">e.g. disabling check constraints is unsafe, but may be required</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">during preliminary data loading</i>).</p></li>
+<li class="calibre22"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">foreign_key</b></span> can be used to query, enable or disable</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">FOREIGN KEY</b></span>
+constraints<br class="calibre12"/>
+(<i class="calibre11">and this too may be useful or required during preliminary data</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">loading</i>).</p></li>
+<li class="calibre22"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">journal_mode</b></span> can be used to query or set fine details</p>
+<p class="calibre1">about <span class="calibre33"><b class="calibre9">TRANSACTION</b></span>
+journaling.</p></li>
+</ul>
+<span class="calibre33"><b class="calibre9">PRAGMA</b></span>'s<p class="calibre1"></p>
+<p class="calibre1">implementation change from time to time, so you can usefully</p>
+<p class="calibre1">consult the appropriate <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.sqlite.org/pragma.html"&gt;SQLite documentation</a></p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"dijkstra.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#desserts"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="impexp.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="impexp.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

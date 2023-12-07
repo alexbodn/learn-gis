@@ -1,0 +1,350 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<ul class="calibre21">
+<li class="calibre22">
+<h2 class="calibre30" id="calibre_pb_0">PRIMARY KEY</h2>
+
+<p class="calibre1">AUTOINCREMENT
+</p><ul class="calibre46">
+<li class="calibre22">inserting a <div class="calibre33"><b class="calibre9">PRIMARY<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">KEY</b></span> on each table always is a very good idea.</p></li>
+<li class="calibre22">declaring an <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AUTOINCREMENT</b></span> clause we'll</p>
+<p class="calibre1">request SQLite to automatically generate unique values for this</p>
+<p class="calibre1">key.</p></li>
+</ul>
+</li>
+<li class="calibre22">we have added a <div class="calibre33"><b class="calibre9">NOT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> clause for <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">first_name</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">last_name</b></span> columns.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">this will declare a first kind of <b class="calibre9">constraint</b>:<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> values will</p>
+<p class="calibre1">be rejected for these columns.</p></li>
+<li class="calibre22">in other words, <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">first_name</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">last_name</b></span> absolutely have to</p>
+<p class="calibre1">contain some explicitly set value.</p></li>
+</ul>
+</li>
+<li class="calibre22">we have added a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">CONSTRAINT ... CHECK (...)</b></span>
+for <span class="calibre33"><b class="calibre9">age</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">gender</b></span> columns.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">this will declare a second kind of <b class="calibre9">constraint</b>: values<p class="calibre1"></p>
+<p class="calibre1">failing to satisfy the <span class="calibre33"><b class="calibre9">CHECK</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">(...)</b></span> criterion will be rejected.</p></li>
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">age</b></span>
+column will now accept only reasonable <i class="calibre11">adult</i> ages.</li>
+<li class="calibre22">and the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">gender</b></span> column will now</p>
+<p class="calibre1">accept only <span class="calibre33"><b class="calibre9">'M'</b></span>
+or <span class="calibre33"><b class="calibre9">'F'</b></span>
+values.</p></li>
+<li class="calibre22"><span class="calibre17">please note:</span> we have not declared the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">NOT NULL</b></span> clause, so</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">age = NULL</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">gender = NULL</b></span> are</p>
+<p class="calibre1">still considered to be valid values.</p></li>
+</ul>
+</li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre18"><b class="calibre9">about SQLite data-types</b></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+Very shortly said: SQLite hasn't data-types at all ...<br class="calibre12"/>
+You are absolutely free to insert any data-type on every column:</p>
+<p class="calibre1">the column declared data-type simply have a <i class="calibre11">decorative</i> role,</p>
+<p class="calibre1">but isn't neither checked not enforced at all.<br class="calibre12"/>
+This one absolutely is not a <b class="calibre9">bug</b>: it's more a <b class="calibre9">peculiar</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">design choice</b>.<br class="calibre12"/>
+Anyway, any other different DBMS applies strong data-type</p>
+<p class="calibre1">qualification and enforcement, so the SQLite's own behavior may</p>
+<p class="calibre1">easily look odd and puzzling. <b class="calibre9">Be warned</b>.<br class="calibre12"/>
+<br class="calibre12"/>
+Anyway SQLite internally supports the following data-types:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre33"><b class="calibre9">NULL</b></span>: no<p class="calibre1"></p>
+<p class="calibre1">value at all.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">INTEGER</b></span>:<p class="calibre1"></p>
+<p class="calibre1">actually <b class="calibre9">64bit</b> integers, so to support really huge</p>
+<p class="calibre1">values.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">DOUBLE</b></span>:<p class="calibre1"></p>
+<p class="calibre1">floating point, double precision.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">TEXT</b></span>: any<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">UTF-8</b> encoded text string, of unconstrained arbitrary</p>
+<p class="calibre1">length.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">BLOB</b></span>: any<p class="calibre1"></p>
+<p class="calibre1">generic <i class="calibre11">Binary Long Object</i>, of unconstrained arbitrary</p>
+<p class="calibre1">length.</p></li>
+</ul>
+<span class="calibre17">Remember:</span> each single <i class="calibre11">cell</i> (<i class="calibre11">row/column</i>
+intersection) can store any arbitrary data-type.<br class="calibre12"/>
+One unique exception exists: columns declared as <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INTEGER PRIMARY KEY</b></span>
+absolutely require integer values.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">ALTER<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE peoples2</b><br class="calibre12"/>
+<b class="calibre9">  ADD COLUMN cell_phone TEXT;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You can add any further column even after the initial table<p class="calibre1"></p>
+<p class="calibre1">creation.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre51">Yet another SQLite's own very <b class="calibre9">peculiar<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">design choice</b>.</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">dropping columns is <b class="calibre9">unsupported</b>.</li>
+<li class="calibre22">renaming columns is <b class="calibre9">unsupported</b>.</li>
+</ul>
+i.e. once you've created a column there is no way at all to change<p class="calibre1"></p>
+<p class="calibre1">its initial definition.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">ALTER<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE peoples2</b><br class="calibre12"/>
+<b class="calibre9">  RENAME TO peoples_ok;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Anyway you are absolutely free to change the table name.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">DROP<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE peoples;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And this will completely erase the table (and its whole content)</p>
+<p class="calibre1">from the DB.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INDEX idx_peoples_phone</b><br class="calibre12"/>
+<b class="calibre9">  ON peoples_ok (phone);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This will create an Index.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">DROP<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INDEX idx_peoples_phone;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And this will destroy the same Index.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">UNIQUE INDEX idx_peoples_name</b><br class="calibre12"/>
+<b class="calibre9">  ON peoples_ok (last_name,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">first_name);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<ul class="calibre21">
+<li class="calibre22">an Index can support more columns.</li>
+<li class="calibre22">declaring the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UNIQUE</b></span> clause implements a</p>
+<p class="calibre1">further <b class="calibre9">constraint</b>:<br class="calibre12"/>
+once some value is already defined, any further attempt to insert</p>
+<p class="calibre1">the same value will then fail.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">table_info(peoples_ok);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">cid</td>
+<td class="calibre13">name</td>
+<td class="calibre13">type</td>
+<td class="calibre13">notnull</td>
+<td class="calibre13">dflt_value</td>
+<td class="calibre13">pk</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">0</td>
+<td class="calibre13">id</td>
+<td class="calibre13">INTEGER</td>
+<td class="calibre13">1</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">1</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">first_name</td>
+<td class="calibre13">TEXT</td>
+<td class="calibre13">1</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">last_name</td>
+<td class="calibre13">TEXT</td>
+<td class="calibre13">1</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">age</td>
+<td class="calibre13">INTEGER</td>
+<td class="calibre13">0</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">4</td>
+<td class="calibre13">gender</td>
+<td class="calibre13">TEXT</td>
+<td class="calibre13">0</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">5</td>
+<td class="calibre13">phone</td>
+<td class="calibre13">TEXT</td>
+<td class="calibre13">0</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">6</td>
+<td class="calibre13">cell_phone</td>
+<td class="calibre13">TEXT</td>
+<td class="calibre13">0</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+</tbody></table>
+You can use <div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">table_info(...)</b></span> in order to query a table layout.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">index_list(peoples_ok);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">seq</td>
+<td class="calibre13">name</td>
+<td class="calibre13">unique</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">0</td>
+<td class="calibre13">idx_peoples_phone</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">idx_peoples_name</td>
+<td class="calibre13">1</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">index_info(idx_peoples_name);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">seqno</td>
+<td class="calibre13">cid</td>
+<td class="calibre13">name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">0</td>
+<td class="calibre13">2</td>
+<td class="calibre13">last_name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="calibre13">first_name</td>
+</tr>
+</tbody></table>
+And using <span class="calibre33"><b class="calibre9">PRAGMA</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">index_list(...)</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRAGMA index_info(...)</b></span> you</p>
+<p class="calibre1">can easily query the corresponding Index layout.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"views.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="new-geom_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="new-geom_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">Performance considerations</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">Executing complex queries involving many different tables may</p>
+<p class="calibre1">easily run in a very slow and sluggish mode.<br class="calibre12"/>
+This will most easily noticed when such tables contain a huge</p>
+<p class="calibre1">number of rows.<br class="calibre12"/>
+Explaining all this isn't at all difficult: in order to calculate</p>
+<p class="calibre1">the Cartesian Product the SQL engine has to access many and many</p>
+<p class="calibre1">times each table involved in the query.<br class="calibre12"/>
+<br class="calibre12"/>
+The basic behavior is the one to perform a <b class="calibre9">full table scan</b>
+each time: and obviously scanning a long table many and many times</p>
+<p class="calibre1">requires a long time.<br class="calibre12"/>
+So the main key-point in order optimize your queries is the one to</p>
+<p class="calibre1">avoid using <i class="calibre11">full table scans</i> as much as possible.<br class="calibre12"/>
+All this is fully supported, and it's easy to be implemented.<br class="calibre12"/>
+<br class="calibre12"/>
+Each time the <i class="calibre11"><b class="calibre9">SQL-planner</b></i> (an internal component of</p>
+<p class="calibre1">the <i class="calibre11"><b class="calibre9">SQL-engine</b></i>) detects that an appropriate</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">INDEX</b></span> is</p>
+<p class="calibre1">available, there is no need at all to perform <i class="calibre11">full table</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">scans</i>, because each single row can now be immediately accessed</p>
+<p class="calibre1">using this Index.<br class="calibre12"/>
+And this one will obviously be a much faster process.<br class="calibre12"/>
+Any column (or group of columns) frequently used in <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> clauses is a good</p>
+<p class="calibre1">candidate for a corresponding <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INDEX</b></span>.<br class="calibre12"/>
+Anyway, creating an Index implies several negative consequences:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the storage allocation required by the DB-file will increase<p class="calibre1"></p>
+<p class="calibre1">(sometimes will dramatically increase).</p></li>
+<li class="calibre22">performing <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UPDATE</b></span> and/or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DELETE</b></span> ops will require a</p>
+<p class="calibre1">longer time, because the Index has to be accordingly updated.<br class="calibre12"/>
+And this obviously imposes a further overhead.</p></li>
+</ul>
+So (not surprisingly) it's a <i class="calibre11">trade-off process</i>: you must<p class="calibre1"></p>
+<p class="calibre1">evaluate carefully when an <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INDEX</b></span> is absolutely</p>
+<p class="calibre1">required, and attempt to reach a well balanced mix.<br class="calibre12"/>
+i.e a <i class="calibre11">compromise</i> between contrasting requirements, under</p>
+<p class="calibre1">various conditions and in different users-cases.<br class="calibre12"/>
+In other words there is no <i class="calibre11">absolute rule</i>: you must find your</p>
+<p class="calibre1">optimal <i class="calibre11">case-by-case</i> solution performing several practical</p>
+<p class="calibre1">tests, until you get the optimal solution fulfilling your</p>
+<p class="calibre1">requirements.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"create-db.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="join-2.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="join-2.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

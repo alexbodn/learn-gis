@@ -1,0 +1,416 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">what's this SRID stuff ? ...<br class="calibre12"/>
+I've never heard this term before now ...</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"charset.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="first-sql.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="first-sql.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre18"><b class="calibre9">What's this SRID stuff ?</b> <i class="calibre11">... I've never</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">heard this term before now ...</i></p>
+<p class="calibre1"></p>
+<p class="calibre1">Planet Earth is a <i class="calibre11"><b class="calibre9">sphere</b></i> ... not exactly, planet</p>
+<p class="calibre1">Earth has an <i class="calibre11"><b class="calibre9">ellipsoidal</b></i> shape (<i class="calibre11">slightly flattened</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">at poles</i>) ...<br class="calibre12"/>
+oh no, that's absolutely wrong: planet Earth hasn't a geometric</p>
+<p class="calibre1">regular shape, it actually is a <i class="calibre11"><b class="calibre9">geoid</b></i><br class="calibre12"/>
+<br class="calibre12"/>
+All the above assertions can be assumed to be true, but at</p>
+<p class="calibre1">different approximation levels.<br class="calibre12"/>
+Near the Equator differences between a sphere and an ellipsoid are</p>
+<p class="calibre1">rather slight and quite unnoticeable; but neat both Poles such</p>
+<p class="calibre1">differences becomes greater and most easily appreciable.<br class="calibre12"/>
+For many practical purposes differences between an ellipsoid and a</p>
+<p class="calibre1">geoid are very slim: but for long range aircraft navigation (or</p>
+<p class="calibre1">even worse, for satellite positioning), this is too much simplistic</p>
+<p class="calibre1">and unacceptably approximate.<br class="calibre12"/>
+<br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://commons.wikimedia.org/wiki/File:Geographic_coordinates_sphere.svg"&gt;
+<img src="lat-long.png" alt="&lt;/p" class="calibre14"/>
+</a></p><p class="calibre1"><a href="&lt;/p">"lat-long illustration" /&gt;</a><br class="calibre12"/>
+<br class="calibre12"/>
+Anyway, whatsoever could be the real shape of the Earth, position</p>
+<p class="calibre1">of each point on the planet surface can precisely determined simply</p>
+<p class="calibre1">measuring two <b class="calibre9">angles</b>: <b class="calibre9">longitude</b> and</p>
+<p class="calibre1"><b class="calibre9">latitude</b>.<br class="calibre12"/>
+In order to set a complete <b class="calibre9">Spatial Reference System</b> [aka</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">SRS</b></i>] we can use the <b class="calibre9"><i class="calibre11">Poles</i></b> and the</p>
+<p class="calibre1"><b class="calibre9"><i class="calibre11">Equator</i></b> (<i class="calibre11">which after all are outstanding places by</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">intrinsic astronomic properties</i>): choosing a <b class="calibre9"><i class="calibre11">Prime</i></b></p><b class="calibre9"><i class="calibre11">
+</i></b><p class="calibre1"><b class="calibre9"><i class="calibre11">Meridian</i></b> on the other side is absolutely conventional: but</p>
+<p class="calibre1">since many centuries (<i class="calibre11">Britannia rule the waves</i> ...) adopting</p>
+<p class="calibre1">the <b class="calibre9"><i class="calibre11">Greenwich Meridian</i></b> is an obvious choice.<br class="calibre12"/>
+<br class="calibre12"/>
+Any SRS based on <b class="calibre9">long-lat</b> coordinates is known as a</p>
+<p class="calibre1"><b class="calibre9">Geographic System</b>. Using a Geographic SRS surely grants you</p>
+<p class="calibre1">maximum precision and accuracy: but unhappily this fatally implies</p>
+<p class="calibre1">several undesirable side-effects:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">paper sheets (and monitor screens) are absolutely flat; they<p class="calibre1"></p>
+<p class="calibre1">don't look at all like a sphere</p></li>
+<li class="calibre22">using <i class="calibre11"><b class="calibre9">angles</b></i> makes measuring distances and areas<p class="calibre1"></p>
+<p class="calibre1">really difficult and counter-intuitive.</p></li>
+</ul>
+So since many centuries cartographers invented several<p class="calibre1"></p>
+<p class="calibre1">(<i class="calibre11">conventional</i>) systems enabling to represent spherical</p>
+<p class="calibre1">surfaces into a flatten plane: none of them all is <i class="calibre11">the best</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">one</i>.<br class="calibre12"/>
+All them introduce some degree of approximation and deformation:</p>
+<p class="calibre1">choosing the one or the other implies an absolutely</p>
+<p class="calibre1"><i class="calibre11">arbitrary</i> and <i class="calibre11">conventional</i> process: a map projection</p>
+<p class="calibre1">good to represent small Earth's portions can easily be awful when</p>
+<p class="calibre1">used to represent very wide territories, and <i class="calibre11">vice</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">versa</i>.<br class="calibre12"/>
+We'll quickly examine the <b class="calibre9">UTM</b> [<i class="calibre11">Universal Transverse</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Mercator</i>] map projection, simply because it's really often</p>
+<p class="calibre1">used.<br class="calibre12"/>
+<br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://en.wikipedia.org/wiki/File:Usgs_map_traverse_mercator.PNG"&gt;<img src="utm0.png" _="" p="" class="calibre14"/>
+</a></p><p class="calibre1"><a href="&lt;/p">alt="UTM projection" /&gt;</a><br class="calibre12"/>
+<br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://en.wikipedia.org/wiki/File:MercTranSph.png"&gt;<img src="&lt;/p" class="calibre14"/>
+</a></p><p class="calibre1"><a href="&lt;/p">"../img/utm1.jpg" alt="UTM projected" /&gt;</a><br class="calibre12"/>
+<br class="calibre12"/>
+Apparently this map projection introduces severe and not acceptable</p>
+<p class="calibre1">deformations: but when you carefully focus your attention on the</p>
+<p class="calibre1">narrow central fuse, you'll immediately recognize that UTM allows</p>
+<p class="calibre1">to get a nearly perfect planar projection of excellent</p>
+<p class="calibre1">quality.<br class="calibre12"/>
+Anyway all this has a price: the central fuse has to be really</p>
+<p class="calibre1">narrow (let say, it will span only few degrees on both sides). As</p>
+<p class="calibre1">the fuse becomes wider, as much more deformations will become</p>
+<p class="calibre1">stronger and more evident.<br class="calibre12"/>
+<br class="calibre12"/>
+<a href="http://en.wikipedia.org/wiki/File:Utm-zones.jpg"><img src="&lt;/p" class="calibre14"/>
+</a></p><p class="calibre1"><a href="http://en.wikipedia.org/wiki/File:Utm-zones.jpg">"../img/utm2.jpg" alt="UTM Zones" /&gt;</a><br class="calibre12"/>
+<br class="calibre12"/>
+Accordingly to all the above considerations, UTM defines 60</p>
+<p class="calibre1">standard zones, each one covering exactly 6 longitude</p>
+<p class="calibre1">degrees.<br class="calibre12"/>
+Merging together two adjacent fuses (12 degrees) obviously reduces</p>
+<p class="calibre1">accuracy, but is still acceptable for many practical purposes:</p>
+<p class="calibre1">exceeding this limit produces really low-quality results, and has</p>
+<p class="calibre1">to be absolutely avoided.<br class="calibre12"/>
+</p><p class="calibre38"><span class="calibre37">
+</span></p><p class="calibre1"><span class="calibre37">"font-size: 16pt"&gt;<b class="calibre9">Attempting to standardize the</b></span></p><span class="calibre37"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre37"><b class="calibre9">chaos</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+During the past two centuries every National State has introduced</p>
+<p class="calibre1">at least one (and very often, more than one) map projection system</p>
+<p class="calibre1">and related SRS: the overall result is absolutely chaotic (and</p>
+<p class="calibre1">really painful to be handled).<br class="calibre12"/>
+<br class="calibre12"/>
+Happily, an international standard is widely adopted so to make</p>
+<p class="calibre1">easier correctly handling map SRS: the <b class="calibre9">European Petroleum Survey</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Group</b> [<i class="calibre11"><b class="calibre9">EPSG</b></i>] maintains a huge worldwide dataset</p>
+<p class="calibre1">of more than 3,700 different entries.<br class="calibre12"/>
+Many of them are nowadays obsolete, and simply play a historical</p>
+<p class="calibre1">role; many others are only useful in very limited national</p>
+<p class="calibre1">boundaries.<br class="calibre12"/>
+Anyway, this one is an absolutely impressive collection.<br class="calibre12"/>
+And each single entry within the EPSG dataset is uniquely</p>
+<p class="calibre1">identified by its <b class="calibre9">numeric ID</b> and <b class="calibre9">descriptive name</b>, so</p>
+<p class="calibre1">to avoid any possible confusion and ambiguity.<br class="calibre12"/>
+<br class="calibre12"/>
+Any Spatial DBMS requires some <b class="calibre9">SRID-value</b> to be specified</p>
+<p class="calibre1">for each Geometry: but such SRID simply is a <i class="calibre11"><b class="calibre9">Spatial</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">Reference ID</b></i>, and (<i class="calibre11">hopefully</i>) coincides with the</p>
+<p class="calibre1">corresponding <b class="calibre9">EPSG ID</b><br class="calibre12"/>
+<br class="calibre12"/>
+Just in order to help you understand better this SRID chaos, this</p>
+<p class="calibre1">is a quite complete list of SRIDs often used in a (<i class="calibre11">small</i>)</p>
+<p class="calibre1">Nation such as <b class="calibre9">Italy</b>:<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre39"><b class="calibre9">EPSG SRID</b></td>
+<td class="calibre39"><b class="calibre9">Name</b></td>
+<td class="calibre39"><b class="calibre9">Notes</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">4326</td>
+<td class="calibre40">WGS 84</td>
+<td class="calibre40">Geographic [<i class="calibre11">long-lat</i>]; worldwide; used<p class="calibre1"></p>
+<p class="calibre1">by GPS devices</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">3003<br class="calibre12"/>
+3004</td>
+<td class="calibre40">Monte Mario / Italy zone 1<br class="calibre12"/>
+Monte Mario / Italy zone 2</td>
+<td class="calibre40">obsolete (1940) but still commonly used</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">23032<br class="calibre12"/>
+23033</td>
+<td class="calibre40">ED50 / UTM zone 32N<br class="calibre12"/>
+ED50 / UTM zone 33N</td>
+<td class="calibre40">superseded and rarely used: European Datum<p class="calibre1"></p>
+<p class="calibre1">1950</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">32632<br class="calibre12"/>
+32633</td>
+<td class="calibre40">WGS 84 / UTM zone 32N<br class="calibre12"/>
+WGS 84 / UTM zone 33N</td>
+<td class="calibre40">WGS84, adopting the planar UTM<p class="calibre1"></p>
+<p class="calibre1">projection</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">25832<br class="calibre12"/>
+25833</td>
+<td class="calibre40">ETRS89 / UTM zone 32N<br class="calibre12"/>
+ETRS89 / UTM zone 33N</td>
+<td class="calibre40">enhanced evolution of WGS84: official EU<p class="calibre1"></p>
+<p class="calibre1">standard</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+And the following examples may help to understand even</p>
+<p class="calibre1">better:<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre39"><b class="calibre9">Town</b></td>
+<td rowspan="2" class="calibre39"><b class="calibre9">SRID</b></td>
+<td colspan="2" class="calibre41">
+<b class="calibre9">Coordinates</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre39"><b class="calibre9">X (longitude)</b></td>
+<td class="calibre39"><b class="calibre9">Y (latitude)</b></td>
+</tr>
+<tr class="calibre5">
+<td rowspan="5" class="calibre40">Roma</td>
+<td class="calibre40">4326</td>
+<td class="calibre42">12.483900</td>
+<td class="calibre42">41.894740</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">3003</td>
+<td class="calibre42">1789036.071860</td>
+<td class="calibre42">4644043.280244</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">23032</td>
+<td class="calibre42">789036.071860</td>
+<td class="calibre42">4644043.280244</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">32632</td>
+<td class="calibre42">789022.867800</td>
+<td class="calibre42">4643960.982152</td>
+</tr>
+<tr class="calibre5">
+<td width="58" class="calibre40">35832</td>
+<td width="117" class="calibre42">789022.867802</td>
+<td width="117" class="calibre42">4643960.982036</td>
+</tr>
+<tr class="calibre5">
+<td rowspan="5" class="calibre40">Milano</td>
+<td class="calibre40">4326</td>
+<td class="calibre42">9.189510</td>
+<td class="calibre42">45.464270</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">3003</td>
+<td class="calibre42">1514815.861095</td>
+<td class="calibre42">5034638.873050</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">23032</td>
+<td class="calibre42">514815.861095</td>
+<td class="calibre42">5034638.873050</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">32632</td>
+<td class="calibre42">514815.171223</td>
+<td class="calibre42">5034544.482565</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">35832</td>
+<td class="calibre42">514815.171223</td>
+<td class="calibre42">5034544.482445</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+As you can easily notice:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">WGS84 [4326] coordinates are expressed in <i class="calibre11">decimal<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">degrees</i>, because this one is a <i class="calibre11"><b class="calibre9">Geographic System</b></i>
+directly based on long-lat angles.</p></li>
+<li class="calibre22">on the other side any other system adopts coordinates expressed<p class="calibre1"></p>
+<p class="calibre1">in <i class="calibre11">meters</i>: all them are <i class="calibre11"><b class="calibre9">projected</b></i> aka</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">planar</b></i> systems.</p></li>
+<li class="calibre22">Y-values look very similar for every planar SRS: that's not<p class="calibre1"></p>
+<p class="calibre1">surprising, because this value simply represents the distance from</p>
+<p class="calibre1">the Equator.</p></li>
+<li class="calibre22">X-values are more dispersed, because different SRSes adopt<p class="calibre1"></p>
+<p class="calibre1">different <i class="calibre11"><b class="calibre9">false easting</b></i> origins: i.e. they place</p>
+<p class="calibre1">their Prime Meridian in different (<i class="calibre11">conventional</i>)</p>
+<p class="calibre1">places.</p></li>
+<li class="calibre22">Anyway, any UTM-based SRS gives very closely related values,<p class="calibre1"></p>
+<p class="calibre1">simply because all them share the same <i class="calibre11"><b class="calibre9">UTM zone 32</b></i>
+definition.</p></li>
+<li class="calibre22">The (<i class="calibre11">small</i>) differences you can notice about different<p class="calibre1"></p>
+<p class="calibre1">UTM-based SRSes can be easily explained: UTM zone 32 is always the</p>
+<p class="calibre1">same, but the underlying <i class="calibre11"><b class="calibre9">ellipsoid</b></i> changes each</p>
+<p class="calibre1">time.<br class="calibre12"/>
+Getting a precise measure for <i class="calibre11"><b class="calibre9">ellipsoid's axes</b></i> isn't</p>
+<p class="calibre1">an easy task: and obviously during the time several increasingly</p>
+<p class="calibre1">better and most accurate estimates has been progressively</p>
+<p class="calibre1">adopted.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td colspan="2" class="calibre41"><b class="calibre9">Distance<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">intercurring between<br class="calibre12"/>
+Roma and Milano</b></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre39"><b class="calibre9">SRID</b></td>
+<td class="calibre39"><b class="calibre9">Calculated Distance</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">4326</td>
+<td class="calibre42">4.857422</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">3003</td>
+<td class="calibre42">477243.796305</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">23032</td>
+<td class="calibre42">477243.796305</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">32632</td>
+<td class="calibre42">477226.708868</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">35832</td>
+<td class="calibre42">477226.708866</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">Great Circle</td>
+<td class="calibre42">477109.583358</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">Geodesic</td>
+<td class="calibre42">477245.299993</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+And now we can examine how using different SRSes affects distances:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">Using WGS84 [4326] <i class="calibre11">geographic, long-lat</i> coordinates<p class="calibre1"></p>
+<p class="calibre1">we'll actually get a measure corresponding to an</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">angle</b></i> expressed in <b class="calibre9">decimal degrees</b>. [<i class="calibre11">not so</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">useful, really ...</i>]</p></li>
+<li class="calibre22">any other SRS will return a distance measure expressed in<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">meters</b>: anyway, as you can easily notice, figures aren't</p>
+<p class="calibre1">exactly the same.</p></li>
+<li class="calibre22"><b class="calibre9">Great Circle</b> distances are calculated assuming that the<p class="calibre1"></p>
+<p class="calibre1">Earth is exactly a sphere: and this one obviously is the worst</p>
+<p class="calibre1">estimate we can get.</p></li>
+<li class="calibre22">on the other side <b class="calibre9">Geodesic</b> distances are directly<p class="calibre1"></p>
+<p class="calibre1">calculated on the reference Ellipsoid.</p></li>
+</ul>
+<span class="calibre17"><b class="calibre9">Conclusion:</b></span>: <b class="calibre9">Thou shall not have exact<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">measures</b><br class="calibre12"/>
+<br class="calibre12"/>
+But this isn't at all surprising in physical and natural sciences:</p>
+<p class="calibre1">any measured value is intrinsically affected by errors and</p>
+<p class="calibre1">approximations.<br class="calibre12"/>
+And any calculated value will be inexorably affected by rounding</p>
+<p class="calibre1">and truncation artifacts.<br class="calibre12"/>
+<br class="calibre12"/>
+So absolutely exact figures simply doesn't exist in the real world:</p>
+<p class="calibre1">you have to be conscious that you can simply get some more or less</p>
+<p class="calibre1">approximated value.<br class="calibre12"/>
+But at least, you can take care to properly reduce such</p>
+<p class="calibre1">approximations in the best possible way.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"charset.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="first-sql.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="first-sql.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</p></body></html>

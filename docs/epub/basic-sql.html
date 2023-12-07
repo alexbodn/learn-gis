@@ -1,0 +1,396 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Basics about SQL queries</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"first-sql.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="aggregate.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="aggregate.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+The following SQL queries are so elementary simple that you can</p>
+<p class="calibre1">directly verify the results by yourself.<br class="calibre12"/>
+Simply follow any example executing the corresponding SQL statement</p>
+<p class="calibre1">(using <b class="calibre9">copy&amp;paste</b>).</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s;</b></span></p></td>
+</tr>
+</tbody></table>
+This one really is the <i class="calibre11">pons asinorum</i> of SQL: all columns for<p class="calibre1"></p>
+<p class="calibre1">each row of the selected table will be dumped following a random</p>
+<p class="calibre1">order.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">pop2001, regione</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s;</b></span></p></td>
+</tr>
+</tbody></table>
+You aren't necessarily obliged to retrieve every column: you can</p>
+<p class="calibre1">explicitly choose which columns have to be included into the</p>
+<p class="calibre1">result-set, establishing their relative order.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">Cod_rEg AS code, REGIONE AS name,</b><br class="calibre12"/>
+<b class="calibre9">  pop2001 AS "population (2001)"</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s;</b></span></p></td>
+</tr>
+</tbody></table>
+You can set a most appropriate and intelligible name for each</p>
+<p class="calibre1">column, if you feel this is appropriate.<br class="calibre12"/>
+this example shows two important aspects to be absolutely noticed:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">SQL names are <i class="calibre11">case-insensitive</i>: <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">REGIONE</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regione</b></span> refers the same</p>
+<p class="calibre1">column.</p></li>
+<li class="calibre22">SQL names cannot contain <i class="calibre11"><b class="calibre9">forbidden characters</b></i>
+(such as <i class="calibre11">spaces, brackets, colons, hyphens</i> and so on).<br class="calibre12"/>
+And they cannot correspond to any <i class="calibre11"><b class="calibre9">reserved keyword</b></i>
+(i.e. you cannot define a column named e.g. <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SELECT</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">FROM</b></span>, because they shadow</p>
+<p class="calibre1">SQL commands)</p></li>
+<li class="calibre22">anyway you can explicitly <i class="calibre11"><b class="calibre9">mask</b></i> any<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11">forbidden</i> name, so to make it become fully legal.<br class="calibre12"/>
+In order to apply such masking, you simply have to enclose the full</p>
+<p class="calibre1">name within <b class="calibre9">double quotes</b>.</p></li>
+<li class="calibre22">you can obviously indiscriminately double quote every SQL name:<p class="calibre1"></p>
+<p class="calibre1">this is completely harmless, but not strictly required.</p></li>
+<li class="calibre22">in the (<i class="calibre11">extremely rare, but not impossible</i>) case your<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11">forbidden</i> name already contains one or more double quote</p>
+<p class="calibre1">characters, you must insert an extra double quote for each one of</p>
+<p class="calibre1">them.<br class="calibre12"/>
+e.g.: <span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#C04040"&gt;<b class="calibre9">A"Bc"D</b></span> has to be correctly masked as:</p>
+<p class="calibre1"><span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#C04040"&gt;<b class="calibre9">"A""Bc""D"</b></span></p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">COD_REG, REGIONE, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY regione;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+SQL allows you to order rows into the result-set in the most<p class="calibre1"></p>
+<p class="calibre1">convenient way for your purposes.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">COD_REG, REGIONE, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY POP2001 DESC;</b></span></p></td>
+</tr>
+</tbody></table>
+You can order in <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ASC</b></span>ending or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DESC</b></span>ending order at your</p>
+<p class="calibre1">will: the <span class="calibre33"><b class="calibre9">ASC</b></span>
+qualifier is usually omitted, simply because this one is the</p>
+<p class="calibre1">default ordering.</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">Ascending order means A-Z for text values: and from lesser to<p class="calibre1"></p>
+<p class="calibre1">greater for numeric values.</p></li>
+<li class="calibre22">Descending order means Z-A for text values: and from greater to<p class="calibre1"></p>
+<p class="calibre1">lesser for numeric values.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">COD_PRO, PROVINCIA, SIGLA</b><br class="calibre12"/>
+<b class="calibre9">FROM prov2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE COD_REG = 9;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Using the <span class="calibre33"><b class="calibre9">WHERE</b></span>
+clause you can restrict the range: only rows satisfying the<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">WHERE</b></span> clause will</p>
+<p class="calibre1">be placed into the result-set: in this case, the list of Counties</p>
+<p class="calibre1">belonging to Tuscany Region will be extracted.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE COD_PRO = 48;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Same as above: this time the list of Local Councils belonging to</p>
+<p class="calibre1">the Florence County will be extracted.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE COD_REG = 9 AND POP2001 &gt; 50000</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY POP2001 DESC;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You can combine more conditions under the same <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WHERE</b></span> clause: this time the</p>
+<p class="calibre1">list of the most populated Local Councils (&gt; 50,000 peoples)</p>
+<p class="calibre1">belonging to Tuscany Region will be extracted.<br class="calibre12"/>
+And the result-set will be ordered accordingly to decreasing</p>
+<p class="calibre1">population.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE nome_com = 'ROMA';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You can obviously use text strings as comparison values: in</p>
+<p class="calibre1"><i class="calibre11">pure</i> SQL any text string has to be enclosed within <b class="calibre9">single</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">quotes</b>.<br class="calibre12"/>
+[<i class="calibre11">SQLite is smart enough to recognize <b class="calibre9">double quoted</b> text</i></p><i class="calibre11">
+<p class="calibre1">strings as well, but I strongly discourage you to adopt this bad</p>
+</i><p class="calibre1"><i class="calibre11">style as your preferred one</i>].<br class="calibre12"/>
+<span class="calibre17">Please note well</span>: string values comparisons for SQLite are</p>
+<p class="calibre1">always <i class="calibre11"><b class="calibre9">case-sensitive</b></i>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE nome_com = 'L''AQUILA';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+When some text string contains an <i class="calibre11">apostrophe</i>, you have to</p>
+<p class="calibre1">apply <i class="calibre11">masking</i>.<br class="calibre12"/>
+An extra <b class="calibre9">single quote</b> is required to mask every apostrophe</p>
+<p class="calibre1">withing the text string: e.g.: <span _="" p="" class="calibre33">
+</span></p><p class="calibre1"><span _="" p="" class="calibre33">color="#C04040"&gt;<b class="calibre9">REGGIO NELL'EMILIA</b></span> has to be</p>
+<p class="calibre1">correctly masked as: <span class="calibre45">
+</span></p><p class="calibre1"><span class="calibre45">"#C04040"&gt;<b class="calibre9">'REGGIO NELL''EMILIA'</b></span><br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE nome_com LIKE 'roma';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You can use the <i class="calibre11">approximate evaluation</i> operator <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LIKE</b></span> to make text</p>
+<p class="calibre1">comparisons to become <i class="calibre11"><b class="calibre9">case-insensitive</b></i>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE nome_com LIKE '%maria%';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And you can use the operator <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LIKE</b></span> so to apply partial</p>
+<p class="calibre1">text comparison, using <b class="calibre9">%</b> as a wild-card: this query will</p>
+<p class="calibre1">extract any Local Council containing the sub-string <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace" color="#C04040"&gt;<b class="calibre9">'maria'</b></span>
+within its name.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE nome_com IN ('ROMA', 'MILANO',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'NAPOLI');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Sometimes may be useful using a list of values, as the one shown</p>
+<p class="calibre1">above.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PRO_COM, NOME_COM, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE POP2001 BETWEEN 1990 AND 2010;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Another not often used, but sometimes useful comparison criterion</p>
+<p class="calibre1">is the one to set a range of values to be checked.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">PROVINCIA, SIGLA, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM prov2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE COD_REG IN (9, 10, 11, 12)</b><br class="calibre12"/>
+<b class="calibre9">  AND SIGLA NOT IN ('LI', 'PI')</b><br class="calibre12"/>
+<b class="calibre9">  AND (POP2001 BETWEEN 300000 AND 500000</b><br class="calibre12"/>
+<b class="calibre9">    OR POP2001 &gt;</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">750000);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Using SQL you can set any kind of complex <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WHERE</b></span> clause: there are no</p>
+<p class="calibre1">imposed limits.<br class="calibre12"/>
+And this one is a really fantastic feature, disclosing potentially</p>
+<p class="calibre1">infinite scenarios.<br class="calibre12"/>
+Just a short explanation: the previous query will:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">include any County in Central Italy (Regions: Tuscany, Umbria,<p class="calibre1"></p>
+<p class="calibre1">Marche and Lazio)</p></li>
+<li class="calibre22">excluding the Livorno and Pisa Counties</li>
+<li class="calibre22">then filtering Counties by population:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">including the ones within the range 300,000 to 500,000</li>
+<li class="calibre22">including as well the ones exceeding 750,000 peoples</li>
+</ul>
+</li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">PROVINCIA, SIGLA, POP2001</b><br class="calibre12"/>
+<b class="calibre9">FROM prov2001_s</b><br class="calibre12"/>
+<b class="calibre9">WHERE COD_REG IN (9, 10, 11, 12)</b><br class="calibre12"/>
+<b class="calibre9">  AND SIGLA NOT IN ('LI', 'PI')</b><br class="calibre12"/>
+<b class="calibre9">  AND POP2001 BETWEEN 300000 AND 500000</b><br class="calibre12"/>
+<b class="calibre9">  OR POP2001 &gt; 750000;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre17">Please note well:</span> in SQL the logical connector <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">OR</b></span> has a very low</p>
+<p class="calibre1">priority.<br class="calibre12"/>
+Check by yourself: omitting to properly enclose the OR-clause</p>
+<p class="calibre1">within brackets produces very different results, isn't ?</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">LIMIT 10;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+There is a last sometimes useful <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SELECT</b></span> clause to explain:</p>
+<p class="calibre1">using <span class="calibre33"><b class="calibre9">LIMIT</b></span> you</p>
+<p class="calibre1">can set the maximum number of rows to be extracted into the</p>
+<p class="calibre1">result-set<br class="calibre12"/>
+(<i class="calibre11">very often you aren't actually interested into reading a very</i></p><i class="calibre11">
+<p class="calibre1">densely populated table as a whole: a shorted preview will easily</p>
+</i><p class="calibre1"><i class="calibre11">be enough in many cases</i>).<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s</b><br class="calibre12"/>
+<b class="calibre9">LIMIT 10 OFFSET 1000;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And that's not all: SQL doesn't constraints you to read a limited</p>
+<p class="calibre1">row-set necessarily starting from the beginning: you can place the</p>
+<p class="calibre1">start-point at your will, simply using <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">OFFSET</b></span> combined with</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">LIMIT.</b></span><br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">Learning <b class="calibre9">SQL</b>
+isn't so difficult after all.<br class="calibre12"/>
+There are very few <b class="calibre9">keywords</b>, language syntax is notably<p class="calibre1"></p>
+<p class="calibre1">regular and predictable, and query statements are designed to</p>
+<p class="calibre1">resemble <i class="calibre11">plain English</i> (as much as possible ...).<br class="calibre12"/>
+Now you are supposed to be able to attempt writing (<i class="calibre11">simple</i>)</p>
+<p class="calibre1">SQL query statements by yourself.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"first-sql.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="aggregate.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="aggregate.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</p></body></html>

@@ -1,0 +1,475 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4">
+<tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre56" id="calibre_pb_0"><b class="calibre9">linking</b></p>
+<p class="calibre1"></p>
+<p class="calibre1">SpatiaLite comes in different flavors:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre33"><b class="calibre9">libspatialite</b></span>
+is the standard library intended to be loaded as an extension.</li>
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span>
+is a self-standing complete <i class="calibre11"><span class="calibre17"><b class="calibre9">SQL-engine</b></span></i>
+supporting an <i class="calibre11"><span class="calibre17">internal private copy</span></i> of SQLite.</p></li>
+</ul>
+If your principal interest is developing easy-to-be-deployed,<p class="calibre1"></p>
+<p class="calibre1">stand-alone C/C++ applications, then using the <i class="calibre11"><b class="calibre9">statically</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">linked</b></i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span>
+will surely be a desirable option.<br class="calibre12"/>
+Anyway nothing prevents you from using a different layout based on</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">dynamically linked</b></i> shared libraries.<br class="calibre12"/>
+And a third option is supported as well: you can completely avoid</p>
+<p class="calibre1">using SQLite and SpatiaLite libraries.<br class="calibre12"/>
+Both them simply are <i class="calibre11"><span class="calibre17">one single monolithic source</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">file</span></i>: so you can directly compile any required source in a</p>
+<p class="calibre1">single pass (<i class="calibre11">this will obviously generate a <b class="calibre9">statically</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">linked</b> executable</i>).</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">Get a quick glance<p class="calibre1"></p>
+<p class="calibre1">to the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_sample.c</b></span> source</p>
+<p class="calibre1">code; you easily notice that two <i class="calibre11"><b class="calibre9">conditional macros</b></i>
+are extensively used:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SPATIALITE_AMALGAMATION</b></span> is</p>
+<p class="calibre1">used to determine if we are using separate <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libsqlite</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span>, or if we are</p>
+<p class="calibre1">using the all-in-one <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span>
+</p><ul class="calibre46">
+<li class="calibre22">as you can notice the only difference affects inclusion of<p class="calibre1"></p>
+<p class="calibre1">header files:<br class="calibre12"/>
+when using <b class="calibre9">amalgamation</b> you cannot use <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">#include &lt;sqlite3.h&gt;</b></span>
+(<i class="calibre11">because this one is the standard <b class="calibre9">system sqlite</b> header</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">file</i>).</p></li>
+<li class="calibre22">you are required using <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">#include</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">&lt;spatialite/sqlite3.h&gt;</b></span> (<i class="calibre11">a purposely modified</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">version supporting <b class="calibre9">amalgamation</b></i>).</p></li>
+</ul>
+</li>
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SPATIALITE_EXTENSION</b></span> is used</p>
+<p class="calibre1">to determine if we are using an <i class="calibre11">hard-linked</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span> or if we</p>
+<p class="calibre1">intend loading this library as an extension:</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22"><span class="calibre17"><b class="calibre9">please note:</b></span> loading <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span> as an</p>
+<p class="calibre1">extension excludes using the <b class="calibre9">amalgamation</b>, because</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libsqlite</b></span> is</p>
+<p class="calibre1">already linked to the executable in this case.</p></li>
+</ul>
+</li>
+</ul>
+You can now build <b class="calibre9">spatialite_sample.c</b> in many different<p class="calibre1"></p>
+<p class="calibre1">flavors, simply defining these two macros as appropriate, in the</p>
+<p class="calibre1">most flexible way.<br class="calibre12"/>
+The following practical examples are based on the <i class="calibre11">standard</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">GNU</i> <span class="calibre33"><b class="calibre9">gcc</b></span>
+compiler on Linux.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Loading SpatiaLite as an</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">extension</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -DSPATIALITE_EXTENSION</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  spatialite_sample.c -o spatialite_sample</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">-lsqlite3</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Some interesting points to be noted:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you must not explicitly link <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b>;<br class="calibre12"/>
+this is because we'll <i class="calibre11"><span class="calibre17">dynamically load</span></i></span> this</p>
+<p class="calibre1">library only at run-time.</p></li>
+<li class="calibre22">the standard <i class="calibre11">system</i> <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libsqlite</b></span> will be used in</p>
+<p class="calibre1">this case.</p></li>
+<li class="calibre22"><span class="calibre17">please note #1:</span> this approach strongly simplifies<p class="calibre1"></p>
+<p class="calibre1">compile and link phases, but simply postpones the problem until</p>
+<p class="calibre1">run-time.<br class="calibre12"/>
+And obviously a main failure will surely arise if (<i class="calibre11">for any</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">reason</i>) the extension library cannot be actually loaded.</p></li>
+<li class="calibre22"><span class="calibre17">please note #2:</span> adopting this approach your executable<p class="calibre1"></p>
+<p class="calibre1">cannot directly access any SpatiaLite's own function, because no</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libspatialite</b></span> was</p>
+<p class="calibre1">hard-linked;<br class="calibre12"/>
+and consequently any <i class="calibre11"><span class="calibre17">export symbol</span></i> defined into this</p>
+<p class="calibre1">library is actually <i class="calibre11">invisible</i> to the executable code.<br class="calibre12"/>
+Anyway, you can safely invoke any function exposed via SQL</p>
+<p class="calibre1">language, once <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libsqlite</b></span> has successfully</p>
+<p class="calibre1">loaded the extension library.</p></li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">This basic approach<p class="calibre1"></p>
+<p class="calibre1">is exactely the same supported by any other language binding (Java,</p>
+<p class="calibre1">Python, PHP ...).<br class="calibre12"/>
+But using C/C++ you get get more flexible configuration options:</p>
+<p class="calibre1">please, see the following examples.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Dynamically linking libspatialite +</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">libsqlite</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -I/usr/local/include</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  spatialite_sample.c -o spatialite_sample</b><br class="calibre12"/>
+<b class="calibre9">  -L/usr/local/lib -lspatialite</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">-lsqlite3</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Some interesting points to be noted:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this time we'll <i class="calibre11">hard-link</i> <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span> to our</p>
+<p class="calibre1">executable.</p></li>
+<li class="calibre22">we'll <b class="calibre9">not</b> use <b class="calibre9">amalgamation</b>, so neither<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">-DSPATIALITE_AMALGAMATION</b></span>
+nor <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-DSPATIALITE_EXTENSION</b></span> have</p>
+<p class="calibre1">to be declared this time.</p></li>
+<li class="calibre22">usually <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span> is installed</p>
+<p class="calibre1">on the <span class="calibre33"><b class="calibre9">/usr/local</b></span>
+directory:<br class="calibre12"/>
+so we'll set <span class="calibre33"><b class="calibre9">-I</b></span>
+and <span class="calibre33"><b class="calibre9">-L</b></span> options in</p>
+<p class="calibre1">order to extend the searching rules for header files and</p>
+<p class="calibre1">libraries.</p></li>
+<li class="calibre22"><span class="calibre17">please note:</span> this time we'll link both <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libsqlite</b></span></p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Dynamically linking</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">libspatialite-amalgamation</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -DSPATIALITE_AMALGAMATION</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -I/usr/local/include spatialite_sample.c \</b><br class="calibre12"/>
+<b class="calibre9">  -o spatialite_sample \</b><br class="calibre12"/>
+<b class="calibre9">  -L/usr/local/lib -lspatialite</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Some interesting points to be noted:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this time we'll use <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span></p></li>
+<li class="calibre22">and accordingly to this, we'll define <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-DSPATIALITE_AMALGAMATION</b></span></p></li>
+<li class="calibre22">as in the previous example we'll set <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-I</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-L</b></span> options in order to</p>
+<p class="calibre1">extend the searching rules for header files and libraries.</p></li>
+<li class="calibre22"><span class="calibre17">please note:</span> this time will simply link <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite</b></span>;<br class="calibre12"/>
+there is absolutely no need to link <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libsqlite</b></span> as well, because</p>
+<p class="calibre1">we'll use the <i class="calibre11"><span class="calibre17">private internal copy</span></i> directly included</p>
+<p class="calibre1">within <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span></p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Statically linking libspatialite +</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">libsqlite</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -I/usr/local/include</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  spatialite_sample.c -o spatialite_sample \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/local/lib/libspatialite.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libsqlite.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libgeos_c.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libgeos.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libproj.a \</b><br class="calibre12"/>
+<b class="calibre9">  -lstdc++ -ldl -lpthread -lm</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Some interesting points to be noted:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">adopting a <i class="calibre11"><span class="calibre17">statically linked</span></i> strategy we are<p class="calibre1"></p>
+<p class="calibre1">consequently required to resolve any symbol at link time.<br class="calibre12"/>
+So we have to explicitly refer several further libraries:</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22"><span class="calibre33"><b class="calibre9">libproj</b></span>,<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libgeos_c</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libgeos</b></span> are</p>
+<p class="calibre1">always required.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">-lstdc++</b></span> is<p class="calibre1"></p>
+<p class="calibre1">required as well, because <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libgeos</b></span> actually is a C++</p>
+<p class="calibre1">library, thus requiring the C++ run-time support.</p></li>
+<li class="calibre22">on Linux <span class="calibre33"><b class="calibre9">-ldl</b></span>
+and <span class="calibre33"><b class="calibre9">-lpthread</b></span> are<p class="calibre1"></p>
+<p class="calibre1">strictly required.</p></li>
+<li class="calibre22">on some Linux declaring <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-lm</b></span> may be required as well</p>
+<p class="calibre1">(<i class="calibre11">and is always harmless, even when not strictly</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">required</i>).</p></li>
+</ul>
+</li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Statically linking</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">libspatialite-amalgamation</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -DSPATIALITE_AMALGAMATION</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -I/usr/local/include spatialite_sample.c \</b><br class="calibre12"/>
+<b class="calibre9">  -o spatialite_sample \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/local/lib/libspatialite.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libgeos_c.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libgeos.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libproj.a \</b><br class="calibre12"/>
+<b class="calibre9">  -lstdc++ -ldl -lpthread -lm</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Exactly the same as above; simply this time <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libsqlite</b></span> is no longer</p>
+<p class="calibre1">required, because this is directly supported by the <i class="calibre11"><span class="calibre17">private</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">internal copy</span></i> included within the <b class="calibre9">amalgamation</b>
+itself.<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><span class="calibre17"><b class="calibre9">Please<p class="calibre1"></p>
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">note:</b></span> different platforms, different system libraries,</p>
+<p class="calibre1">different file system layouts.<br class="calibre12"/>
+The <span class="calibre33"><b class="calibre9">gcc</b></span> compiler</p>
+<p class="calibre1">is available on quite every platform (<i class="calibre11">this including Microsoft</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Windows, of course</i>).<br class="calibre12"/>
+Unhappily, each platform has its own specific idiosyncrasies.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">MacOsX:</b><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -DSPATIALITE_AMALGAMATION</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -I/usr/local/include -I/opt/local/include</b><br class="calibre12"/>
+<b class="calibre9">  spatialite_sample.c -o spatialite_sample \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/local/lib/libspatialite.a \</b><br class="calibre12"/>
+<b class="calibre9">  /opt/local/lib/libgeos_c.a \</b><br class="calibre12"/>
+<b class="calibre9">  /opt/local/lib/libgeos.a \</b><br class="calibre12"/>
+<b class="calibre9">  /opt/local/lib/libproj.a \</b><br class="calibre12"/>
+<b class="calibre9">  /opt/local/lib/libiconv.a \</b><br class="calibre12"/>
+<b class="calibre9">  /opt/local/lib/libcharset.a \</b><br class="calibre12"/>
+<b class="calibre9">  -lstdc++ -ldl -lpthread -lm</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+MacOsX basically is an Unix derivative (<i class="calibre11">most precisely a FreeBSD</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">derivative</i>).<br class="calibre12"/>
+The wonderful <a href="http://www.macports.org/">MacPorts</a> fully</p>
+<p class="calibre1">supports <i class="calibre11">standard open source</i> libraries (in our case</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libgeos</b></span>,</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libproj</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libiconv</b></span>):</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><b class="calibre9">MacPorts</b> header files will be installed on <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">/opt/local/include</b></span></p></li>
+<li class="calibre22"><b class="calibre9">MacPorts</b> libraries will be installed on <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">/opt/local/lib</b></span></p></li>
+<li class="calibre22">Both <span class="calibre33"><b class="calibre9">libiconv</b></span>
+and <span class="calibre33"><b class="calibre9">libcharset</b></span>
+are directly integrated within the C run-time on Linux.<br class="calibre12"/>
+But on MacOsX you are required to explicitly link these<p class="calibre1"></p>
+<p class="calibre1">libraries.</p></li>
+</ul>
+<b class="calibre9">Windows [MinGW + MSYS]:</b>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -DSPATIALITE_AMALGAMATION</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -I/usr/local/include spatialite_sample.c \</b><br class="calibre12"/>
+<b class="calibre9">  -o spatialite_sample.exe \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/local/lib/libspatialite.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libgeos_c.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libgeos.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/lib/libproj.a \</b><br class="calibre12"/>
+<b class="calibre9">  /usr/local/lib/libiconv.a \</b><br class="calibre12"/>
+<b class="calibre9">  -lstdc++ -lm</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Windows and Unix are strongly different:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">as we have already seen for MacOsX explicitly linking<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">libiconv</b></span> is</p>
+<p class="calibre1">required for Windows as well (but not <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libcharset</b></span>).</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">-ldl</b></span> and<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">-lpthread</b></span> aren't</p>
+<p class="calibre1">required at all<br class="calibre12"/>
+(<i class="calibre11">simply because Windows <b class="calibre9">dynamic loader</b> and</i></p><i class="calibre11">
+<p class="calibre1"><b class="calibre9">multithreading</b> are completely different from the</p>
+<p class="calibre1">corresponding Unix implementations, and are directly supported by</p>
+</i><p class="calibre1"><i class="calibre11">the <b class="calibre9">WIN32</b> run-time</i>).</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre7"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Simplest approach: no libs at all</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">...</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">gcc -Wall -Wextra -Wunused -DSPATIALITE_AMALGAMATION</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -DOMIT_GEOS=1 -DOMIT_PROJ=1 -DOMIT_ICONV=1</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -DOMIT_GEOCALLBACKS=1 \</b><br class="calibre12"/>
+<b class="calibre9">  -I./headers -I/usr/local/include \</b><br class="calibre12"/>
+<b class="calibre9">  spatialite.c sqlite3.c spatialite_sample.c</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">\</b><br class="calibre12"/>
+<b class="calibre9">  -o spatialite_sample.exe</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And finally a <i class="calibre11"><span class="calibre17">third way</span></i> exists, one allowing to</p>
+<p class="calibre1">directly embed a complete Spatial SQL engine in the simplest and</p>
+<p class="calibre1">absolutely painless way.<br class="calibre12"/>
+[<i class="calibre11">I suppose following this latest approach you can be actually</i></p><i class="calibre11">
+<p class="calibre1">able to get a minimal SpatiaLite support even on <b class="calibre9">PDA</b> or</p>
+</i><p class="calibre1"><i class="calibre11"><b class="calibre9">smart-phones</b></i>]<br class="calibre12"/>
+Just few explanations:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you must create a new directory.</li>
+<li class="calibre22">copy the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_sample.c</b></span> source</p>
+<p class="calibre1">into this directory.</p></li>
+<li class="calibre22">then copy into the same directory the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">sqlite3.c</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite.c</b></span> sources<br class="calibre12"/>
+(<i class="calibre11">they are included in any source distribution of <span class="calibre32">
+</span></i></p><p class="calibre1"><i class="calibre11"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span></i>).</p></li>
+<li class="calibre22">and finally you must copy the whole <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">headers</b></span> directory from</p>
+<p class="calibre1"><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgmation</b></span>sources.</p></li>
+</ul>
+All right, you are now ready to build all-together your<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11">statically linked</i> executable.<br class="calibre12"/>
+Please note, absolutely no external libraries are required:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this build is based on <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite-amalgamation</b></span>,</p>
+<p class="calibre1">so we'll define <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-DSPATIALITE_AMALGAMATION</b></span></p></li>
+<li class="calibre22">by defining <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-DOMIT_GEOS=1</b></span> (<i class="calibre11">and so</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">on</i>) we'll completely disable GEOS, PROJ.4 and ICONV</p>
+<p class="calibre1">support.</p></li>
+<li class="calibre22">but this will avoid at all linking any further library.</li>
+<li class="calibre22">yes, that's true, now SpatiaLite is severely gilded:<br class="calibre12"/>
+but the <b class="calibre9">main-core</b> of Spatial SQL is preserved<p class="calibre1"></p>
+<p class="calibre1">untouched.<br class="calibre12"/>
+And that's more than enough for many and many practical</p>
+<p class="calibre1">purposes.</p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<p class="calibre1">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">The problem</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">Very closely related to the latest one. Now the problem is:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">identify any isolated Local Council, i.e. each one doesn't<p class="calibre1"></p>
+<p class="calibre1">sharing a common boundary with any other Italian Local</p>
+<p class="calibre1">Councils.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">Local Council</td>
+<td class="calibre13">County</td>
+<td class="calibre13">Region</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CAMPIONE D'ITALIA</td>
+<td class="calibre13">COMO</td>
+<td class="calibre13">LOMBARDIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CAPRAIA ISOLA</td>
+<td class="calibre13">LIVORNO</td>
+<td class="calibre13">TOSCANA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CARLOFORTE</td>
+<td class="calibre13">CAGLIARI</td>
+<td class="calibre13">SARDEGNA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">FAVIGNANA</td>
+<td class="calibre13">TRAPANI</td>
+<td class="calibre13">SICILIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ISOLA DEL GIGLIO</td>
+<td class="calibre13">GROSSETO</td>
+<td class="calibre13">TOSCANA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ISOLE TREMITI</td>
+<td class="calibre13">FOGGIA</td>
+<td class="calibre13">PUGLIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">LA MADDALENA</td>
+<td class="calibre13">SASSARI</td>
+<td class="calibre13">SARDEGNA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">LAMPEDUSA E LINOSA</td>
+<td class="calibre13">AGRIGENTO</td>
+<td class="calibre13">SICILIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">LIPARI</td>
+<td class="calibre13">MESSINA</td>
+<td class="calibre13">SICILIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">PANTELLERIA</td>
+<td class="calibre13">TRAPANI</td>
+<td class="calibre13">SICILIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">PONZA</td>
+<td class="calibre13">LATINA</td>
+<td class="calibre13">LAZIO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">PROCIDA</td>
+<td class="calibre13">NAPOLI</td>
+<td class="calibre13">CAMPANIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">USTICA</td>
+<td class="calibre13">PALERMO</td>
+<td class="calibre13">SICILIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">VENTOTENE</td>
+<td class="calibre13">LATINA</td>
+<td class="calibre13">LAZIO</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<span class="calibre17">Please note:</span> quite all the above listed Local Councils are</p>
+<p class="calibre1">small sea island.<br class="calibre12"/>
+With the remarkable exception of <b class="calibre9">Campione d'Italia</b>, which is</p>
+<p class="calibre1">a <i class="calibre11"><b class="calibre9">land island</b></i>:<br class="calibre12"/>
+i.e. a small Italian <i class="calibre11"><b class="calibre9">enclave</b></i> completely surrounded by</p>
+<p class="calibre1">Switzerland.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc1.lc_name AS "Local Council",</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS Region</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc1</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id = lc1.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id = c.region_id)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN local_councils AS lc2 ON (</b><br class="calibre12"/>
+<b class="calibre9">  lc1.lc_id &lt;&gt; lc2.lc_id</b><br class="calibre12"/>
+<b class="calibre9">  AND NOT ST_Disjoint(lc1.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">lc2.geometry)</b><br class="calibre12"/>
+<b class="calibre9">  AND lc2.ROWID IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_local_councils_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">      MbrMinY(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">      MbrMaxX(lc1.geometry),</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">      MbrMaxY(lc1.geometry))))</b><br class="calibre12"/>
+</p>
+</div><p class="calibre1"><span class="calibre33"><b class="calibre9">GROUP BY lc1.lc_id</b><br class="calibre12"/>
+<b class="calibre9">HAVING Count(lc2.lc_id) = 0</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY lc1.lc_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Nothing really new in this: more or less, this is quite exactly the<p class="calibre1"></p>
+<p class="calibre1">same we've already examined in the latest example.<br class="calibre12"/>
+Just few differences are worth to be explained:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this time we've used <div class="calibre33"><b class="calibre9">NOT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ST_Disjoint()</b></span> to identify any allowable Spatial</p>
+<p class="calibre1">relationship between couples of adjacent Local Councils.</p></li>
+<li class="calibre22">and we've used <div class="calibre33"><b class="calibre9">LEFT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span> for the second instance of the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> table</p>
+<p class="calibre1">(<span class="calibre33"><b class="calibre9">AS lc2</b></span>): this</p>
+<p class="calibre1">way we'll be absolutely sure to insert into the result-set every</p>
+<p class="calibre1">Local Council coming from the <i class="calibre11"><b class="calibre9">left-sided</b></i> term</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">lc1</b></span>, because a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">LEFT JOIN</b></span> is</p>
+<p class="calibre1">valid even when the <i class="calibre11"><b class="calibre9">right-sided</b></i> term <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">lc2</b></span> doesn't matches any</p>
+<p class="calibre1">corresponding entry.</p></li>
+<li class="calibre22">the <div class="calibre33"><b class="calibre9">GROUP BY<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">lc1.lc_id</b></span> clause is required so to build a distinct</p>
+<p class="calibre1">aggregation group for each Local Council.</p></li>
+<li class="calibre22">after all this the function <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Count(lc2.lc_id)</b></span> will return</p>
+<p class="calibre1">the number of neighbours for each Local Council:<br class="calibre12"/>
+quite obviously, a value <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ZERO</b></span> denotes that this one</p>
+<p class="calibre1">actually is an isolated Local Council.</p></li>
+<li class="calibre22">and finally we've used the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">HAVING</b></span> clause to exclude any</p>
+<p class="calibre1">not-isolated Local Council.</p></li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">Please note well:</b></span> the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">HAVING</b></span> clause must not be</p>
+<p class="calibre1">confused with the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WHERE</b></span> clause.<br class="calibre12"/>
+They only are apparently similar, but a strong difference exists</p>
+<p class="calibre1">between them:</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22"><span class="calibre33"><b class="calibre9">WHERE</b></span>
+immediately evaluates if a <i class="calibre11"><span class="calibre17">candidate row</span></i> has to<p class="calibre1"></p>
+<p class="calibre1">inserted into the result-set or not.<br class="calibre12"/>
+So, a row discarded by <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WHERE</b></span> is completely ignored,</p>
+<p class="calibre1">and cannot be used in any further step.</p></li>
+<li class="calibre22">on the other side <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">HAVING</b></span> is evaluated only</p>
+<p class="calibre1">when the result-set is completely defined, just immediately before</p>
+<p class="calibre1">be passed back to the calling process.<br class="calibre12"/>
+So <span class="calibre33"><b class="calibre9">HAVING</b></span> is</p>
+<p class="calibre1">really useful to perform any kind of <i class="calibre11"><b class="calibre9">post-processing</b></i>,</p>
+<p class="calibre1">as in this case.<br class="calibre12"/>
+We simply needed to <i class="calibre11"><b class="calibre9">reduce</b></i> the result-set (<i class="calibre11">by</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">deleting any not-isolated Local Council</i>), and the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">HAVING</b></span> clause was exactly</p>
+<p class="calibre1">the tool for the job.</p></li>
+</ul>
+</li>
+</ul>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"neighbours.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="pop-places_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="pop-places_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

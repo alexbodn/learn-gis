@@ -1,0 +1,277 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<p class="calibre1">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">The problem</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">Do you remember ?</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">We've left the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">populated_places</b></span> table in a self-standing position since now.</p></li>
+<li class="calibre22">While designing the DB layout we concluded that some spatial<p class="calibre1"></p>
+<p class="calibre1">relationship must exists between <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">populated_places</b></span> and</p>
+<p class="calibre1"><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span>.</p></li>
+<li class="calibre22">We can easily expect to get some inconsistencies between these two datasets, because they come from absolutely unrelated<p class="calibre1"></p>
+<p class="calibre1">sources.</p></li>
+<li class="calibre22">The <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">populated_places</b></span> table has <span class="calibre33"><b class="calibre9">POINT</b></span> Geometries into the <span class="calibre33"><b class="calibre9">4236</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">SRID</b></span> (<b class="calibre9">Geographic</b>, <i class="calibre11"><b class="calibre9">WGS84</b></i>,</p>
+<p class="calibre1"><i class="calibre11">long-lat</i>):<br class="calibre12"/>
+whilst the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> table has <span class="calibre33"><b class="calibre9">MULTIPOLYGON</b></span>
+Geometries into the <span class="calibre33"><b class="calibre9">23032</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">SRID</b></span> (<i class="calibre11">planar</i>, <i class="calibre11"><b class="calibre9">ED50 UTM zone</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">32</b></i>)</p></li>
+<li class="calibre22">Using two different <b class="calibre9">SRID</b>s surely introduces some further complication to be resolved.</li>
+</ul>
+It's now time to confront yourself with this not-so-simple<p class="calibre1"></p>
+<p class="calibre1">problem.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">PopulatedPlaceId</td>
+<td class="calibre13">PopulatedPlaceName</td>
+<td class="calibre13">LocalCouncilId</td>
+<td class="calibre13">LocalCouncilName</td>
+<td class="calibre13">County</td>
+<td class="calibre13">Region</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">12383</td>
+<td class="calibre13">Acitrezza</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">12384</td>
+<td class="calibre13">Lavinio</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">NULL</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">11327</td>
+<td class="calibre13">Altino</td>
+<td class="calibre13">69001</td>
+<td class="calibre13">ALTINO</td>
+<td class="calibre13">CHIETI</td>
+<td class="calibre13">ABRUZZO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">11265</td>
+<td class="calibre13">Archi</td>
+<td class="calibre13">69002</td>
+<td class="calibre13">ARCHI</td>
+<td class="calibre13">CHIETI</td>
+<td class="calibre13">ABRUZZO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">11247</td>
+<td class="calibre13">Ari</td>
+<td class="calibre13">69003</td>
+<td class="calibre13">ARI</td>
+<td class="calibre13">CHIETI</td>
+<td class="calibre13">ABRUZZO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">pp.id AS PopulatedPlaceId,</b><br class="calibre12"/>
+<b class="calibre9">  pp.name AS PopulatedPlaceName,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_id AS LocalCouncilId,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS LocalCouncilName</b><br class="calibre12"/>
+<b class="calibre9">FROM populated_places AS pp,</b><br class="calibre12"/>
+<b class="calibre9">  local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">WHERE ST_Contains(lc.geometry,</b><br class="calibre12"/>
+<b class="calibre9">  Transform(pp.geometry,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">23032));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You can start with this first simple query:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">ST_Contains(<i class="calibre11">geom1</i>,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9"><i class="calibre11">geom2</i>)</b></span> function is used to evaluate the spatial relationship existing between Local Councils and Populated</p>
+<p class="calibre1">Places.</p></li>
+<li class="calibre22">there is absolutely nothing strange in this query: you'll<p class="calibre1"></p>
+<p class="calibre1">simply use a JOIN condition based on a spatial relationship.</p></li>
+<li class="calibre22">quite obviously using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Transform()</b></span> is required so to re-project any coordinate into the same SRID.</p></li>
+<li class="calibre22">anyway you are already warned: you are now well conscious that using a so simplistic approach (i.e. not using the <i class="calibre11">R*Tree<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">Spatial Index</i>) will surely produce a very slowly running</p>
+<p class="calibre1">query.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">pp.id AS PopulatedPlaceId,</b><br class="calibre12"/>
+<b class="calibre9">  pp.name AS PopulatedPlaceName,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_id AS LocalCouncilId,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS LocalCouncilName</b><br class="calibre12"/>
+<b class="calibre9">FROM populated_places AS pp,</b><br class="calibre12"/>
+<b class="calibre9">  local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">WHERE ST_Contains(lc.geometry,</b><br class="calibre12"/>
+<b class="calibre9">    Transform(pp.geometry, 23032))</b><br class="calibre12"/>
+<b class="calibre9">  AND lc.lc_id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">    FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_local_councils_geometry</b><br class="calibre12"/>
+<b class="calibre9">    WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMinY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxX(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032)),</b><br class="calibre12"/>
+<b class="calibre9">      MbrMaxY(</b><br class="calibre12"/>
+<b class="calibre9">        Transform(pp.geometry,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">23032)));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This further query is exactly the same as the first one: except in that this second version fully exploits the <i class="calibre11">R*Tree Spatial<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">Index</i>.<br class="calibre12"/>
+<span class="calibre17">Please note:</span> using <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Transform()</b></span> several times is absolutely required, so to correctly re-project any coordinate into an uniform SRID.<br class="calibre12"/>
+<br class="calibre12"/>
+Anyway there is still an unresolved issue in the above query:</p>
+<p class="calibre1">following this way any mismatching Populated Place will never be identified.<br class="calibre12"/>
+In order to detect if some Populated Place does actually falls</p>
+<p class="calibre1">outside any corresponding Local Council you absolutely have to implement a <span class="calibre33"><b class="calibre9">LEFT</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span>.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">pp.id AS PopulatedPlaceId,</b><br class="calibre12"/>
+<b class="calibre9">  pp.name AS PopulatedPlaceName,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_id AS LocalCouncilId,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS LocalCouncilName,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS Region</b><br class="calibre12"/>
+<b class="calibre9">FROM populated_places AS pp</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">  ON (ST_Contains(lc.geometry,</b><br class="calibre12"/>
+<b class="calibre9">      Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032))</b><br class="calibre12"/>
+<b class="calibre9">    AND lc.lc_id IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT pkid</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">idx_local_councils_geometry</b><br class="calibre12"/>
+<b class="calibre9">      WHERE pkid MATCH</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">RTreeIntersects(</b><br class="calibre12"/>
+<b class="calibre9">        MbrMinX(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032)),</b><br class="calibre12"/>
+<b class="calibre9">        MbrMinY(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032)),</b><br class="calibre12"/>
+<b class="calibre9">        MbrMaxX(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          Transform(pp.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">23032)),</b><br class="calibre12"/>
+<b class="calibre9">        MbrMaxY(</b><br class="calibre12"/>
+</p>
+<p class="calibre1"><b class="calibre9">          Transform(pp.geometry,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">23032)))))</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN counties AS c</b><br class="calibre12"/>
+<b class="calibre9">  ON (c.county_id = lc.county_id)</b><br class="calibre12"/>
+<b class="calibre9">LEFT JOIN regions AS r</b><br class="calibre12"/>
+<b class="calibre9">  ON (r.region_id = c.region_id)</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY 6, 5, 4;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+All right: this one is the final and definitive version.<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you've simply added further LEFT JOIN clauses, so to fully<p class="calibre1"></p>
+<p class="calibre1">qualify each Local Council reporting the corresponding County and Region.</p></li>
+<li class="calibre22">not at all surprisingly about twenty Populated Places doesn't actually correspond to any Local Council<br class="calibre12"/>
+(<i class="calibre11">you expected this, because these two datasets come from<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">unrelated sources</i>).</p></li>
+<li class="calibre22">you can duly use QGIS to visually inspect such mismatching<p class="calibre1"></p>
+<p class="calibre1">entries: and you'll soon discover that in each case all them are towns placed very closely to sea shore.<br class="calibre12"/>
+And some (<i class="calibre11">slight</i>) misplacement actually exist.</p></li>
+</ul>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"islands.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="pp-adjacent_split_000.html">Next Slide</a></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

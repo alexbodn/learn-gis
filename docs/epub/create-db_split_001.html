@@ -1,0 +1,391 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<p class="calibre1">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">Normal Form</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1">Any <i class="calibre11">well designed</i> DB adheres to the <b class="calibre9">relational</b>
+paradigm, and implements the so-called <i class="calibre11"><b class="calibre9">Normal</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">Form</b></i>.<br class="calibre12"/>
+Very simply explained in plain words:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">you'll first attempt to identify any distinct <b class="calibre9">category</b>
+(aka class) present into your dataset</li>
+<li class="calibre22">and simultaneously you have to identify any possible<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">relation</b> connecting categories.</p></li>
+<li class="calibre22">data <b class="calibre9">redundancy</b> is strongly discouraged, and has to be<p class="calibre1"></p>
+<p class="calibre1">reduced whenever is possible.</p></li>
+</ul>
+Consider the <b class="calibre9">ISTAT Census 2001</b>; identifying categories and<p class="calibre1"></p>
+<p class="calibre1">relations is absolutely simple:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">At the lowermost hierarchy level we have obviously Local<p class="calibre1"></p>
+<p class="calibre1">Councils.</p></li>
+<li class="calibre22">Each Local Council surely belongs to some County: so a relation<p class="calibre1"></p>
+<p class="calibre1">exists connecting Local Councils and Counties.<br class="calibre12"/>
+To be more descriptive, this one is a typical</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">one-to-many</b></i> relationship<br class="calibre12"/>
+(one single County / many Local Councils: placing the same Local</p>
+<p class="calibre1">Council on two different Counties is absolutely forbidden).</p></li>
+<li class="calibre22">The same is true for Counties and Regions.</li>
+<li class="calibre22">There is not real need to establish a relation between Local<p class="calibre1"></p>
+<p class="calibre1">Councils and Regions, because we can get this relation using the</p>
+<p class="calibre1">County as an intermediate pivot.</p></li>
+</ul>
+<img src="er.png" alt="entity - relation diagram" class="calibre14"/><br class="calibre12"/>
+Accordingly to this, it's quite easy to identify several flaws in<p class="calibre1"></p>
+<p class="calibre1">the original <i class="calibre11">Shapefile's</i> layout:</p>
+<p class="calibre1"></p><ol class="calibre43">
+<li class="calibre22">a <span class="calibre33"><b class="calibre9">POP2001</b></span>
+value is present for Local Councils, Counties and Regions:<br class="calibre12"/>
+well, this one clearly is an unneeded redundancy.<br class="calibre12"/>
+We simply have to preserve this information at the lowermost level<p class="calibre1"></p>
+<p class="calibre1">(Local Councils):<br class="calibre12"/>
+because we can then compute anyway an aggregate value for Counties</p>
+<p class="calibre1">(or Regions).</p></li>
+<li class="calibre22">a second redundancy exists: there is no real need compelling us<p class="calibre1"></p>
+<p class="calibre1">to store both County and Region codes for each Local Council.<br class="calibre12"/>
+Preserving the County code is just enough, because we can get a</p>
+<p class="calibre1">reference to the corresponding Region anyway simply referencing the</p>
+<p class="calibre1">County.</p></li>
+<li class="calibre22">a Geometry representation is stored for each County and<p class="calibre1"></p>
+<p class="calibre1">Region:<br class="calibre12"/>
+this too represents an unneeded redundancy, because we can get such</p>
+<p class="calibre1">Geometries simply aggregating the ones stored at the Local Council</p>
+<p class="calibre1">level.</p></li>
+</ol>
+Then we have the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">cities1000</b></span> dataset: which</p>
+<p class="calibre1">comes from a completely different source (so there is no useful key</p>
+<p class="calibre1">we can use to establish relations to other entities).<br class="calibre12"/>
+And this dataset is in the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">4326 SRID</b></span> (<b class="calibre9">WGS84</b>),</p>
+<p class="calibre1">whilst any <b class="calibre9">ISTAT - Census 2001</b> dataset is in the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">23032 SRID</b></span> [<b class="calibre9">ED50 UTM zone</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">32</b>];<br class="calibre12"/>
+so for now will simply keep this dataset in a completely</p>
+<p class="calibre1">self-standing state.<br class="calibre12"/>
+We'll see later how we can actually integrate this dataset with the</p>
+<p class="calibre1">other ones: after all, all them represent Italy, isn't ?<br class="calibre12"/>
+For sure some geographic relationship must exist ...</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE regions (</b><br class="calibre12"/>
+<b class="calibre9">  region_id INTEGER NOT NULL PRIMARY KEY,</b><br class="calibre12"/>
+<b class="calibre9">  region_name TEXT NOT NULL);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 1a</b>) we'll start creating the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span> table (i.e. the one</p>
+<p class="calibre1">positioned at the topmost hierarchic level).<br class="calibre12"/>
+<span class="calibre17">Please note:</span> we have defined a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRIMARY KEY</b></span>, i.e. a unique</p>
+<p class="calibre1">(not duplicable), absolutely unambiguous identifier for each</p>
+<p class="calibre1">Region.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INTO regions (region_id, region_name)</b><br class="calibre12"/>
+<b class="calibre9">SELECT COD_REG, REGIONE</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 1b</b>) then we'll populate the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span> table.<br class="calibre12"/>
+Using the <span class="calibre33"><b class="calibre9">INSERT INTO ...</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">SELECT ...</b></span> is more or less like performing a copy:<br class="calibre12"/>
+rows are extracted from the input table and immediately inserted</p>
+<p class="calibre1">into the output table.<br class="calibre12"/>
+As you can see, corresponding columns are explicitly identified</p>
+<p class="calibre1"><i class="calibre11">by order</i>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">TABLE counties (</b><br class="calibre12"/>
+<b class="calibre9">  county_id INTEGER NOT NULL PRIMARY KEY,</b><br class="calibre12"/>
+<b class="calibre9">  county_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  car_plate_code TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  region_id INTEGER NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  CONSTRAINT fk_county_region</b><br class="calibre12"/>
+<b class="calibre9">    FOREIGN KEY (region_id)</b><br class="calibre12"/>
+<b class="calibre9">    REFERENCES regions</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(region_id));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INTO counties (county_id, county_name,</b><br class="calibre12"/>
+<b class="calibre9">  car_plate_code, region_id)</b><br class="calibre12"/>
+<b class="calibre9">SELECT cod_pro, provincia, sigla, cod_reg</b><br class="calibre12"/>
+<b class="calibre9">FROM prov2001_s;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 2a</b>) we'll now create (and populate) the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">counties</b></span> table.<br class="calibre12"/>
+<span class="calibre17">Please note:</span> a relation exists linking <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">counties</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span>.<br class="calibre12"/>
+Defining an appropriate <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">FOREIGN KEY</b></span> we'll make such</p>
+<p class="calibre1">relation to be explicitly set once for all.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INDEX idx_county_region</b><br class="calibre12"/>
+<b class="calibre9">  ON counties (region_id);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 2b</b>) accordingly to performance considerations, we must</p>
+<p class="calibre1">also create an <span class="calibre33">INDEX</span>
+corresponding to each <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">FOREIGN KEY</b></span> we'll define.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Very shortly explained: a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRIMARY KEY</b></span> isn't simply a</p>
+<p class="calibre1">logical constraint.<br class="calibre12"/>
+In SQLite defining a <span class="calibre33"><b class="calibre9">PRIMARY</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">KEY</b></span> automatically implies generating an implicit index</p>
+<p class="calibre1">supporting fast direct access to each single row.<br class="calibre12"/>
+But on the other side defining a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">FOREIGN KEY</b></span> simply</p>
+<p class="calibre1">establishes a logical constraint:<br class="calibre12"/>
+so if you actually wish to support fast direct access to each</p>
+<p class="calibre1">single row you have to explicitly create the corresponding</p>
+<p class="calibre1">index.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">TABLE local_councils (</b><br class="calibre12"/>
+<b class="calibre9">  lc_id INTEGER NOT NULL PRIMARY KEY,</b><br class="calibre12"/>
+<b class="calibre9">  lc_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  population INTEGER NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  county_id INTEGER NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  CONSTRAINT fk_lc_county</b><br class="calibre12"/>
+<b class="calibre9">    FOREIGN KEY (county_id)</b><br class="calibre12"/>
+<b class="calibre9">    REFERENCES counties</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(county_id));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INDEX idx_lc_county</b><br class="calibre12"/>
+<b class="calibre9">ON local_councils (county_id);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 3a</b>) we'll now create the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> table.<br class="calibre12"/>
+A relation exists linking <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span>.<br class="calibre12"/>
+So in this case too we have to define a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">FOREIGN KEY</b></span> , then creating</p>
+<p class="calibre1">the corresponding index.<br class="calibre12"/>
+<span class="calibre17">Please note:</span> we haven't defined any Geometry column,</p>
+<p class="calibre1">although one is required for <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span>;<br class="calibre12"/>
+this is not a mistake, this is absolutely <span class="calibre17">intentional</span>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn(</b><br class="calibre12"/>
+<b class="calibre9">  'local_councils', 'geometry',</b><br class="calibre12"/>
+<b class="calibre9">  23032, 'MULTIPOLYGON', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 3b</b>) creating a Geometry column isn't the same as</p>
+<p class="calibre1">creating any other ordinary column.<br class="calibre12"/>
+We have to use the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span> spatial</p>
+<p class="calibre1">function, specifying:</p>
+<p class="calibre1"></p><ol class="calibre43">
+<li class="calibre22">the <b class="calibre9">table</b> name</li>
+<li class="calibre22">the <b class="calibre9">geometry</b> column name</li>
+<li class="calibre22">the <b class="calibre9">SRID</b> to be used</li>
+<li class="calibre22">the expected <b class="calibre9">geometry class</b></li>
+<li class="calibre22">the <b class="calibre9">dimension model</b><br class="calibre12"/>
+(in this case, simple 2D)</li>
+</ol>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INTO local_councils (lc_id,</b><br class="calibre12"/>
+<b class="calibre9">  lc_name, population, county_id, geometry)</b><br class="calibre12"/>
+<b class="calibre9">SELECT PRO_COM, NOME_COM, POP2001,</b><br class="calibre12"/>
+<b class="calibre9">  COD_PRO, Geometry</b><br class="calibre12"/>
+<b class="calibre9">FROM com2001_s;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 3c</b>) after all this can populate the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> table as</p>
+<p class="calibre1">usual.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE populated_places (</b><br class="calibre12"/>
+<b class="calibre9">  id INTEGER NOT NULL</b><br class="calibre12"/>
+<b class="calibre9">    PRIMARY KEY AUTOINCREMENT,</b><br class="calibre12"/>
+<b class="calibre9">  name TEXT NOT NULL);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn(</b><br class="calibre12"/>
+<b class="calibre9">  'populated_places', 'geometry',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INTO populated_places (id,</b><br class="calibre12"/>
+<b class="calibre9">  name, geometry)</b><br class="calibre12"/>
+<b class="calibre9">SELECT NULL, COL002,</b><br class="calibre12"/>
+<b class="calibre9">  MakePoint(COL006, COL005, 4326)</b><br class="calibre12"/>
+<b class="calibre9">FROM cities1000</b><br class="calibre12"/>
+<b class="calibre9">WHERE COL009 = 'IT';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 4)</b> you have now to perform the last step: creating (and<p class="calibre1"></p>
+<p class="calibre1">populating) the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">populated_places</b></span>
+table.<br class="calibre12"/>
+Several interesting points to be noted:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">we have used an <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AUTOINCREMENT</b></span> clause for the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">PRIMARY KEY</b></span></p></li>
+<li class="calibre22">this practically means that SQLite can automatically generate<p class="calibre1"></p>
+<p class="calibre1">an appropriate unique value for this <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">PRIMARY KEY</b></span>, when no</p>
+<p class="calibre1">explicit value has been already set.</p></li>
+<li class="calibre22">accordingly to this, in the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT INTO</b></span> statement a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> value was</p>
+<p class="calibre1">set for the <span class="calibre33"><b class="calibre9">PRIMARY</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">KEY</b></span>:<br class="calibre12"/>
+and this explicitly solicited SQLite to assign automatic</p>
+<p class="calibre1">values.</p></li>
+<li class="calibre22">the original <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">cities1000</b></span> dataset shipped</p>
+<p class="calibre1">two numeric columns for <b class="calibre9">longitude</b> [<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">COL006</b></span>] and <b class="calibre9">latitude</b>
+[<span class="calibre33"><b class="calibre9">COL005</b></span>]:<br class="calibre12"/>
+so we have to use the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MakePoint()</b></span> Spatial function</p>
+<p class="calibre1">in order to build a point-like Geometry.</p></li>
+<li class="calibre22">using the <div class="calibre33"><b class="calibre9">SRID<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326</b></span> we set such Geometry into the <b class="calibre9">WGS84</b>
+[<b class="calibre9">Geographic System</b>] SRS.</p></li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">Just to<p class="calibre1"></p>
+<p class="calibre1">recapitulate:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">You started this tutorial using <b class="calibre9">Virtual Shapefiles</b> (and<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">Virtual CSV/TXT</b>) tables.</p></li>
+<li class="calibre22">Such <b class="calibre9">Virtual Tables</b> aren't at all real DB tables: they<p class="calibre1"></p>
+<p class="calibre1">aren't <i class="calibre11">internally stored</i>.<br class="calibre12"/>
+They simply are trivial <i class="calibre11">external files</i> accessed using an</p>
+<p class="calibre1">appropriate driver.</p></li>
+<li class="calibre22">Using Virtual Tables at first allowed you to test some simple<p class="calibre1"></p>
+<p class="calibre1">and very basic SQL queries.</p></li>
+<li class="calibre22">But in order to test more complex SQL features any dataset have<p class="calibre1"></p>
+<p class="calibre1">to be properly <b class="calibre9">imported</b> into the DBMS itself.</p></li>
+<li class="calibre22">And this step required creating (and then populating)<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">internal tables</b></i>, accordingly to a well designed</p>
+<p class="calibre1">layout.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">DROP<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE com2001_s;</b><br class="calibre12"/>
+<b class="calibre9">DROP TABLE prov2001_s;</b><br class="calibre12"/>
+<b class="calibre9">DROP TABLE reg2001_s;</b><br class="calibre12"/>
+<b class="calibre9">DROP TABLE cities1000;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<b class="calibre9">Step 5)</b> and finally you can drop any <b class="calibre9">Virtual Table</b>,<p class="calibre1"></p>
+<p class="calibre1">because they aren't any longer useful.<br class="calibre12"/>
+<span class="calibre17">Please note:</span> dropping a <i class="calibre11">Virtual Shapefile</i> or</p>
+<p class="calibre1"><i class="calibre11">Virtual CSV/TXT</i> doesn't removes the corresponding</p>
+<p class="calibre1"><i class="calibre11">external</i> data-source, but simply removes the connection with</p>
+<p class="calibre1">the current database.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"qgis.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="join-1_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="join-1_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

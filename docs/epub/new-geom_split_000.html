@@ -1,0 +1,444 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #6:</b><br class="calibre12"/>
+<b class="calibre9">Creating a new Geometry column</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"tables.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="ins-upd-del_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="ins-upd-del_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">We'll now examine<p class="calibre1"></p>
+<p class="calibre1">in deeper detail how to correctly define a Geometry-type</p>
+<p class="calibre1">column.<br class="calibre12"/>
+<b class="calibre9">SpatiaLite</b> follows an approach very closely related to the</p>
+<p class="calibre1">one adopted by <b class="calibre9">PostgreSQL/PostGIS</b>;<br class="calibre12"/>
+i.e. creating a Geometry-type at the same time the corresponding</p>
+<p class="calibre1">table is created isn't allowed.<br class="calibre12"/>
+You always must first create the table, then adding the</p>
+<p class="calibre1">Geometry-column in a second time and as a separate step.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">TABLE test_geom (</b><br class="calibre12"/>
+<b class="calibre9">  id INTEGER NOT NULL</b><br class="calibre12"/>
+<b class="calibre9">    PRIMARY KEY AUTOINCREMENT,</b><br class="calibre12"/>
+<b class="calibre9">  name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  measured_value DOUBLE NOT</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">NULL);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn('test_geom', 'the_geom',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This is the only supported way to get a completely valid</p>
+<p class="calibre1">Geometry.<br class="calibre12"/>
+Any different approach will surely produce an incorrect and</p>
+<p class="calibre1">unreliable Geometry.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn('test_geom', 'the_geom',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY', 0);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn('test_geom', 'the_geom',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY', 1);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Although the previous one surely is the most often used form, this</p>
+<p class="calibre1">one the complete form supported by <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span>:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the last (<i class="calibre11">optional</i>) arguments actually means:<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">NOT NULL</b></span></p></li>
+<li class="calibre22">setting a value <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ZERO</b></span> (<i class="calibre11">assumed to be the</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">default value if omitted</i>) then the Geometry column will accept</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> values.</p></li>
+<li class="calibre22">otherwise only <div class="calibre33"><b class="calibre9">NOT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> geometries will be accepted.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Supported <b class="calibre9">SRID</b>s:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">any possible SRID defined within the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatial_ref_sys</b></span>
+<i class="calibre11">metadata</i> table.</p></li>
+<li class="calibre22">or <span class="calibre33"><b class="calibre9">-1</b></span> to<p class="calibre1"></p>
+<p class="calibre1">politely denote any unknown / unspecified SRS.</p></li>
+</ul>
+Supported <b class="calibre9">Geometry-type</b>s:<p class="calibre1"></p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre52"><b class="calibre9">Geometry Type</b></td>
+<td class="calibre52"><b class="calibre9">Notes</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">POINT</td>
+<td rowspan="6" class="calibre40">
+<p class="calibre18">the commonly used Geometry-types:<br class="calibre12"/>
+corresponding to Shapefile's specs<br class="calibre12"/>
+supported by any desktop GIS apps</p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">LINESTRING</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">POLYGON</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">MULTIPOINT</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">MULTILINESTRING</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">MULTIPOLYGON</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">GEOMETRYCOLLECTION</td>
+<td class="calibre40">Not often used: unsupported by Shapefile and<p class="calibre1"></p>
+<p class="calibre1">desktop GIS apps</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">GEOMETRY</td>
+<td class="calibre40">A generic container supporting any possible<p class="calibre1"></p>
+<p class="calibre1">geometry-class<br class="calibre12"/>
+Not often used: unsupported by Shapefile and desktop GIS apps</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Supported <b class="calibre9">Dimension-model</b>s:</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre52"><b class="calibre9">Dimension model</b></td>
+<td class="calibre52"><b class="calibre9">Alias</b></td>
+<td class="calibre52"><b class="calibre9">Notes</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">XY</td>
+<td class="calibre40">2</td>
+<td class="calibre40">X and Y coords (simple 2D)</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">XYZ</td>
+<td class="calibre40">3</td>
+<td class="calibre40">X, Y and Z coords (3D)</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">XYM</td>
+<td class="calibre40"><br class="calibre12"/></td>
+<td class="calibre40">X and Y coords + <i class="calibre11">measure value</i> M</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40">XYZM</td>
+<td class="calibre40"><br class="calibre12"/></td>
+<td class="calibre40">X, Y and Z coords + <i class="calibre11">measure value</i>
+M</td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><span class="calibre17"><b class="calibre9">Please note<p class="calibre1"></p>
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">well:</b></span> this one is a very frequent pitfall.<br class="calibre12"/>
+Many developers, GIS professionals and alike obviously feel to be</p>
+<p class="calibre1">much smarter than this, so they often tend to invent some highly</p>
+<p class="calibre1">imaginative alternative way to create their own Geometries.<br class="calibre12"/>
+e.g. bungling someway the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">geometry_columns</b></span> table seems</p>
+<p class="calibre1">to be a very popular practice.<br class="calibre12"/>
+<br class="calibre12"/>
+May well be that such <i class="calibre11">creative</i> methods will actually work</p>
+<p class="calibre1">with some very specific SpatiaLite's version; but for sure some</p>
+<p class="calibre1">severe incompatibility will raise before or after ...<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9"><span class="calibre17">Be warned:</span></b> only Geometries created using <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span> are</p>
+<p class="calibre1">fully legitimate.<br class="calibre12"/>
+Any different approach is completely unsafe (<i class="calibre11">and unsupported</i>
+..)</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+I suppose that directly checking how AddGeometryColumn() affects<p class="calibre1"></p>
+<p class="calibre1">the database may help you to understand better.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">PRAGMA<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">table_info(test_geom);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">cid</td>
+<td class="calibre13">name</td>
+<td class="calibre13">type</td>
+<td class="calibre13">notnull</td>
+<td class="calibre13">dflt_value</td>
+<td class="calibre13">pk</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">0</td>
+<td class="calibre13">id</td>
+<td class="calibre13">INTEGER</td>
+<td class="calibre13">1</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">1</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">name</td>
+<td class="calibre13">TEXT</td>
+<td class="calibre13">1</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">measured_value</td>
+<td class="calibre13">DOUBLE</td>
+<td class="calibre13">1</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">the_geom</td>
+<td class="calibre13">POINT</td>
+<td class="calibre13">0</td>
+<td class="calibre13">NULL</td>
+<td class="calibre13">0</td>
+</tr>
+</tbody></table>
+<span class="calibre17"><b class="calibre9">step 1</b></span><span class="calibre17">:</span> a new <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">test_geom</b></span> column has been</p>
+<p class="calibre1">added to the corresponding table.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM geometry_columns</b><br class="calibre12"/>
+<b class="calibre9">WHERE f_table_name LIKE 'test_geom';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">f_table_name</td>
+<td class="calibre13">f_geometry_column</td>
+<td class="calibre13">type</td>
+<td class="calibre13">coord_dimension</td>
+<td class="calibre13">srid</td>
+<td class="calibre13">spatial_index_enabled</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">test_geom</td>
+<td class="calibre13">the_geom</td>
+<td class="calibre13">POINT</td>
+<td class="calibre13">XY</td>
+<td class="calibre13">4326</td>
+<td class="calibre13">0</td>
+</tr>
+</tbody></table>
+<span class="calibre17"><b class="calibre9">step 2:</b></span> a corresponding row has been inserted into</p>
+<p class="calibre1">the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">geometry_columns</b></span> metadata</p>
+<p class="calibre1">table.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM sqlite_master</b><br class="calibre12"/>
+<b class="calibre9">WHERE type = 'trigger'</b><br class="calibre12"/>
+<b class="calibre9">  AND tbl_name LIKE 'test_geom';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">type</td>
+<td class="calibre13">name</td>
+<td class="calibre13">tbl_name</td>
+<td class="calibre13">rootpage</td>
+<td class="calibre13">sql</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">trigger</td>
+<td class="calibre13">ggi_test_geom_the_geom</td>
+<td class="calibre13">test_geom</td>
+<td class="calibre13">0</td>
+<td class="calibre13">CREATE TRIGGER "ggi_test_geom_the_geom" BEFORE<p class="calibre1"></p>
+<p class="calibre1">INSERT ON "test_geom"<br class="calibre12"/>
+FOR EACH ROW BEGIN<br class="calibre12"/>
+SELECT RAISE(ROLLBACK, 'test_geom.the_geom violates Geometry</p>
+<p class="calibre1">constraint [geom-type or SRID not allowed]')<br class="calibre12"/>
+WHERE (SELECT type FROM geometry_columns<br class="calibre12"/>
+WHERE f_table_name = 'test_geom' AND f_geometry_column =</p>
+<p class="calibre1">'the_geom'<br class="calibre12"/>
+AND GeometryConstraints(NEW."the_geom", type, srid, 'XY') = 1) IS</p>
+<p class="calibre1">NULL;<br class="calibre12"/>
+END</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">trigger</td>
+<td class="calibre13">ggu_test_geom_the_geom</td>
+<td class="calibre13">test_geom</td>
+<td class="calibre13">0</td>
+<td class="calibre13">CREATE TRIGGER "ggu_test_geom_the_geom" BEFORE<p class="calibre1"></p>
+<p class="calibre1">UPDATE ON "test_geom"<br class="calibre12"/>
+FOR EACH ROW BEGIN<br class="calibre12"/>
+SELECT RAISE(ROLLBACK, 'test_geom.the_geom violates Geometry</p>
+<p class="calibre1">constraint [geom-type or SRID not allowed]')<br class="calibre12"/>
+WHERE (SELECT type FROM geometry_columns<br class="calibre12"/>
+WHERE f_table_name = 'test_geom' AND f_geometry_column =</p>
+<p class="calibre1">'the_geom'<br class="calibre12"/>
+AND GeometryConstraints(NEW."the_geom", type, srid, 'XY') = 1) IS</p>
+<p class="calibre1">NULL;<br class="calibre12"/>
+END</p></td>
+</tr>
+</tbody></table>
+<span class="calibre17"><b class="calibre9">step 3:</b></span> the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">sqlite_master</b></span> is the main</p>
+<p class="calibre1"><i class="calibre11">metadata</i> table used by SQLite to store internal</p>
+<p class="calibre1">objects.<br class="calibre12"/>
+As you can easily notice, each Geometry requires some</p>
+<p class="calibre1"><b class="calibre9">triggers</b> to be fully supported and well integrated into the</p>
+<p class="calibre1">DBMS workflow.<br class="calibre12"/>
+Not at all surprisingly, all this has to be defined in a strongly</p>
+<p class="calibre1">self-consistent way in order to let SpatiaLite work as</p>
+<p class="calibre1">expected.<br class="calibre12"/>
+If some element is missing or badly defined, the obvious</p>
+<p class="calibre1">consequence will be a defective and unreliable Spatial DBMS.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">DiscardGeometryColumn('test_geom',</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'the_geom');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This will remove any <b class="calibre9">metadata</b> and any <b class="calibre9">trigger</b> related<p class="calibre1"></p>
+<p class="calibre1">to the given Geometry.<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note:</b></span> anyway this will leave any</p>
+<p class="calibre1">geometry-value stored within the corresponding table absolutely</p>
+<p class="calibre1">untouched.<br class="calibre12"/>
+Simply, after calling <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DiscardGeometryColumn(...)</b></span>
+they aren't any longer fully qualified geometries, but anonymous</p>
+<p class="calibre1">and generic BLOB values.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">RecoverGeometryColumn('test_geom', 'the_geom',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This will attempt to recreate any <b class="calibre9">metadata</b> and any</p>
+<p class="calibre1"><b class="calibre9">trigger</b> related to the given Geometry.<br class="calibre12"/>
+If the operation successfully completes, then the Geometry column</p>
+<p class="calibre1">is fully qualified.<br class="calibre12"/>
+In other words, there is absolutely no difference between a</p>
+<p class="calibre1">Geometry created by <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span> and</p>
+<p class="calibre1">another created by <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">RecoverGeometryColumn()</b></span>.<br class="calibre12"/>
+</p>
+<p class="calibre1">Very simply explained:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span> is</p>
+<p class="calibre1">intended to create a new, empty column.</p></li>
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">RecoverGeometryColumn()</b></span> is</p>
+<p class="calibre1">intended to recover in a second time an already existing (<i class="calibre11">and</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">populated</i>) column.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre50">
+<p class="calibre18"><b class="calibre9">Compatibility issues between different</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">versions</b></p>
+<p class="calibre1"></p>
+<p class="calibre1">SpatiaLite isn't eternally immutable.<br class="calibre12"/>
+Like any other human artifact and any other software package</p>
+<p class="calibre1">SpatiaLite tends to evolve during the time; and SQLite as well</p>
+<p class="calibre1">evolves during the time.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Solemn commitment:</b></span> you are absolutely granted that</p>
+<p class="calibre1">any database-file generated by some previous (<i class="calibre11"><b class="calibre9">older</b></i>)</p>
+<p class="calibre1">version can be safely operated using any later</p>
+<p class="calibre1">(<i class="calibre11"><b class="calibre9">newer</b></i>) version of both SQLite and SpatiaLite.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note well:</b></span> the opposite isn't necessarily</p>
+<p class="calibre1">true.<br class="calibre12"/>
+Attempting to operate a database-file generated by a most recent</p>
+<p class="calibre1">(<i class="calibre11"><b class="calibre9">newer</b></i>) version using any previous</p>
+<p class="calibre1">(<i class="calibre11"><b class="calibre9">older</b></i>) version may easily be impossible at all, or</p>
+<p class="calibre1">may cause some more or less serious trouble.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Sometimes circumventing version-related issues is inherently<p class="calibre1"></p>
+<p class="calibre1">impossible: e.g. there is absolutely no way to use 3D geometries on</p>
+<p class="calibre1">obsolescent versions, because the required support was introduced</p>
+<p class="calibre1">in more recent times.<br class="calibre12"/>
+But in many other cases such issues are simply caused by some</p>
+<p class="calibre1">incompatible binary function required by <b class="calibre9">triggers</b>.<br class="calibre12"/>
+<br class="calibre12"/>
+</p></body></html>

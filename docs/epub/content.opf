@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="uuid_id">
+  <metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:calibre="http://calibre.kovidgoyal.net/2009/metadata">
+    <dc:title>SpatiaLite Cookbook</dc:title>
+    <meta name="calibre:timestamp" content="2023-12-04T22:23:08.554312+00:00"/>
+    <dc:language>en</dc:language>
+    <dc:creator>Unknown</dc:creator>
+    <dc:identifier id="uuid_id" opf:scheme="uuid">090e39f0-a85b-47a3-bfe2-c4347f398272</dc:identifier>
+  </metadata>
+  <manifest>
+    <item id="html" href="index1.html" media-type="application/xhtml+xml"/>
+    <item id="html1" href="tech-intro.html" media-type="application/xhtml+xml"/>
+    <item id="html2" href="index.html" media-type="application/xhtml+xml"/>
+    <item id="html312" href="start_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html311" href="start_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html310" href="start_split_002.html" media-type="application/xhtml+xml"/>
+    <item id="html39" href="start_split_003.html" media-type="application/xhtml+xml"/>
+    <item id="html38" href="start_split_004.html" media-type="application/xhtml+xml"/>
+    <item id="html4" href="first-db.html" media-type="application/xhtml+xml"/>
+    <item id="html5" href="shapefile.html" media-type="application/xhtml+xml"/>
+    <item id="html6" href="charset.html" media-type="application/xhtml+xml"/>
+    <item id="html7" href="srid.html" media-type="application/xhtml+xml"/>
+    <item id="html8" href="first-sql.html" media-type="application/xhtml+xml"/>
+    <item id="html9" href="basic-sql.html" media-type="application/xhtml+xml"/>
+    <item id="html10" href="aggregate.html" media-type="application/xhtml+xml"/>
+    <item id="html11" href="first-spatial.html" media-type="application/xhtml+xml"/>
+    <item id="html122" href="wkt-wkb_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html121" href="wkt-wkb_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html13" href="metadata.html" media-type="application/xhtml+xml"/>
+    <item id="html14" href="qgis.html" media-type="application/xhtml+xml"/>
+    <item id="html152" href="create-db_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html151" href="create-db_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html162" href="join-1_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html161" href="join-1_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html17" href="join-2.html" media-type="application/xhtml+xml"/>
+    <item id="html18" href="views.html" media-type="application/xhtml+xml"/>
+    <item id="html192" href="tables_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html191" href="tables_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html202" href="new-geom_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html201" href="new-geom_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html212" href="ins-upd-del_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html211" href="ins-upd-del_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html222" href="constraints_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html221" href="constraints_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html232" href="acid_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html231" href="acid_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html242" href="rtree_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html241" href="rtree_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html25" href="guinness.html" media-type="application/xhtml+xml"/>
+    <item id="html262" href="neighbours_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html261" href="neighbours_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html272" href="islands_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html271" href="islands_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html282" href="pop-places_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html281" href="pop-places_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html292" href="pp-adjacent_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html291" href="pp-adjacent_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html302" href="railways-lc_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html301" href="railways-lc_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html314" href="railways-pp_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html313" href="railways-pp_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html322" href="railways-buf_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html321" href="railways-buf_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html332" href="union_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html331" href="union_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html34" href="sp-view.html" media-type="application/xhtml+xml"/>
+    <item id="html352" href="dijkstra_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html351" href="dijkstra_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html36" href="system.html" media-type="application/xhtml+xml"/>
+    <item id="html37" href="impexp.html" media-type="application/xhtml+xml"/>
+    <item id="html382" href="lang_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html381" href="lang_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html392" href="c_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html391" href="c_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html403" href="java_split_000.html" media-type="application/xhtml+xml"/>
+    <item id="html402" href="java_split_001.html" media-type="application/xhtml+xml"/>
+    <item id="html401" href="java_split_002.html" media-type="application/xhtml+xml"/>
+    <item id="html41" href="python.html" media-type="application/xhtml+xml"/>
+    <item id="html42" href="php.html" media-type="application/xhtml+xml"/>
+    <item id="added18" href="point.gif" media-type="image/gif"/>
+    <item id="added19" href="polygon.gif" media-type="image/gif"/>
+    <item id="added1" href="fettuccine.jpg" media-type="image/jpeg"/>
+    <item id="added2" href="terrine.jpg" media-type="image/jpeg"/>
+    <item id="added3" href="the-author.jpg" media-type="image/jpeg"/>
+    <item id="added4" href="cc-by-sa.png" media-type="image/png"/>
+    <item id="added38" href="dbfimp.png" media-type="image/png"/>
+    <item id="added22" href="er.png" media-type="image/png"/>
+    <item id="added6" href="fig1.png" media-type="image/png"/>
+    <item id="added7" href="fig2.png" media-type="image/png"/>
+    <item id="added8" href="fig3.png" media-type="image/png"/>
+    <item id="added9" href="fig4.png" media-type="image/png"/>
+    <item id="added10" href="fig5.png" media-type="image/png"/>
+    <item id="added11" href="fig6.png" media-type="image/png"/>
+    <item id="added12" href="fig7.png" media-type="image/png"/>
+    <item id="added15" href="fig8.png" media-type="image/png"/>
+    <item id="added16" href="fig9.png" media-type="image/png"/>
+    <item id="added17" href="fig10.png" media-type="image/png"/>
+    <item id="added5" href="gnu.png" media-type="image/png"/>
+    <item id="added42" href="html.png" media-type="image/png"/>
+    <item id="added41" href="htmlexp.png" media-type="image/png"/>
+    <item id="added13" href="lat-long.png" media-type="image/png"/>
+    <item id="added43" href="mapexp.png" media-type="image/png"/>
+    <item id="added44" href="mapexp2.png" media-type="image/png"/>
+    <item id="added23" href="mbr.png" media-type="image/png"/>
+    <item id="added35" href="net.png" media-type="image/png"/>
+    <item id="added46" href="pdf.png" media-type="image/png"/>
+    <item id="added48" href="php.png" media-type="image/png"/>
+    <item id="added45" href="png.png" media-type="image/png"/>
+    <item id="added24" href="qgis-buf.png" media-type="image/png"/>
+    <item id="added20" href="qgis1.png" media-type="image/png"/>
+    <item id="added21" href="qgis2.png" media-type="image/png"/>
+    <item id="added37" href="shpexp.png" media-type="image/png"/>
+    <item id="added36" href="shpimp.png" media-type="image/png"/>
+    <item id="added30" href="sp-view1.png" media-type="image/png"/>
+    <item id="added31" href="sp-view2.png" media-type="image/png"/>
+    <item id="added32" href="sp-view3.png" media-type="image/png"/>
+    <item id="added33" href="sp-view4.png" media-type="image/png"/>
+    <item id="added34" href="sp-view5.png" media-type="image/png"/>
+    <item id="added" href="spatialite.png" media-type="image/png"/>
+    <item id="added47" href="svg.png" media-type="image/png"/>
+    <item id="added40" href="txtexp.png" media-type="image/png"/>
+    <item id="added39" href="txtimp.png" media-type="image/png"/>
+    <item id="added25" href="union1.png" media-type="image/png"/>
+    <item id="added26" href="union2.png" media-type="image/png"/>
+    <item id="added27" href="union3.png" media-type="image/png"/>
+    <item id="added28" href="union4.png" media-type="image/png"/>
+    <item id="added29" href="union5.png" media-type="image/png"/>
+    <item id="added14" href="utm0.png" media-type="image/png"/>
+    <item id="page_css" href="page_styles.css" media-type="text/css"/>
+    <item id="css" href="stylesheet.css" media-type="text/css"/>
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="html"/>
+    <itemref idref="html1"/>
+    <itemref idref="html2"/>
+    <itemref idref="html312"/>
+    <itemref idref="html311"/>
+    <itemref idref="html310"/>
+    <itemref idref="html39"/>
+    <itemref idref="html38"/>
+    <itemref idref="html4"/>
+    <itemref idref="html5"/>
+    <itemref idref="html6"/>
+    <itemref idref="html7"/>
+    <itemref idref="html8"/>
+    <itemref idref="html9"/>
+    <itemref idref="html10"/>
+    <itemref idref="html11"/>
+    <itemref idref="html122"/>
+    <itemref idref="html121"/>
+    <itemref idref="html13"/>
+    <itemref idref="html14"/>
+    <itemref idref="html152"/>
+    <itemref idref="html151"/>
+    <itemref idref="html162"/>
+    <itemref idref="html161"/>
+    <itemref idref="html17"/>
+    <itemref idref="html18"/>
+    <itemref idref="html192"/>
+    <itemref idref="html191"/>
+    <itemref idref="html202"/>
+    <itemref idref="html201"/>
+    <itemref idref="html212"/>
+    <itemref idref="html211"/>
+    <itemref idref="html222"/>
+    <itemref idref="html221"/>
+    <itemref idref="html232"/>
+    <itemref idref="html231"/>
+    <itemref idref="html242"/>
+    <itemref idref="html241"/>
+    <itemref idref="html25"/>
+    <itemref idref="html262"/>
+    <itemref idref="html261"/>
+    <itemref idref="html272"/>
+    <itemref idref="html271"/>
+    <itemref idref="html282"/>
+    <itemref idref="html281"/>
+    <itemref idref="html292"/>
+    <itemref idref="html291"/>
+    <itemref idref="html302"/>
+    <itemref idref="html301"/>
+    <itemref idref="html314"/>
+    <itemref idref="html313"/>
+    <itemref idref="html322"/>
+    <itemref idref="html321"/>
+    <itemref idref="html332"/>
+    <itemref idref="html331"/>
+    <itemref idref="html34"/>
+    <itemref idref="html352"/>
+    <itemref idref="html351"/>
+    <itemref idref="html36"/>
+    <itemref idref="html37"/>
+    <itemref idref="html382"/>
+    <itemref idref="html381"/>
+    <itemref idref="html392"/>
+    <itemref idref="html391"/>
+    <itemref idref="html403"/>
+    <itemref idref="html402"/>
+    <itemref idref="html401"/>
+    <itemref idref="html41"/>
+    <itemref idref="html42"/>
+  </spine>
+</package>

@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #10:</b><br class="calibre12"/>
+<b class="calibre9">Wonderful R*Tree Spatial Index</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"acid.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="guinness.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="guinness.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">A <b class="calibre9">Spatial<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">Index</b> more or less is like any other Index: i.e. the intended</p>
+<p class="calibre1">role of any Index is to support really fast search of selected</p>
+<p class="calibre1">items within an huge dataset.<br class="calibre12"/>
+<br class="calibre12"/>
+Simply think of some huge textbook: searching some specific item by</p>
+<p class="calibre1">reading the whole book surely is painful, and may require a very</p>
+<p class="calibre1">long time.<br class="calibre12"/>
+But you can actually look at the textbook's index, then simply</p>
+<p class="calibre1">jumping to the appropriate page(s).<br class="calibre12"/>
+<br class="calibre12"/>
+Any DB index plays exactly the same identical role.<br class="calibre12"/>
+Anyway, searching Geometries falling within a given search frame</p>
+<p class="calibre1">isn't the same of searching a text string or a number: so a</p>
+<p class="calibre1">different Index type is required. i.e. a <b class="calibre9">Spatial Index</b>.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Several algorithms supporting a Spatial Index has been defined<p class="calibre1"></p>
+<p class="calibre1">during the past years.<br class="calibre12"/>
+SQLite's Spatial Index is based on the <b class="calibre9">R*Tree</b>
+algorithm.<br class="calibre12"/>
+<br class="calibre12"/>
+<a href="http://en.wikipedia.org/wiki/File:R-tree.svg"><img src="&lt;/p" class="calibre14"/>
+</a></p><p class="calibre1"><a href="http://en.wikipedia.org/wiki/File:R-tree.svg">"../img/rtree.png" alt="R*Tree illustration" /&gt;</a><br class="calibre12"/>
+<br class="calibre12"/>
+Very shortly said, an R*Tree defines a <i class="calibre11">tree-like</i> structure</p>
+<p class="calibre1">based on rectangles (the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">R</b></span> in R*Tree stands exactly</p>
+<p class="calibre1">for <b class="calibre9">R</b><i class="calibre11">ectangle</i>).<br class="calibre12"/>
+<img src="mbr.png" alt="MBR illustration" class="calibre14"/><br class="calibre12"/>
+Every arbitrary Geometry can be represented as a</p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17">rectangle</span></i>, irrelevantly of its actual shape: we can</p>
+<p class="calibre1">simply use the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MBR</b></span> (<i class="calibre11">Minimum Bounding</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">Rectangle</i>) corresponding to such Geometry.<br class="calibre12"/>
+May well be the term <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BBOX</b></span> (<i class="calibre11">Bounding Box</i>)</p>
+<p class="calibre1">is more familiar to you: both terms are exact synonyms.<br class="calibre12"/>
+<br class="calibre12"/>
+It's now quite intuitive understanding how the R*Tree does actually</p>
+<p class="calibre1">works:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">Spatial query defines an arbitrary search frame (this too being<p class="calibre1"></p>
+<p class="calibre1">a rectangle)</p></li>
+<li class="calibre22">the R*Tree is quickly scanned identifying any overlapping index<p class="calibre1"></p>
+<p class="calibre1">rectangle</p></li>
+<li class="calibre22">and finally any individual Geometry falling withing the search<p class="calibre1"></p>
+<p class="calibre1">frame will be identified.&gt;</p></li>
+</ul>
+Think of the well known <i class="calibre11"><span class="calibre17"><b class="calibre9">needle in the hay</b></span></i>
+problem: using an R*Tree is an excellent solution allowing to find<p class="calibre1"></p>
+<p class="calibre1">the <i class="calibre11"><b class="calibre9">needle</b></i> in a very short time, even when the</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">hay</b></i> actually is an impressively huge one.<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<p class="calibre18"><b class="calibre9">Common misconceptions and</b></p><b class="calibre9">
+</b></td>
+</tr>
+</tbody></table>
+</p></body></html>

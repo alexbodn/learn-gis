@@ -1,0 +1,369 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Language bindings: Python</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Test environment</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Linux Debian:</b></span><br class="calibre12"/>
+just to be sure to check an up-to-date state-of-the-art I've</p>
+<p class="calibre1">actually used <b class="calibre9">Debian Squeeze</b> (32 bit). So I'm actually sure</p>
+<p class="calibre1">that all required packages are reasonably using the most recent</p>
+<p class="calibre1">version.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Python:</b></span><br class="calibre12"/>
+<b class="calibre9">python-2.6.6</b> was already installed on my testbed system, so</p>
+<p class="calibre1">I was immediately ready to start my test.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">pyspatialite connector:</b></span><br class="calibre12"/>
+the connector source is available for download at: <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://code.google.com/p/pyspatialite/"&gt;http://code.google.com/p/pyspatialite/</a><br class="calibre12"/>
+</p>
+<p class="calibre1">I've actually downloaded the latest supported version: <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://pyspatialite.googlecode.com/files/pyspatialite-2.6.1.tar.gz"&gt;
+http://pyspatialite.googlecode.com/files/pyspatialite-2.6.1.tar.gz</a><br class="calibre12"/>
+</p>
+<p class="calibre1">In order to build and install the <b class="calibre9">pyspatialite</b> connector I</p>
+<p class="calibre1">used the canonical Python scripts:<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre62"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" color="#FFFFFF"&gt;$ python setup.py</p>
+</div><p class="calibre1"><span class="calibre32">build</span><br class="calibre12"/>
+<span class="calibre63">... verbose</span></p><span class="calibre63">
+</span><p class="calibre1"><span class="calibre63">output follows [suppressed] ...</span><br class="calibre12"/>
+<span class="calibre63">$</span></p><span class="calibre63">
+</span><p class="calibre1"><span class="calibre63">su</span><br class="calibre12"/>
+<span class="calibre63"># python</span></p><span class="calibre63">
+</span><p class="calibre1"><span class="calibre63">setup.py install</span><br class="calibre12"/></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Very important notice:</b></span> I soon discovered that simply</p>
+<p class="calibre1">using the standard build script wasn't enough: this way I got an</p>
+<p class="calibre1">obsolete SpatiaLite <b class="calibre9">v.2.3.1</b> and that's not at all a good</p>
+<p class="calibre1">thing.<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre67">
+<p class="calibre18"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Caveat</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">The most recent QGIS versions (<b class="calibre9">1.6 / 1.7 trunk</b>) are actually</p>
+<p class="calibre1">using SpatiaLite <b class="calibre9">v.2.4.0</b> so any Python plugin using the</p>
+<p class="calibre1">previous v.2.3.1 can easily cause conflicts due to version</p>
+<p class="calibre1">incompatilibiles.<br class="calibre12"/>
+And this fully accounts for any issue noticed by QGIS users.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><p class="calibre18">
+</p><p class="calibre1">"margin-bottom: 0cm; text-decoration: none"&gt;<span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Patching setup.py</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+I quickly discovered that supporting the most recent SpatiaLite</p>
+<p class="calibre1">v.2.4.0-RC4 was actually a piece of cake: I simply had to change</p>
+<p class="calibre1">two lines in the <b class="calibre9">setup.py</b> script (<b class="calibre9">line 87</b> and</p>
+<p class="calibre1">followings).<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre62"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" size="2" style="font-size: 10pt" color=</p>
+<p class="calibre1">"#FFFFFF"&gt;def get_amalgamation():<br class="calibre12"/>
+    """Download the Spatialite amalgamation if</p>
+<p class="calibre1">it isn't there, already."""<br class="calibre12"/>
+    if os.path.exists(AMALGAMATION_ROOT):<br class="calibre12"/>
+        return<br class="calibre12"/>
+    os.mkdir(AMALGAMATION_ROOT)<br class="calibre12"/>
+    print "Downloading amalgation."<br class="calibre12"/>
+<br class="calibre12"/>
+    # find out what's current amalgamation ZIP</p>
+<p class="calibre1">file<br class="calibre12"/>
+    download_page =</p>
+<p class="calibre1">urllib.urlopen("http://www.gaia-gis.it/spatialite<span>
+</span></p><p class="calibre1">"background: #ff0000"&gt;-2.4.0-4/sources.html").read()<br class="calibre12"/>
+    pattern =</p>
+<p class="calibre1">re.compile("(libspatialite-amalgamation.*?\.zip)")<br class="calibre12"/>
+    download_file =</p>
+<p class="calibre1">pattern.findall(download_page)[0]<br class="calibre12"/>
+    amalgamation_url =</p>
+<p class="calibre1">"http://www.gaia-gis.it/spatialite<span>
+</span></p><p class="calibre1">"background: #ff0000"&gt;-2.4.0-4/"+ download_file<br class="calibre12"/>
+    zip_dir =</p>
+<p class="calibre1">string.replace(download_file,'.zip','')<br class="calibre12"/>
+    # and download it<br class="calibre12"/>
+    urllib.urlretrieve(amalgamation_url,</p>
+</div><p class="calibre1"><span class="calibre32">"tmp.zip")</span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Once I applied such a trivial patch anything ran in the smoothest</p>
+<p class="calibre1">and most pleasant way.<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Python sample program</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre25"><b class="calibre9">spatialite_sample.py</b></span>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre29"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" size="2"&gt;# importing pyspatialite<br class="calibre12"/>
+from pyspatialite import dbapi2 as db<br class="calibre12"/>
+<br class="calibre12"/>
+# creating/connecting the test_db<br class="calibre12"/>
+conn = db.connect('test_db.sqlite')<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a Cursor<br class="calibre12"/>
+cur = conn.cursor()<br class="calibre12"/>
+<br class="calibre12"/>
+# testing library versions<br class="calibre12"/>
+rs = cur.execute('SELECT sqlite_version(),</p>
+<p class="calibre1">spatialite_version()')<br class="calibre12"/>
+for row in rs:<br class="calibre12"/>
+    msg = "&gt; SQLite v%s Spatialite v%s" %</p>
+<p class="calibre1">(row[0], row[1])<br class="calibre12"/>
+    print msg<br class="calibre12"/>
+<br class="calibre12"/>
+# initializing Spatial MetaData<br class="calibre12"/>
+# using v.2.4.0 this will automatically create<br class="calibre12"/>
+# GEOMETRY_COLUMNS and SPATIAL_REF_SYS<br class="calibre12"/>
+sql = 'SELECT InitSpatialMetadata()'<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a POINT table<br class="calibre12"/>
+sql = 'CREATE TABLE test_pt ('<br class="calibre12"/>
+sql += 'id INTEGER NOT NULL PRIMARY KEY,'<br class="calibre12"/>
+sql += 'name TEXT NOT NULL)'<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+# creating a POINT Geometry column<br class="calibre12"/>
+sql = "SELECT AddGeometryColumn('test_pt',<br class="calibre12"/>
+" sql += "'geom', 4326, 'POINT', 'XY')"<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a LINESTRING table<br class="calibre12"/>
+sql = 'CREATE TABLE test_ln ('<br class="calibre12"/>
+sql += 'id INTEGER NOT NULL PRIMARY KEY,'<br class="calibre12"/>
+sql += 'name TEXT NOT NULL)'<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+# creating a LINESTRING Geometry column<br class="calibre12"/>
+sql = "SELECT AddGeometryColumn('test_ln', "<br class="calibre12"/>
+sql += "'geom', 4326, 'LINESTRING', 'XY')"<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a POLYGON table<br class="calibre12"/>
+sql = 'CREATE TABLE test_pg ('<br class="calibre12"/>
+sql += 'id INTEGER NOT NULL PRIMARY KEY,'<br class="calibre12"/>
+sql += 'name TEXT NOT NULL)'<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+# creating a POLYGON Geometry column<br class="calibre12"/>
+sql = "SELECT AddGeometryColumn('test_pg', "<br class="calibre12"/>
+sql += "'geom', 4326, 'POLYGON', 'XY')"<br class="calibre12"/>
+cur.execute(sql)<br class="calibre12"/>
+<br class="calibre12"/>
+# inserting some POINTs<br class="calibre12"/>
+# please note well: SQLite is ACID and Transactional<br class="calibre12"/>
+# so (to get best performance) the whole insert cycle<br class="calibre12"/>
+# will be handled as a single TRANSACTION<br class="calibre12"/>
+for i in range(100000):<br class="calibre12"/>
+    name = "test POINT #%d" % (i+1)<br class="calibre12"/>
+    geom = "GeomFromText('POINT("<br class="calibre12"/>
+    geom += "%f " % (i / 1000.0)<br class="calibre12"/>
+    geom += "%f" % (i / 1000.0)<br class="calibre12"/>
+    geom += ")', 4326)"<br class="calibre12"/>
+    sql = "INSERT INTO test_pt (id, name, geom)</p>
+<p class="calibre1">"<br class="calibre12"/>
+    sql += "VALUES (%d, '%s', %s)" % (i+1,</p>
+<p class="calibre1">name, geom)<br class="calibre12"/>
+    cur.execute(sql)<br class="calibre12"/>
+conn.commit()<br class="calibre12"/>
+<br class="calibre12"/>
+# checking POINTs<br class="calibre12"/>
+sql = "SELECT DISTINCT Count(*), ST_GeometryType(geom), "<br class="calibre12"/>
+sql += "ST_Srid(geom) FROM test_pt"<br class="calibre12"/>
+rs = cur.execute(sql)<br class="calibre12"/>
+for row in rs:<br class="calibre12"/>
+    msg = "&gt; Inserted %d entities of type "</p>
+<p class="calibre1">% (row[0])<br class="calibre12"/>
+    msg += "%s SRID=%d" % (row[1],</p>
+<p class="calibre1">row[2])<br class="calibre12"/>
+    print msg<br class="calibre12"/>
+<br class="calibre12"/>
+# inserting some LINESTRINGs<br class="calibre12"/>
+for i in range(100000):<br class="calibre12"/>
+    name = "test LINESTRING #%d" % (i+1)<br class="calibre12"/>
+    geom = "GeomFromText('LINESTRING("<br class="calibre12"/>
+    if (i%2) == 1:<br class="calibre12"/>
+    # odd row: five points<br class="calibre12"/>
+        geom += "-180.0</p>
+<p class="calibre1">-90.0, "<br class="calibre12"/>
+        geom += "%f " %</p>
+<p class="calibre1">(-10.0 - (i / 1000.0))<br class="calibre12"/>
+        geom += "%f, " %</p>
+<p class="calibre1">(-10.0 - (i / 1000.0))<br class="calibre12"/>
+        geom += "%f " %</p>
+<p class="calibre1">(10.0 + (i / 1000.0))<br class="calibre12"/>
+        geom += "%f" %</p>
+<p class="calibre1">(10.0 + (i / 1000.0))<br class="calibre12"/>
+        geom += ", 180.0</p>
+<p class="calibre1">90.0"<br class="calibre12"/>
+    else:<br class="calibre12"/>
+    # even row: two points<br class="calibre12"/>
+        geom += "%f " %</p>
+<p class="calibre1">(-10.0 - (i / 1000.0))<br class="calibre12"/>
+        geom += "%f, " %</p>
+<p class="calibre1">(-10.0 - (i / 1000.0))<br class="calibre12"/>
+        geom += "%f " %</p>
+<p class="calibre1">(10.0 + (i / 1000.0))<br class="calibre12"/>
+        geom += "%f" %</p>
+<p class="calibre1">(10.0 + (i / 1000.0))<br class="calibre12"/>
+    geom += ")', 4326)"<br class="calibre12"/>
+    sql = "INSERT INTO test_ln (id, name, geom)</p>
+<p class="calibre1">"<br class="calibre12"/>
+    sql += "VALUES (%d, '%s', %s)" % (i+1,</p>
+<p class="calibre1">name, geom)<br class="calibre12"/>
+    cur.execute(sql)<br class="calibre12"/>
+conn.commit()<br class="calibre12"/>
+<br class="calibre12"/>
+# checking LINESTRINGs<br class="calibre12"/>
+sql = "SELECT DISTINCT Count(*), ST_GeometryType(geom), "<br class="calibre12"/>
+sql += "ST_Srid(geom) FROM test_ln"<br class="calibre12"/>
+rs = cur.execute(sql)<br class="calibre12"/>
+for row in rs:<br class="calibre12"/>
+    msg = "&gt; Inserted %d entities of type "</p>
+<p class="calibre1">% (row[0])<br class="calibre12"/>
+    msg += "%s SRID=%d" % (row[1],</p>
+<p class="calibre1">row[2])<br class="calibre12"/>
+    print msg<br class="calibre12"/>
+<br class="calibre12"/>
+# inserting some POLYGONs<br class="calibre12"/>
+for i in range(100000):<br class="calibre12"/>
+    name = "test POLYGON #%d" % (i+1)<br class="calibre12"/>
+    geom = "GeomFromText('POLYGON(("<br class="calibre12"/>
+    geom += "%f " % (-10.0 - (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f, " % (-10.0 - (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f " % (10.0 + (i / 1000.0))<br class="calibre12"/>
+    geom += "%f, " % (-10.0 - (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f " % (10.0 + (i / 1000.0))<br class="calibre12"/>
+    geom += "%f, " % (10.0 + (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f " % (-10.0 - (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f, " % (10.0 + (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f " % (-10.0 - (i /</p>
+<p class="calibre1">1000.0))<br class="calibre12"/>
+    geom += "%f" % (-10.0 - (i / 1000.0))<br class="calibre12"/>
+    geom += "))', 4326)"<br class="calibre12"/>
+    sql = "INSERT INTO test_pg (id, name, geom)</p>
+<p class="calibre1">"<br class="calibre12"/>
+    sql += "VALUES (%d, '%s', %s)" % (i+1,</p>
+<p class="calibre1">name, geom)<br class="calibre12"/>
+    cur.execute(sql)<br class="calibre12"/>
+conn.commit()<br class="calibre12"/>
+<br class="calibre12"/>
+# checking POLYGONs<br class="calibre12"/>
+sql = "SELECT DISTINCT Count(*), ST_GeometryType(geom), "<br class="calibre12"/>
+sql += "ST_Srid(geom) FROM test_pg"<br class="calibre12"/>
+rs = cur.execute(sql)<br class="calibre12"/>
+for row in rs:<br class="calibre12"/>
+    msg = "&gt; Inserted %d entities of type "</p>
+<p class="calibre1">% (row[0])<br class="calibre12"/>
+    msg += "%s SRID=%d" % (row[1],</p>
+</div><p class="calibre1"><span class="calibre32">row[2])<br class="calibre12"/>
+    print msg<br class="calibre12"/>
+<br class="calibre12"/>
+rs.close()<br class="calibre12"/>
+conn.close()<br class="calibre12"/>
+quit()<br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre62"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" size="3" color="#FFFFFF"&gt;$ python</p>
+</div><p class="calibre1"><span class="calibre32">spatialite_sample.py</span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Telling the full story is boring and very few interesting: you can</p>
+<p class="calibre1">study and test the sample code by yourself, and that's absolutely</p>
+<p class="calibre1">all.<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

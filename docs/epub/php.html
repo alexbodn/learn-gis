@@ -1,0 +1,450 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Language bindings: PHP</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Test environment</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Linux Debian:</b></span><br class="calibre12"/>
+just to be sure to check an up-to-date state-of-the-art I've</p>
+<p class="calibre1">actually used <b class="calibre9">Debian Squeeze</b> (32 bit).<br class="calibre12"/>
+So I'm actually sure that all required packages are reasonably</p>
+<p class="calibre1">using the most recent version.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">PHP and SQLite connector:</b></span><br class="calibre12"/>
+My Debian Virtual Machine had no Apache and PHP stuff already</p>
+<p class="calibre1">installed.<br class="calibre12"/>
+So I started my test installing the following packages:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><b class="calibre9">apache2</b></li>
+<li class="calibre22"><b class="calibre9">php5-cli</b></li>
+<li class="calibre22"><b class="calibre9">php5-sqlite</b></li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre67">
+<p class="calibre18"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Caveat</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">The most recent <b class="calibre9">PHP 5.3</b> seems to be absolutely required in</p>
+<p class="calibre1">order to support SpatiaLite.<br class="calibre12"/>
+I've performed some further test on the oldest <b class="calibre9">Debian Lenny</b>,</p>
+<p class="calibre1">simply to immediately discover that PHP (and sqlite) where so</p>
+<p class="calibre1">obsolete that using SpatiaLite was completely impossible.<br class="calibre12"/>
+<br class="calibre12"/>
+I suppose that if you are strongly interested into using SpatiaLite</p>
+<p class="calibre1">updating to <b class="calibre9">PHP 5.3</b> is absolutely required before attempting</p>
+<p class="calibre1">any preliminary test.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Configuring PHP</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1">I quickly discovered that using the default PHP configuration</p>
+<p class="calibre1">SpatiaLite cannot be dynamically loaded as an extension to the</p>
+<p class="calibre1">basic SQLite connector.<br class="calibre12"/>
+At least the following change has to applied first into the</p>
+<p class="calibre1"><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">/etc/php5/apache2/php.ini</b></span>
+configuration script.<br class="calibre12"/>
+<br class="calibre12"/>
+<i class="calibre11">default</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">php.ini</b></span>:</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><span class="calibre45">
+</span><p class="calibre1"><span class="calibre45">"#FFFFFF"&gt;<b class="calibre9">[sqlite3]</b><br class="calibre12"/>
+<b class="calibre9">;sqlite3.extension_dir =</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<i class="calibre11">updated</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">php.ini</b></span>:</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9">[sqlite3]</b><br class="calibre12"/>
+<b class="calibre9">sqlite3.extension_dir =</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">/var/www/sqlite3_ext</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+The SQLite connector for PHP actually has a built-in capability to</p>
+<p class="calibre1">load dynamic extensions.<br class="calibre12"/>
+Anyway you must explicitly enable a given directory containing any</p>
+<p class="calibre1">extension to be dynamically loaded.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><span class="calibre45">
+</span><p class="calibre1"><span class="calibre45">"#FFFFFF"&gt;<b class="calibre9"># /etc/init.d/apache2 restart</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+After modifying the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">php.ini</b></span> script restarting</p>
+<p class="calibre1">the Apache WEB server is absolutely required, so to materialize the</p>
+<p class="calibre1">new configuration.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre59"><div class="calibre45">
+<p class="calibre1">"#FFFFFF"&gt;<b class="calibre9"># mkdir /var/www/sqlite3_ext</b><br class="calibre12"/>
+<b class="calibre9"># cp /usr/local/lib/libspatialite.so</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre45"><b class="calibre9">/var/www/sqlite3_ext</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Then I've simply created the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">/var/www/sqlite3_ext</b></span>
+directory.<br class="calibre12"/>
+And finally I've copied the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">libspatialite.so</b></span> shared</p>
+<p class="calibre1">library form <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">/usr/local/lib</b></span> into this</p>
+<p class="calibre1">directory.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9"><span class="calibre17">Please note well:</span></b> in order to perform all the above</p>
+<p class="calibre1">mentioned operations you must login as <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">root</b></span><br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">PHP sample program</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">SpatialiteSample.php</b>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre29"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;&lt;html&gt;<br class="calibre12"/>
+  &lt;head&gt;<br class="calibre12"/>
+    &lt;title&gt;Testing SpatiaLite on</p>
+<p class="calibre1">PHP&lt;/title&gt;<br class="calibre12"/>
+  &lt;/head&gt;<br class="calibre12"/>
+  &lt;body&gt;<br class="calibre12"/>
+    &lt;h1&gt;testing SpatiaLite on</p>
+<p class="calibre1">PHP&lt;/h1&gt;<br class="calibre12"/>
+<br class="calibre12"/>
+&lt;?php<br class="calibre12"/>
+# connecting some SQLite DB<br class="calibre12"/>
+# we'll actually use an IN-MEMORY DB<br class="calibre12"/>
+# so to avoid any further complexity;<br class="calibre12"/>
+# an IN-MEMORY DB simply is a temp-DB<br class="calibre12"/>
+$db = new SQLite3(':memory:');<br class="calibre12"/>
+<br class="calibre12"/>
+# loading SpatiaLite as an extension<br class="calibre12"/>
+$db-&gt;loadExtension('libspatialite.so');<br class="calibre12"/>
+<br class="calibre12"/>
+# enabling Spatial Metadata<br class="calibre12"/>
+# using v.2.4.0 this automatically initializes</p>
+<p class="calibre1">SPATIAL_REF_SYS<br class="calibre12"/>
+# and GEOMETRY_COLUMNS<br class="calibre12"/>
+$db-&gt;exec("SELECT InitSpatialMetadata()");<br class="calibre12"/>
+<br class="calibre12"/>
+# reporting some version info<br class="calibre12"/>
+$rs = $db-&gt;query('SELECT sqlite_version()');<br class="calibre12"/>
+while ($row = $rs-&gt;fetchArray())<br class="calibre12"/>
+{<br class="calibre12"/>
+  print "&lt;h3&gt;SQLite version:</p>
+<p class="calibre1">$row[0]&lt;/h3&gt;";<br class="calibre12"/>
+}<br class="calibre12"/>
+$rs = $db-&gt;query('SELECT spatialite_version()');<br class="calibre12"/>
+while ($row = $rs-&gt;fetchArray())<br class="calibre12"/>
+{<br class="calibre12"/>
+  print "&lt;h3&gt;SpatiaLite version:</p>
+<p class="calibre1">$row[0]&lt;/h3&gt;";<br class="calibre12"/>
+}<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a POINT table<br class="calibre12"/>
+$sql = "CREATE TABLE test_pt (";<br class="calibre12"/>
+$sql .= "id INTEGER NOT NULL PRIMARY KEY,";<br class="calibre12"/>
+$sql .= "name TEXT NOT NULL)";<br class="calibre12"/>
+$db-&gt;exec($sql);<br class="calibre12"/>
+# creating a POINT Geometry column<br class="calibre12"/>
+$sql = "SELECT AddGeometryColumn('test_pt', ";<br class="calibre12"/>
+$sql .= "'geom', 4326, 'POINT', 'XY')";<br class="calibre12"/>
+$db-&gt;exec($sql);<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a LINESTRING table<br class="calibre12"/>
+$sql = "CREATE TABLE test_ln (";<br class="calibre12"/>
+$sql .= "id INTEGER NOT NULL PRIMARY KEY,";<br class="calibre12"/>
+$sql .= "name TEXT NOT NULL)";<br class="calibre12"/>
+$db-&gt;exec($sql);<br class="calibre12"/>
+# creating a LINESTRING Geometry column<br class="calibre12"/>
+$sql = "SELECT AddGeometryColumn('test_ln', ";<br class="calibre12"/>
+$sql .= "'geom', 4326, 'LINESTRING', 'XY')";<br class="calibre12"/>
+$db-&gt;exec($sql);<br class="calibre12"/>
+<br class="calibre12"/>
+# creating a POLYGON table<br class="calibre12"/>
+$sql = "CREATE TABLE test_pg (";<br class="calibre12"/>
+$sql .= "id INTEGER NOT NULL PRIMARY KEY,";<br class="calibre12"/>
+$sql .= "name TEXT NOT NULL)";<br class="calibre12"/>
+$db-&gt;exec($sql);<br class="calibre12"/>
+# creating a POLYGON Geometry column<br class="calibre12"/>
+$sql = "SELECT AddGeometryColumn('test_pg', ";<br class="calibre12"/>
+$sql .= "'geom', 4326, 'POLYGON', 'XY')";<br class="calibre12"/>
+$db-&gt;exec($sql);<br class="calibre12"/>
+<br class="calibre12"/>
+# inserting some POINTs<br class="calibre12"/>
+# please note well: SQLite is ACID and Transactional<br class="calibre12"/>
+# so (to get best performance) the whole insert cycle<br class="calibre12"/>
+# will be handled as a single TRANSACTION<br class="calibre12"/>
+$db-&gt;exec("BEGIN");<br class="calibre12"/>
+for ($i = 0; $i &lt; 10000; $i++)<br class="calibre12"/>
+{<br class="calibre12"/>
+  # for POINTs we'll use full text sql statements<br class="calibre12"/>
+  $sql = "INSERT INTO test_pt (id, name, geom) VALUES</p>
+</div><p class="calibre1"><span class="calibre32">(";<br class="calibre12"/>
+  $sql .= $i + 1;<br class="calibre12"/>
+  $sql .= ", 'test POINT #";<br class="calibre12"/>
+  $sql .= $i + 1;<br class="calibre12"/>
+  $sql .= "', GeomFromText('POINT(";<br class="calibre12"/>
+  $sql .= $i / 1000.0;<br class="calibre12"/>
+  $sql .= " ";<br class="calibre12"/>
+  $sql .= $i / 1000.0;<br class="calibre12"/>
+  $sql .= ")', 4326))";<br class="calibre12"/>
+  $db-&gt;exec($sql);<br class="calibre12"/>
+}<br class="calibre12"/>
+$db-&gt;exec("COMMIT");<br class="calibre12"/>
+<br class="calibre12"/>
+# checking POINTs<br class="calibre12"/>
+$sql = "SELECT DISTINCT Count(*), ST_GeometryType(geom), ";<br class="calibre12"/>
+$sql .= "ST_Srid(geom) FROM test_pt";<br class="calibre12"/>
+$rs = $db-&gt;query($sql);<br class="calibre12"/>
+while ($row = $rs-&gt;fetchArray())<br class="calibre12"/>
+{<br class="calibre12"/>
+  # read the result set<br class="calibre12"/>
+  $msg = "Inserted ";<br class="calibre12"/>
+  $msg .= $row[0];<br class="calibre12"/>
+  $msg .= " entities of type ";<br class="calibre12"/>
+  $msg .= $row[1];<br class="calibre12"/>
+  $msg .= " SRID=";<br class="calibre12"/>
+  $msg .= $row[2];<br class="calibre12"/>
+  print "&lt;h3&gt;$msg&lt;/h3&gt;";<br class="calibre12"/>
+}<br class="calibre12"/>
+<br class="calibre12"/>
+# inserting some LINESTRINGs<br class="calibre12"/>
+# this time we'll use a Prepared Statement<br class="calibre12"/>
+$sql = "INSERT INTO test_ln (id, name, geom) ";<br class="calibre12"/>
+$sql .= "VALUES (?, ?, GeomFromText(?, 4326))";<br class="calibre12"/>
+$stmt = $db-&gt;prepare($sql);<br class="calibre12"/>
+$db-&gt;exec("BEGIN");<br class="calibre12"/>
+for ($i = 0; $i &lt; 10000; $i++)<br class="calibre12"/>
+{<br class="calibre12"/>
+  # setting up values / binding<br class="calibre12"/>
+  $name = "test LINESTRING #";<br class="calibre12"/>
+  $name .= $i + 1;<br class="calibre12"/>
+  $geom = "LINESTRING(";<br class="calibre12"/>
+  if (($i%2) == 1)<br class="calibre12"/>
+  {<br class="calibre12"/>
+    # odd row: five points<br class="calibre12"/>
+    $geom .= "-180.0 -90.0, ";<br class="calibre12"/>
+    $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+    $geom .= " ";<br class="calibre12"/>
+    $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+    $geom .= ", ";<br class="calibre12"/>
+    $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+    $geom .= " ";<br class="calibre12"/>
+    $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+    $geom .= ", ";<br class="calibre12"/>
+    $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+    $geom .= " ";<br class="calibre12"/>
+    $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+    $geom .= ", 180.0 90.0";<br class="calibre12"/>
+  }<br class="calibre12"/>
+  else<br class="calibre12"/>
+  {<br class="calibre12"/>
+    # even row: two points<br class="calibre12"/>
+    $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+    $geom .= " ";<br class="calibre12"/>
+    $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+    $geom .= ", ";<br class="calibre12"/>
+    $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+    $geom .= " ";<br class="calibre12"/>
+    $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+  }<br class="calibre12"/>
+  $geom .= ")";<br class="calibre12"/>
+<br class="calibre12"/>
+  $stmt-&gt;reset();<br class="calibre12"/>
+  $stmt-&gt;clear();<br class="calibre12"/>
+  $stmt-&gt;bindValue(1, $i+1, SQLITE3_INTEGER);<br class="calibre12"/>
+  $stmt-&gt;bindValue(2, $name, SQLITE3_TEXT);<br class="calibre12"/>
+  $stmt-&gt;bindValue(3, $geom, SQLITE3_TEXT);<br class="calibre12"/>
+  $stmt-&gt;execute();<br class="calibre12"/>
+}<br class="calibre12"/>
+$db-&gt;exec("COMMIT");<br class="calibre12"/>
+<br class="calibre12"/>
+# checking LINESTRINGs<br class="calibre12"/>
+$sql = "SELECT DISTINCT Count(*), ST_GeometryType(geom), ";<br class="calibre12"/>
+$sql .= "ST_Srid(geom) FROM test_ln";<br class="calibre12"/>
+$rs = $db-&gt;query($sql);<br class="calibre12"/>
+while ($row = $rs-&gt;fetchArray())<br class="calibre12"/>
+{<br class="calibre12"/>
+  # read the result set<br class="calibre12"/>
+  $msg = "Inserted ";<br class="calibre12"/>
+  $msg .= $row[0];<br class="calibre12"/>
+  $msg .= " entities of type ";<br class="calibre12"/>
+  $msg .= $row[1];<br class="calibre12"/>
+  $msg .= " SRID=";<br class="calibre12"/>
+  $msg .= $row[2];<br class="calibre12"/>
+  print "&lt;h3&gt;$msg&lt;/h3&gt;";<br class="calibre12"/>
+}<br class="calibre12"/>
+<br class="calibre12"/>
+# insering some POLYGONs<br class="calibre12"/>
+# this time too we'll use a Prepared Statement<br class="calibre12"/>
+$sql = "INSERT INTO test_pg (id, name, geom) ";<br class="calibre12"/>
+$sql .= "VALUES (?, ?, GeomFromText(?, 4326))";<br class="calibre12"/>
+$stmt = $db-&gt;prepare($sql);<br class="calibre12"/>
+$db-&gt;exec("BEGIN");<br class="calibre12"/>
+for ($i = 0; $i &lt; 10000; $i++)<br class="calibre12"/>
+{<br class="calibre12"/>
+  # setting up values / binding<br class="calibre12"/>
+  $name = "test POLYGON #";<br class="calibre12"/>
+  $name .= $i + 1;<br class="calibre12"/>
+  $geom = "POLYGON((";<br class="calibre12"/>
+  $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+  $geom .= " ";<br class="calibre12"/>
+  $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+  $geom .= ", ";<br class="calibre12"/>
+  $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+  $geom .= " ";<br class="calibre12"/>
+  $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+  $geom .= ", ";<br class="calibre12"/>
+  $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+  $geom .= " ";<br class="calibre12"/>
+  $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+  $geom .= ", ";<br class="calibre12"/>
+  $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+  $geom .= " ";<br class="calibre12"/>
+  $geom .= 10.0 + ($i / 1000.0);<br class="calibre12"/>
+  $geom .= ", ";<br class="calibre12"/>
+  $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+  $geom .= " ";<br class="calibre12"/>
+  $geom .= -10.0 - ($i / 1000.0);<br class="calibre12"/>
+  $geom .= "))";<br class="calibre12"/>
+<br class="calibre12"/>
+  $stmt-&gt;reset();<br class="calibre12"/>
+  $stmt-&gt;clear();<br class="calibre12"/>
+  $stmt-&gt;bindValue(1, $i+1, SQLITE3_INTEGER);<br class="calibre12"/>
+  $stmt-&gt;bindValue(2, $name, SQLITE3_TEXT);<br class="calibre12"/>
+  $stmt-&gt;bindValue(3, $geom, SQLITE3_TEXT);<br class="calibre12"/>
+  $stmt-&gt;execute();<br class="calibre12"/>
+}<br class="calibre12"/>
+$db-&gt;exec("COMMIT");<br class="calibre12"/>
+<br class="calibre12"/>
+# checking POLYGONs<br class="calibre12"/>
+$sql = "SELECT DISTINCT Count(*), ST_GeometryType(geom), ";<br class="calibre12"/>
+$sql .= "ST_Srid(geom) FROM test_pg";<br class="calibre12"/>
+$rs = $db-&gt;query($sql);<br class="calibre12"/>
+while ($row = $rs-&gt;fetchArray())<br class="calibre12"/>
+{<br class="calibre12"/>
+  # read the result set<br class="calibre12"/>
+  $msg = "Inserted ";<br class="calibre12"/>
+  $msg .= $row[0];<br class="calibre12"/>
+  $msg .= " entities of type ";<br class="calibre12"/>
+  $msg .= $row[1];<br class="calibre12"/>
+  $msg .= " SRID=";<br class="calibre12"/>
+  $msg .= $row[2];<br class="calibre12"/>
+  print "&lt;h3&gt;$msg&lt;/h3&gt;";<br class="calibre12"/>
+}<br class="calibre12"/>
+<br class="calibre12"/>
+# closing the DB connection<br class="calibre12"/>
+$db-&gt;close();<br class="calibre12"/>
+?&gt;<br class="calibre12"/>
+<br class="calibre12"/>
+  &lt;/body&gt;<br class="calibre12"/>
+&lt;/html&gt;<br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+I saved this PHP sample script as: <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">/var/www/SpatialiteSample.php</b></span><br class="calibre12"/>
+</p>
+<p class="calibre1"><br class="calibre12"/>
+Then I simply started my Firefox WEB browser requesting the</p>
+<p class="calibre1">corresponding URL:<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="php.png" alt="Firefox image" class="calibre14"/><br class="calibre12"/>
+</p><p class="calibre1">And that's all.<br class="calibre12"/>
+<br class="calibre12"/></p>
+<p class="calibre1"></p>
+<p class="calibre1"><table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre67">
+<p class="calibre1"><span class="calibre17"><b class="calibre9">Please note:</b></span> may well be that using other</p>
+<p class="calibre1">different Linux distros (or Windows) adjusting any <i class="calibre11">pathname</i>
+as appropriate for your specific platform should be required.</p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Your first Spatial SQL queries</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"aggregate.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#common"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="wkt-wkb_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="wkt-wkb_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+SpatiaLite is a <b class="calibre9">Spatial DBMS</b>, so it's now time to perform</p>
+<p class="calibre1">some <b class="calibre9">Spatial SQL</b> query.<br class="calibre12"/>
+There isn't absolutely nothing odd in Spatial SQL: it basically is</p>
+<p class="calibre1">exactly as standard SQL, but it supports the exotic data-type</p>
+<p class="calibre1">Geometry.<br class="calibre12"/>
+Usually you cannot directly query a Geometry value (as we've</p>
+<p class="calibre1">already seen they simply are a meaningless BLOB):<br class="calibre12"/>
+you are expected to use some appropriate <span class="calibre17"><b class="calibre9">spatial</b></span></p><span class="calibre17"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">function</b></span> to access a Geometry value in a meaningful way.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">COD_REG, REGIONE, ST_Area(Geometry)</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+The <span class="calibre33"><b class="calibre9">ST_Area()</b></span>
+function is one of such Spatial functions; usually you can easily<p class="calibre1"></p>
+<p class="calibre1">recognize any Spatial function, simply because all them are</p>
+<p class="calibre1"><b class="calibre9">ST_</b> prefixed.<br class="calibre12"/>
+This one is not an absolute rule, anyway: SpatiaLite is able to</p>
+<p class="calibre1">understand the <i class="calibre11">alias</i> name <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Area()</b></span> to identify the same</p>
+<p class="calibre1">function.<br class="calibre12"/>
+As the name itself states, this function computes the surface of</p>
+<p class="calibre1">the corresponding Geometry.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">COD_REG AS code,</b><br class="calibre12"/>
+<b class="calibre9">  REGIONE AS name,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Area(Geometry) / 1000000.0 AS "Surface</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(sq.Km)"</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY 3 DESC;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+As you surely noticed, the first query returned very high figures:</p>
+<p class="calibre1">this is because the current dataset uses <b class="calibre9">meters</b> as length</p>
+<p class="calibre1">unit, and consequently surfaces are measured in <b class="calibre9">m²</b>.<br class="calibre12"/>
+But we simply have to apply an appropriate scale factor to get the</p>
+<p class="calibre1">most usual <b class="calibre9">km²</b> units.<br class="calibre12"/>
+Please note two SQL features we are introducing for the first time:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">SQL isn't constrained to directly return the column value into<p class="calibre1"></p>
+<p class="calibre1">the result-set: you can freely define any valid arithmetic</p>
+<p class="calibre1">expression as required.</p></li>
+<li class="calibre22">Referencing a complex expression into some <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ORDER BY</b></span> clause isn't too</p>
+<p class="calibre1">much practical:<br class="calibre12"/>
+but you can easily identify any column using its <i class="calibre11"><b class="calibre9">relative</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">position</b></i> (first column has index 1, and so on).</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">COD_REG AS code,</b><br class="calibre12"/>
+<b class="calibre9">  REGIONE AS name,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Area(Geometry) / 1000000.0 AS "Surface</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(sq.Km)",</b><br class="calibre12"/>
+<b class="calibre9">  POP2001 / (ST_Area(Geometry) / 1000000.0)</b><br class="calibre12"/>
+<b class="calibre9">    AS "Density: Peoples / sq.Km"</b><br class="calibre12"/>
+<b class="calibre9">FROM reg2001_s</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY 4 DESC;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+And you can perform even more complex calculations in SQL.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+This query will compute the <b class="calibre9">population density</b> (measured as<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">peoples / km²</b>).<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">All right, you have<p class="calibre1"></p>
+<p class="calibre1">now acquired a basic SQL / Spatial SQL knowledge.<br class="calibre12"/>
+You are now ready to confront yourself with most complex and</p>
+<p class="calibre1">powerful queries: but this requires building a serious</p>
+<p class="calibre1">database.<br class="calibre12"/>
+Do you remember ? for now we where simply using Virtual Shapefiles</p>
+<p class="calibre1">tables; i.e. the faint imitation of real Spatial tables</p>
+<p class="calibre1">(<i class="calibre11">internally stored</i>).<br class="calibre12"/>
+So during the next steps we'll first create and populate a <b class="calibre9">well</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">designed DB</b> (not a so trivial task), and then we'll come again</p>
+<p class="calibre1">to see most complex and sophisticated SQL queries.</p></td>
+</tr>
+</tbody></table>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"aggregate.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#common"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="wkt-wkb_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="wkt-wkb_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</p></body></html>

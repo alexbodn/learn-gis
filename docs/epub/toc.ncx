@@ -1,0 +1,315 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en-US">
+  <head>
+    <meta name="dtb:uid" content="090e39f0-a85b-47a3-bfe2-c4347f398272"/>
+    <meta name="dtb:depth" content="2"/>
+    <meta name="dtb:generator" content="calibre (6.13.0)"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+  </head>
+  <docTitle>
+    <text>SpatiaLite Cookbook</text>
+  </docTitle>
+  <navMap>
+    <navPoint id="uLUByR69jOKFx9lmiNWD2hB" playOrder="1">
+      <navLabel>
+        <text>Table of</text>
+      </navLabel>
+      <content src="index1.html#toc"/>
+    </navPoint>
+    <navPoint id="ut6p5OV49d5HNaeywRaJm7F" playOrder="2">
+      <navLabel>
+        <text>quick technical intro</text>
+      </navLabel>
+      <content src="tech-intro.html"/>
+    </navPoint>
+    <navPoint id="u4iNMMUCfioGWHAYzCcDmAA" playOrder="3">
+      <navLabel>
+        <text>getting started [installing the</text>
+      </navLabel>
+      <content src="start_split_000.html"/>
+    </navPoint>
+    <navPoint id="uCijXnEK9jQlzhMWfE4DTG4" playOrder="4">
+      <navLabel>
+        <text>building your first Spatial</text>
+      </navLabel>
+      <content src="first-db.html"/>
+    </navPoint>
+    <navPoint id="ubRLOz7MFUsqvUwcjFGuua7" playOrder="5">
+      <navLabel>
+        <text>what's a Shapefile ?</text>
+      </navLabel>
+      <content src="shapefile.html"/>
+    </navPoint>
+    <navPoint id="uXcxHBY2BhjbtFYiO3lO4NB" playOrder="6">
+      <navLabel>
+        <text>what's a Charset encoding ? (and</text>
+      </navLabel>
+      <content src="charset.html"/>
+    </navPoint>
+    <navPoint id="umU3uN7djYZJeIvr2fj6lTD" playOrder="7">
+      <navLabel>
+        <text>what's this SRID stuff ? ... I've</text>
+      </navLabel>
+      <content src="srid.html"/>
+    </navPoint>
+    <navPoint id="unnvL8z4mInSvx4UrsH72m3" playOrder="8">
+      <navLabel>
+        <text>executing your first SQL</text>
+      </navLabel>
+      <content src="first-sql.html"/>
+    </navPoint>
+    <navPoint id="umLBEUFbNjXDTvWOzgRcNmB" playOrder="9">
+      <navLabel>
+        <text>basics about SQL queries</text>
+      </navLabel>
+      <content src="basic-sql.html"/>
+    </navPoint>
+    <navPoint id="u49UvoKhuO6UE27oehpfzj3" playOrder="10">
+      <navLabel>
+        <text>understanding aggregate</text>
+      </navLabel>
+      <content src="aggregate.html"/>
+    </navPoint>
+    <navPoint id="uFc2RWZNdPes7K5XAPyFBWA" playOrder="10">
+      <navLabel>
+        <text>"http://commons.wikimedia.org/wiki/File:Toepfe_fcm.jpg"&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uAg7myKktdfChRAgS5W7CC4" playOrder="11">
+      <navLabel>
+        <text>"img/kitchen-tools.jpg" alt="kitchen tools" /&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uxqKvkhCl5iVNzmRIeLbNy5" playOrder="11">
+      <navLabel>
+        <text>your first Spatial SQL</text>
+      </navLabel>
+      <content src="first-spatial.html"/>
+    </navPoint>
+    <navPoint id="urAL3rqKbnxxJxsQffh5qdF" playOrder="12">
+      <navLabel>
+        <text>more about Spatial SQL: WKT and</text>
+      </navLabel>
+      <content src="wkt-wkb_split_000.html"/>
+    </navPoint>
+    <navPoint id="u2yviNahHhEpdup9LPeAYaG" playOrder="13">
+      <navLabel>
+        <text>Spatial MetaData Tables</text>
+      </navLabel>
+      <content src="metadata.html"/>
+    </navPoint>
+    <navPoint id="uEE9kaLTz3fr8VnZ3oX64GG" playOrder="14">
+      <navLabel>
+        <text>viewing SpatiaLite layers in</text>
+      </navLabel>
+      <content src="qgis.html"/>
+    </navPoint>
+    <navPoint id="uGV7GzVKgHWlROROmBeDCMG" playOrder="16">
+      <navLabel>
+        <text>"http://en.wikibooks.org/wiki/File:NCI_meatpile.jpg"&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uyRJ86sb8uLU2FcdNAWxxCA" playOrder="17">
+      <navLabel>
+        <text>"img/meat.jpg" alt="meat" /&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uFKiVG7xqQK5rax9Y67vZJF" playOrder="15">
+      <navLabel>
+        <text>recipe #1: creating a well</text>
+      </navLabel>
+      <content src="create-db_split_000.html"/>
+    </navPoint>
+    <navPoint id="uDORh4hZKQaxLTNzhEn7eD6" playOrder="16">
+      <navLabel>
+        <text>recipe #2: your first JOIN</text>
+      </navLabel>
+      <content src="join-1_split_000.html"/>
+    </navPoint>
+    <navPoint id="uEU7L5lCFSkGeWUP6yA4vX4" playOrder="17">
+      <navLabel>
+        <text>recipe #3: more about JOIN</text>
+      </navLabel>
+      <content src="join-2.html"/>
+    </navPoint>
+    <navPoint id="uVshNkNapYYZdfDvp32NrLG" playOrder="18">
+      <navLabel>
+        <text>recipe #4: about VIEW</text>
+      </navLabel>
+      <content src="views.html"/>
+    </navPoint>
+    <navPoint id="uBrKdzGiDurRIJjiDBZFCB3" playOrder="19">
+      <navLabel>
+        <text>recipe #5: creating a new table (and</text>
+      </navLabel>
+      <content src="tables_split_000.html"/>
+    </navPoint>
+    <navPoint id="uVw8Xg65SXPM9mG3yBL94G3" playOrder="20">
+      <navLabel>
+        <text>recipe #6: creating a new Geometry</text>
+      </navLabel>
+      <content src="new-geom_split_000.html"/>
+    </navPoint>
+    <navPoint id="uI78ulDrzg7wwoGYibiLuYB" playOrder="21">
+      <navLabel>
+        <text>recipe #7: Insert, Update and</text>
+      </navLabel>
+      <content src="ins-upd-del_split_000.html"/>
+    </navPoint>
+    <navPoint id="u9CNblZTKJIN4HHWHeaLIOG" playOrder="22">
+      <navLabel>
+        <text>recipe #8: understanding</text>
+      </navLabel>
+      <content src="constraints_split_000.html"/>
+    </navPoint>
+    <navPoint id="u5a97llzbFEMXqicpdSFHg9" playOrder="23">
+      <navLabel>
+        <text>recipe #9: ACIDity: undestranding</text>
+      </navLabel>
+      <content src="acid_split_000.html"/>
+    </navPoint>
+    <navPoint id="uKDUxXKtzWh5TTRBBCQDHVC" playOrder="24">
+      <navLabel>
+        <text>recipe #10: wonderful R*Tree Spatial</text>
+      </navLabel>
+      <content src="rtree_split_000.html"/>
+    </navPoint>
+    <navPoint id="uqFk4ZyCMytecmVoHgxPt8H" playOrder="28">
+      <navLabel>
+        <text>Unnamed</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="usZjyq7GLv8VWfjqhwypUd9" playOrder="29">
+      <navLabel>
+        <text>"http://commons.wikimedia.org/wiki/File:Fettuccine_al_rag%C3%B9_modified.JPG"&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uOKD4RptEulwBqeZGuOS7u6" playOrder="25">
+      <navLabel>
+        <text>recipe #11: Guinness Book of</text>
+      </navLabel>
+      <content src="guinness.html"/>
+    </navPoint>
+    <navPoint id="ueRO3ZcaaQplVCZQEmDwFV3" playOrder="26">
+      <navLabel>
+        <text>recipe #12: Neighbours</text>
+      </navLabel>
+      <content src="neighbours_split_000.html"/>
+    </navPoint>
+    <navPoint id="u9TzrIhNJPRG2xCnHs22yYA" playOrder="27">
+      <navLabel>
+        <text>recipe #13: Isolated</text>
+      </navLabel>
+      <content src="islands_split_000.html"/>
+    </navPoint>
+    <navPoint id="ujCWZ6nBPDmA4jCgd65FV76" playOrder="28">
+      <navLabel>
+        <text>recipe #14: Populated Places vs</text>
+      </navLabel>
+      <content src="pop-places_split_000.html"/>
+    </navPoint>
+    <navPoint id="u7VdROMb2gXznQWUFjUhdD5" playOrder="29">
+      <navLabel>
+        <text>recipe #15: Tightly bounded</text>
+      </navLabel>
+      <content src="pp-adjacent_split_000.html"/>
+    </navPoint>
+    <navPoint id="uH7AIEEPTLktL4SS6WtQBk4" playOrder="30">
+      <navLabel>
+        <text>recipe #16: Railways vs Local</text>
+      </navLabel>
+      <content src="railways-lc_split_000.html"/>
+    </navPoint>
+    <navPoint id="uOBTTDTVrCQv7KOAVFQwm9H" playOrder="31">
+      <navLabel>
+        <text>recipe #17: Railways vs</text>
+      </navLabel>
+      <content src="railways-pp_split_000.html"/>
+    </navPoint>
+    <navPoint id="unie9qJu9HCF5mXYCNARfw2" playOrder="32">
+      <navLabel>
+        <text>recipe #18: Railway Zones as</text>
+      </navLabel>
+      <content src="railways-buf_split_000.html"/>
+    </navPoint>
+    <navPoint id="uyLXklFOvCnmma5Ui4UnqEH" playOrder="33">
+      <navLabel>
+        <text>recipe #19: merging Local Councils</text>
+      </navLabel>
+      <content src="union_split_000.html"/>
+    </navPoint>
+    <navPoint id="uM53IQwd232P9RVuhbR7FAB" playOrder="34">
+      <navLabel>
+        <text>recipe #20: Spatial Views</text>
+      </navLabel>
+      <content src="sp-view.html"/>
+    </navPoint>
+    <navPoint id="uPfR2tXwMzRdogkiFTq75cA" playOrder="35">
+      <navLabel>
+        <text>Fine dining experience: Chez</text>
+      </navLabel>
+      <content src="dijkstra_split_000.html"/>
+    </navPoint>
+    <navPoint id="uvuVR4eDLIDE4MHyWpYFMn3" playOrder="41">
+      <navLabel>
+        <text>Unnamed</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uX6UEsGVAzpY4W6buiIvimC" playOrder="42">
+      <navLabel>
+        <text>"http://en.wikipedia.org/wiki/File:Terrine_de_saumon_au_basilic.JPG"&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="u5HRzzNPv3Sm2OLvJmtZj82" playOrder="36">
+      <navLabel>
+        <text>System level performace</text>
+      </navLabel>
+      <content src="system.html"/>
+    </navPoint>
+    <navPoint id="ulorjrY3SDlNWPPPsfdHjCB" playOrder="37">
+      <navLabel>
+        <text>Importing/Exporting Shapefiles (DBF,</text>
+      </navLabel>
+      <content src="impexp.html"/>
+    </navPoint>
+    <navPoint id="umYGn694ECdSfpoFJUp6TOE" playOrder="38">
+      <navLabel>
+        <text>Language bindings: [C/C++, Java,</text>
+      </navLabel>
+      <content src="lang_split_000.html"/>
+    </navPoint>
+    <navPoint id="u83UNFsokbdBut57Cdhzwh8" playOrder="46">
+      <navLabel>
+        <text>"http://commons.wikimedia.org/wiki/File:Fried_banana.jpg"&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uAQkMYUGDuP3D93zGH5EpkG" playOrder="47">
+      <navLabel>
+        <text>"img/banana.jpg" alt="fried banana" /&gt;</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uSbDfv4uMh4wrXjelEjhcR9" playOrder="48">
+      <navLabel>
+        <text>Unnamed</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+    <navPoint id="uc3UNXAbaD8PKeaqIPhhjv7" playOrder="49">
+      <navLabel>
+        <text>"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</text>
+      </navLabel>
+      <content src="%3c/p"/>
+    </navPoint>
+  </navMap>
+</ncx>

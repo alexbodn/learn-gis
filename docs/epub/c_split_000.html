@@ -1,0 +1,762 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Language bindings: C/C++</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">C/C++ sample program</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">spatialite_sample.c</b>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre29"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">#include &lt;stdlib.h&gt;</b><br class="calibre12"/>
+<b class="calibre9">#include &lt;stdio.h&gt;</b><br class="calibre12"/>
+<b class="calibre9">#include &lt;string.h&gt;</b><br class="calibre12"/>
+<b class="calibre9">#include &lt;float.h&gt;</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">#ifdef SPATIALITE_AMALGAMATION</b><br class="calibre12"/>
+<b class="calibre9">    #include</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&lt;spatialite/sqlite3.h&gt;</b><br class="calibre12"/>
+<b class="calibre9">#else</b><br class="calibre12"/>
+<b class="calibre9">    #include &lt;sqlite3.h&gt;</b><br class="calibre12"/>
+<b class="calibre9">#endif</b><br class="calibre12"/>
+<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">#ifndef SPATIALITE_EXTENSION</b><br class="calibre12"/>
+<b class="calibre9">    #include &lt;spatialite.h&gt;</b><br class="calibre12"/>
+<b class="calibre9">#endif</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">int</b><br class="calibre12"/>
+<b class="calibre9">main (void)</b><br class="calibre12"/>
+<b class="calibre9">{</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3 *db_handle;</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_stmt *stmt;</b><br class="calibre12"/>
+<b class="calibre9">    int ret;</b><br class="calibre12"/>
+<b class="calibre9">    char *err_msg = NULL;</b><br class="calibre12"/>
+<b class="calibre9">    char sql[2048];</b><br class="calibre12"/>
+<b class="calibre9">    char sql2[1024];</b><br class="calibre12"/>
+<b class="calibre9">    int i;</b><br class="calibre12"/>
+<b class="calibre9">    char **results;</b><br class="calibre12"/>
+<b class="calibre9">    int rows;</b><br class="calibre12"/>
+<b class="calibre9">    int columns;</b><br class="calibre12"/>
+<b class="calibre9">    int cnt;</b><br class="calibre12"/>
+<b class="calibre9">    const char *type;</b><br class="calibre12"/>
+<b class="calibre9">    int srid;</b><br class="calibre12"/>
+<b class="calibre9">    char name[1024];</b><br class="calibre12"/>
+<b class="calibre9">    char geom[2048];</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">#ifndef SPATIALITE_EXTENSION</b><br class="calibre12"/>
+<b class="calibre9">    /*</b><br class="calibre12"/>
+<b class="calibre9">     * initializing</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">SpatiaLite-Amalgamation</b><br class="calibre12"/>
+<b class="calibre9">     *</b><br class="calibre12"/>
+<b class="calibre9">     * any C/C++ source requires this</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">to be performed</b><br class="calibre12"/>
+<b class="calibre9">     * for each connection before</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">invoking the first</b><br class="calibre12"/>
+<b class="calibre9">     * SQLite/SpatiaLite call</b><br class="calibre12"/>
+<b class="calibre9">     */</b><br class="calibre12"/>
+<b class="calibre9">    spatialite_init (0);</b><br class="calibre12"/>
+<b class="calibre9">    fprintf(stderr, "\n\n******* hard-linked</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">libspatialite ********\n\n");</b><br class="calibre12"/>
+<b class="calibre9">#endif</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* creating/connecting the test_db */</b><br class="calibre12"/>
+<b class="calibre9">    ret =</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_open_v2 ("test-db.sqlite",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&amp;db_handle,</b><br class="calibre12"/>
+<b class="calibre9">        </b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "cannot</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">open 'test-db.sqlite': %s\n",</b><br class="calibre12"/>
+<b class="calibre9">         sqlite3_errmsg</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle));</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_close</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle);</b><br class="calibre12"/>
+<b class="calibre9">      db_handle = NULL;</b><br class="calibre12"/>
+<b class="calibre9">      return -1;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">#ifdef SPATIALITE_EXTENSION</b><br class="calibre12"/>
+<b class="calibre9">    /*</b><br class="calibre12"/>
+<b class="calibre9">     * loading SpatiaLite as an</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">extension</b><br class="calibre12"/>
+<b class="calibre9">     */</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_enable_load_extension</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle, 1);</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">load_extension('libspatialite.so')");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"load_extension() error: %s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      return 0;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    fprintf(stderr, "\n\n**** SpatiaLite</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">loaded as an extension ***\n\n");</b><br class="calibre12"/>
+<b class="calibre9">#endif</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* reporting version infos */</b><br class="calibre12"/>
+<b class="calibre9">#ifndef SPATIALITE_EXTENSION</b><br class="calibre12"/>
+<b class="calibre9">/*</b><br class="calibre12"/>
+<b class="calibre9">* please note well:</b><br class="calibre12"/>
+<b class="calibre9">* this process is physically linked to libspatialite</b><br class="calibre12"/>
+<b class="calibre9">* so we can directly call any SpatiaLite's API</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">function</b><br class="calibre12"/>
+<b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">    fprintf (stderr, "SQLite version: %s\n",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sqlite3_libversion());</b><br class="calibre12"/>
+<b class="calibre9">    fprintf (stderr, "SpatiaLite version:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", spatialite_version());</b><br class="calibre12"/>
+<b class="calibre9">#else</b><br class="calibre12"/>
+<b class="calibre9">/*</b><br class="calibre12"/>
+<b class="calibre9">* please note well:</b><br class="calibre12"/>
+<b class="calibre9">* this process isn't physically linked to</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">libspatialite</b><br class="calibre12"/>
+<b class="calibre9">* because we loaded the library as an extension</b><br class="calibre12"/>
+<b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">* so we aren't enabled to directly call any SpatiaLite's API</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">functions</b><br class="calibre12"/>
+<b class="calibre9">* we simply can access SpatiaLite indirectly via SQL</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">statements</b><br class="calibre12"/>
+<b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sqlite_version()");</b><br class="calibre12"/>
+<b class="calibre9">    ret =</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_get_table (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&amp;results, &amp;rows, &amp;columns, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    if (rows &lt; 1)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr,</b><br class="calibre12"/>
+<b class="calibre9">         "Unexpected</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">error: sqlite_version() not found ??????\n");</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    else</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      for (i = 1; i &lt;= rows;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"SQLite version: %s\n",</b><br class="calibre12"/>
+<b class="calibre9">         results[(i *</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">columns) + 0]);</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_free_table (results);</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">spatialite_version()");</b><br class="calibre12"/>
+<b class="calibre9">    ret =</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_get_table (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&amp;results, &amp;rows, &amp;columns, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    if (rows &lt; 1)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr,</b><br class="calibre12"/>
+<b class="calibre9">         "Unexpected</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">error: spatialite_version() not found ??????\n");</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    else</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      for (i = 1; i &lt;= rows;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"SpatiaLite version: %s\n",</b><br class="calibre12"/>
+<b class="calibre9">         results[(i *</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">columns) + 0]);</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_free_table (results);</b><br class="calibre12"/>
+<b class="calibre9">#endif /* SpatiaLite as an extension */</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* initializing SpatiaLite's metadata tables */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">InitSpatialMetadata()");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"InitSpatialMetadata() error: %s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      return 0;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* creating a POINT table */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "CREATE TABLE test_pt</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "id INTEGER NOT NULL</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">PRIMARY KEY,");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "name TEXT NOT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL)");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">/* creating a POINT Geometry column */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">AddGeometryColumn('test_pt', ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "'geom', 4326, 'POINT',</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'XY')");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* creating a LINESTRING table */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "CREATE TABLE test_ln</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "id INTEGER NOT NULL</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">PRIMARY KEY,");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "name TEXT NOT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL)");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">/* creating a LINESTRING Geometry column */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">AddGeometryColumn('test_ln', ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "'geom', 4326,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'LINESTRING', 'XY')");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* creating a POLYGON table */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "CREATE TABLE test_pg</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "id INTEGER NOT NULL</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">PRIMARY KEY,");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "name TEXT NOT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL)");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">/* creating a POLYGON Geometry column */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">AddGeometryColumn('test_pg', ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "'geom', 4326, 'POLYGON',</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'XY')");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/*</b><br class="calibre12"/>
+<b class="calibre9">* inserting some POINTs</b><br class="calibre12"/>
+<b class="calibre9">* please note well: SQLite is ACID and Transactional</b><br class="calibre12"/>
+<b class="calibre9">* so (to get best performance) the whole insert cycle</b><br class="calibre12"/>
+<b class="calibre9">* will be handled as a single TRANSACTION</b><br class="calibre12"/>
+<b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, "BEGIN",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    for (i = 0; i &lt; 100000;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      /* for POINTs we'll use full</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">text sql statements */</b><br class="calibre12"/>
+<b class="calibre9">      strcpy (sql, "INSERT INTO</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">test_pt (id, name, geom) VALUES (");</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, "%d, 'test</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">POINT #%d'", i + 1, i + 1);</b><br class="calibre12"/>
+<b class="calibre9">      strcat (sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, ",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">GeomFromText('POINT(%1.6f %1.6f)'", i / 1000.0,</b><br class="calibre12"/>
+<b class="calibre9">         i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0);</b><br class="calibre12"/>
+<b class="calibre9">      strcat (sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      strcat (sql, ",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">4326))");</b><br class="calibre12"/>
+<b class="calibre9">      ret = sqlite3_exec</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle, sql, NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      if (ret !=</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"Error: %s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">        sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">        goto</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">stop;</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, "COMMIT",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* checking POINTs */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT DISTINCT Count(*),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">ST_GeometryType(geom), ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "ST_Srid(geom) FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">test_pt");</b><br class="calibre12"/>
+<b class="calibre9">    ret =</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_get_table (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&amp;results, &amp;rows, &amp;columns, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    if (rows &lt; 1)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Unexpected</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">error: ZERO POINTs found ??????\n");</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    else</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      for (i = 1; i &lt;= rows;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        cnt = atoi</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(results[(i * columns) + 0]);</b><br class="calibre12"/>
+<b class="calibre9">        type =</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">results[(i * columns) + 1];</b><br class="calibre12"/>
+<b class="calibre9">        srid = atoi</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(results[(i * columns) + 2]);</b><br class="calibre12"/>
+<b class="calibre9">        fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"Inserted %d entities of type %s SRID=%d\n",</b><br class="calibre12"/>
+<b class="calibre9">         cnt, type,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">srid);</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_free_table (results);</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/*</b><br class="calibre12"/>
+<b class="calibre9">* inserting some LINESTRINGs</b><br class="calibre12"/>
+<b class="calibre9">* this time we'll use a Prepared Statement</b><br class="calibre12"/>
+<b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "INSERT INTO test_ln (id,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">name, geom) ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "VALUES (?, ?,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">GeomFromText(?, 4326))");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_prepare_v2 (db_handle,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql, strlen (sql), &amp;stmt, NULL);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "SQL error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n%s\n", sql,</b><br class="calibre12"/>
+<b class="calibre9">         sqlite3_errmsg</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle));</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, "BEGIN",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    for (i = 0; i &lt; 100000;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      /* setting up values /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">binding */</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (name, "test</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">LINESTRING #%d", i + 1);</b><br class="calibre12"/>
+<b class="calibre9">      strcpy (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"LINESTRING(");</b><br class="calibre12"/>
+<b class="calibre9">      if ((i % 2) == 1)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        /* odd row: five</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">points */</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"-180.0 -90.0, ");</b><br class="calibre12"/>
+<b class="calibre9">        sprintf (sql2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"%1.6f %1.6f, ", -10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         -10.0 - (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">        sprintf (sql2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"%1.6f %1.6f, ", -10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         10.0 + (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">        sprintf (sql2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"%1.6f %1.6f, ", 10.0 + (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         10.0 + (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"180.0 90.0");</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      else</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        /* even row: two</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">points */</b><br class="calibre12"/>
+<b class="calibre9">        sprintf (sql2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"%1.6f %1.6f, ", -10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         -10.0 - (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">        sprintf (sql2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"%1.6f %1.6f, ", 10.0 + (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         10.0 + (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">        strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">")");</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_reset</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(stmt);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_clear_bindings</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(stmt);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_bind_int (stmt, 1, i</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">+ 1);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_bind_text (stmt, 2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">name, strlen (name), SQLITE_STATIC);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_bind_text (stmt, 3,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">geom, strlen (geom), SQLITE_STATIC);</b><br class="calibre12"/>
+<b class="calibre9">      /* performing INSERT INTO</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">      ret = sqlite3_step</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(stmt);</b><br class="calibre12"/>
+<b class="calibre9">      if (ret == SQLITE_DONE ||</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">ret == SQLITE_ROW)</b><br class="calibre12"/>
+<b class="calibre9">       continue;</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"sqlite3_step() error: [%s]\n",</b><br class="calibre12"/>
+<b class="calibre9">         sqlite3_errmsg</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle));</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_finalize (stmt);</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, "COMMIT",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* checking LINESTRINGs */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT DISTINCT Count(*),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">ST_GeometryType(geom), ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "ST_Srid(geom) FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">test_ln");</b><br class="calibre12"/>
+<b class="calibre9">    ret =</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_get_table (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&amp;results, &amp;rows, &amp;columns, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    if (rows &lt; 1)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Unexpected</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">error: ZERO LINESTRINGs found ??????\n");</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    else</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      for (i = 1; i &lt;= rows;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        cnt = atoi</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(results[(i * columns) + 0]);</b><br class="calibre12"/>
+<b class="calibre9">        type =</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">results[(i * columns) + 1];</b><br class="calibre12"/>
+<b class="calibre9">        srid = atoi</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(results[(i * columns) + 2]);</b><br class="calibre12"/>
+<b class="calibre9">        fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"Inserted %d entities of type %s SRID=%d\n",</b><br class="calibre12"/>
+<b class="calibre9">         cnt, type,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">srid);</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_free_table (results);</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/*</b><br class="calibre12"/>
+<b class="calibre9">* inserting some POLYGONs</b><br class="calibre12"/>
+<b class="calibre9">* this time too we'll use a Prepared Statement</b><br class="calibre12"/>
+<b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "INSERT INTO test_pg (id,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">name, geom) ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "VALUES (?, ?,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">GeomFromText(?, 4326))");</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_prepare_v2 (db_handle,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql, strlen (sql), &amp;stmt, NULL);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "SQL error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n%s\n", sql,</b><br class="calibre12"/>
+<b class="calibre9">         sqlite3_errmsg</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle));</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, "BEGIN",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    for (i = 0; i &lt; 100000;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      /* setting up values /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">binding */</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (name, "test POLYGON</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">#%d", i + 1);</b><br class="calibre12"/>
+<b class="calibre9">      strcpy (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"POLYGON((");</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, "%1.6f %1.6f,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">", -10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         -10.0 - (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, "%1.6f %1.6f,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">", 10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         -10.0 - (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, "%1.6f %1.6f,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">", 10.0 + (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         10.0 + (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, "%1.6f %1.6f,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">", -10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         10.0 - (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      sprintf (sql2, "%1.6f</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%1.6f", -10.0 - (i / 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">         -10.0 - (i /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0));</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sql2);</b><br class="calibre12"/>
+<b class="calibre9">      strcat (geom,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"))");</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_reset</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(stmt);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_clear_bindings</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(stmt);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_bind_int (stmt, 1, i</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">+ 1);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_bind_text (stmt, 2,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">name, strlen (name), SQLITE_STATIC);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_bind_text (stmt, 3,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">geom, strlen (geom), SQLITE_STATIC);</b><br class="calibre12"/>
+<b class="calibre9">      /* performing INSERT INTO</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">*/</b><br class="calibre12"/>
+<b class="calibre9">      ret = sqlite3_step</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(stmt);</b><br class="calibre12"/>
+<b class="calibre9">      if (ret == SQLITE_DONE ||</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">ret == SQLITE_ROW)</b><br class="calibre12"/>
+<b class="calibre9">       continue;</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"sqlite3_step() error: [%s]\n",</b><br class="calibre12"/>
+<b class="calibre9">         sqlite3_errmsg</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(db_handle));</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_finalize (stmt);</b><br class="calibre12"/>
+<b class="calibre9">    ret = sqlite3_exec (db_handle, "COMMIT",</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">NULL, NULL, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* checking POLYGONs */</b><br class="calibre12"/>
+<b class="calibre9">    strcpy (sql, "SELECT DISTINCT Count(*),</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">ST_GeometryType(geom), ");</b><br class="calibre12"/>
+<b class="calibre9">    strcat (sql, "ST_Srid(geom) FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">test_pg");</b><br class="calibre12"/>
+<b class="calibre9">    ret =</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_get_table (db_handle, sql,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">&amp;results, &amp;rows, &amp;columns, &amp;err_msg);</b><br class="calibre12"/>
+<b class="calibre9">    if (ret != SQLITE_OK)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Error:</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">%s\n", err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      sqlite3_free</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(err_msg);</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    if (rows &lt; 1)</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      fprintf (stderr, "Unexpected</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">error: ZERO POLYGONs found ??????\n");</b><br class="calibre12"/>
+<b class="calibre9">      goto stop;</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    else</b><br class="calibre12"/>
+<b class="calibre9">      {</b><br class="calibre12"/>
+<b class="calibre9">      for (i = 1; i &lt;= rows;</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">i++)</b><br class="calibre12"/>
+<b class="calibre9">       {</b><br class="calibre12"/>
+<b class="calibre9">        cnt = atoi</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(results[(i * columns) + 0]);</b><br class="calibre12"/>
+<b class="calibre9">        type =</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">results[(i * columns) + 1];</b><br class="calibre12"/>
+<b class="calibre9">        srid = atoi</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(results[(i * columns) + 2]);</b><br class="calibre12"/>
+<b class="calibre9">        fprintf (stderr,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">"Inserted %d entities of type %s SRID=%d\n",</b><br class="calibre12"/>
+<b class="calibre9">         cnt, type,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">srid);</b><br class="calibre12"/>
+<b class="calibre9">       }</b><br class="calibre12"/>
+<b class="calibre9">      }</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_free_table (results);</b><br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">/* closing the DB connection */</b><br class="calibre12"/>
+<b class="calibre9">  stop:</b><br class="calibre12"/>
+<b class="calibre9">    sqlite3_close (db_handle);</b><br class="calibre12"/>
+<b class="calibre9">    return 0;</b><br class="calibre12"/>
+<b class="calibre9">}</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre38"><b class="calibre9">Compiling and</b></p><b class="calibre9">
+</b></td>
+</tr>
+</tbody></table>
+</body></html>

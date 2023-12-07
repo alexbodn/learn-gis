@@ -1,0 +1,585 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">More about Spatial SQL: WKT and</b></span></p><span class="calibre15"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre15"><b class="calibre9">WKB</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"first-spatial.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#common"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="metadata.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="metadata.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">SpatiaLite supports<p class="calibre1"></p>
+<p class="calibre1">a <span class="calibre33"><b class="calibre9">Geometry</b></span> data</p>
+<p class="calibre1">type conformant to the international standard <b class="calibre9">OGC-SFS</b>
+(<i class="calibre11">Open Geospatial Consortium - Simple Feature SQL</i>).<br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.opengeospatial.org/standards/sfs"&gt;http://www.opengeospatial.org/standards/sfs</a><br class="calibre12"/>
+</p>
+<p class="calibre1"><br class="calibre12"/>
+<span class="calibre33"><b class="calibre9">Geometry</b></span> is an</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">abstract</b></i> data type with seven related</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">concrete</b> sub-classes</i>.<br class="calibre12"/>
+You cannot directly instantiate a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Geometry</b></span> (<i class="calibre11">because this</i></p><i class="calibre11">
+<p class="calibre1">one is and <b class="calibre9">abstract</b> class, and doesn't corresponds to any</p>
+</i><p class="calibre1"><i class="calibre11">actual implementation</i>): but you can freely instantiate any</p>
+<p class="calibre1">related <b class="calibre9">sub-class</b>.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre47"><b class="calibre9">Sub-Class</b></td>
+<td class="calibre47"><b class="calibre9">Example</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span></p></td>
+<td class="calibre49"><img src="point.gif" _="" p="" class="calibre14"/>
+<p class="calibre1">alt="point example" /&gt;</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LINESTRING</b></span></p></td>
+<td class="calibre49"><img src="&lt;/p" class="calibre14"/>
+<p class="calibre1">"../img/linestring.gif" alt="linestring example" /&gt;</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POLYGON</b></span></p></td>
+<td class="calibre49"><img src="polygon.gif" _="" p="" class="calibre14"/>
+<p class="calibre1">alt="polygon example" /&gt;</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span></p></td>
+<td class="calibre49"><img src="&lt;/p" class="calibre14"/>
+<p class="calibre1">"../img/multipoint.gif" alt="multipoint example" /&gt;</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING</b></span></p></td>
+<td class="calibre49"><img src="&lt;/p" class="calibre14"/>
+<p class="calibre1">"../img/multilinestring.gif" alt="multilinestring example" /&gt;</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOLYGON</b></span></p></td>
+<td class="calibre49"><img src="&lt;/p" class="calibre14"/>
+<p class="calibre1">"../img/multipolygon.gif" alt="multipolygon example" /&gt;</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre48"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span></p></td>
+<td class="calibre48">Any arbitrary collection of elementary<p class="calibre1"></p>
+<p class="calibre1">sub-classes.<br class="calibre12"/>
+<span class="calibre17">Please note:</span> for some odd reason this one seems to be the</p>
+<p class="calibre1">sub-class absolutely beloved by <i class="calibre11">inexperienced</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">beginners</i>:<br class="calibre12"/>
+all them are fond of <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span>:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span> isn't</p>
+<p class="calibre1">supported by the <i class="calibre11">Shapefile</i> format.</p></li>
+<li class="calibre22">And this sub-class isn't generally supported by ordinary GIS sw<p class="calibre1"></p>
+<p class="calibre1">(<i class="calibre11">viewers and so on</i>).</p></li>
+</ul>
+So it's very rarely used in the real GIS professional world.</td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p lang="zxx" class="calibre18"><b class="calibre9">WKT and WKT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">notations</b></p>
+<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">Geometry</b></span> is a</p>
+<p class="calibre1">very complex data type: accordingly to this, <b class="calibre9">OGC-SFS</b> defines</p>
+<p class="calibre1">two alternative standard notations allowing to represent Geometry</p>
+<p class="calibre1">values:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <b class="calibre9">WKT</b> (<i class="calibre11">Well Known Text</i>) notation is intended to<p class="calibre1"></p>
+<p class="calibre1">be <i class="calibre11"><b class="calibre9">user friendly</b></i> (<i class="calibre11">not really so user friendly</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">after all, but at least</i> <i class="calibre11"><b class="calibre9">human readable</b></i>).</p></li>
+<li class="calibre22">the <b class="calibre9">WKB</b> (<i class="calibre11">Well Known Binary</i>) notation on the other<p class="calibre1"></p>
+<p class="calibre1">side is more intended for precise and accurate</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">import/export/exchange</b></i> of Geometries between</p>
+<p class="calibre1">different platforms.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Dimension: <b class="calibre9">XY</b> (<b class="calibre9">2D</b>) <i class="calibre11">the most oftenly used<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">..</i>.<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre47"><b class="calibre9">Geometry Type</b></td>
+<td class="calibre47"><b class="calibre9">WKT example</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span></p></td>
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT(123.45 543.21)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LINESTRING</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">LINESTRING(100.0 200.0, 201.5 102.5,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1234.56 123.89)</b></span><br class="calibre12"/>
+<i class="calibre11">three vertices</i></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POLYGON</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">POLYGON((101.23 171.82, 201.32 101.5,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">215.7 201.953, 101.23 171.82))</b></span><br class="calibre12"/>
+<i class="calibre11">exterior ring, no interior rings</i>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">POLYGON((10 10, 20 10, 20<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">20, 10 20, 10 10),</b><br class="calibre12"/>
+<b class="calibre9">(13 13, 17 13, 17 17, 13 17, 13 13))</b></span><br class="calibre12"/>
+<i class="calibre11">exterior ring, one interior ring</i></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT(1234.56 6543.21, 1 2, 3 4,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">65.21 124.78)</b></span><br class="calibre12"/>
+<i class="calibre11">three points</i></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING((1 2, 3 4), (5 6, 7 8,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">9 10), (11 12, 13 14))</b></span><br class="calibre12"/>
+<i class="calibre11">first and last linestrings have 2 vertices each one;</i><br class="calibre12"/>
+<i class="calibre11">the second linestring has 3 vertices</i></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOLYGON</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOLYGON(((0 0,10 20,30 40,0 0),(1</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1,2 2,3 3,1 1)),</b><br class="calibre12"/>
+<b class="calibre9">((100 100,110 110,120 120,100 100)))</b></span><br class="calibre12"/>
+<i class="calibre11">two polygons: the first one has an interior ring</i></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION(POINT(1</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1),</b><br class="calibre12"/>
+<b class="calibre9">LINESTRING(4 5, 6 7, 8 9),</b><br class="calibre12"/>
+<b class="calibre9">POINT(30 30))</b></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">XYZ</b> (<b class="calibre9">3D</b>)<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre47"><b class="calibre9">Geometry Type</b></td>
+<td class="calibre47"><b class="calibre9">WKT example</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">POINTZ(13.21 47.21</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">0.21)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LINESTRING</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">LINESTRINGZ(15.21 57.58 0.31, 15.81</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">57.12 0.33)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POLYGON</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINTZ(15.21 57.58 0.31, 15.81</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">57.12 0.33)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOLYGON</b></span></p></td>
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Times New Roman, serif"&gt;<i class="calibre11">...</i></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTIONZ(POINTZ(13.21 47.21</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">0.21),</b><br class="calibre12"/>
+<b class="calibre9">LINESTRINGZ(15.21 57.58 0.31,</b><br class="calibre12"/>
+<b class="calibre9">15.81 57.12 0.33))</b></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+Dimension: <b class="calibre9">XYM</b> (<b class="calibre9">2D + M</b><i class="calibre11">easure</i>)<br class="calibre12"/>
+<span class="calibre17">Please note:</span> this one has nothing to do with 3D.<br class="calibre12"/>
+<b class="calibre9">M</b> is a <b class="calibre9">m</b><i class="calibre11">easure</i> value, not a geometry</p>
+<p class="calibre1">dimension.</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre47"><b class="calibre9">Geometry Type</b></td>
+<td class="calibre47"><b class="calibre9">WKT example</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">POINTM(13.21 47.21</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1000.0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LINESTRING</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">LINESTRINGM(15.21 57.58 1000.0, 15.81</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">57.12 1100.0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POLYGON</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINTM(15.21 57.58 1000.0, 15.81</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">57.12 1100.0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOLYGON</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTIONM(POINTM(13.21 47.21</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000.0),</b><br class="calibre12"/>
+<b class="calibre9">LINESTRINGM(15.21 57.58 1000.0, 15.81 57.12</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1100.0))</b></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">XYZM</b> (<b class="calibre9">3D + M</b><i class="calibre11"><b class="calibre9">easure</b></i>)<br class="calibre12"/>
+<span class="calibre17">Please note:</span> <b class="calibre9">M</b> is a <b class="calibre9">m</b><i class="calibre11">easure</i> value, not</p>
+<p class="calibre1">a geometry dimension.</p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre47"><b class="calibre9">Geometry Type</b></td>
+<td class="calibre47"><b class="calibre9">WKT example</b></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">POINTZM(13.21 47.21 0.21</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1000.0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">LINESTRING</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">LINESTRINGZM(15.21 57.58 0.31 1000.0,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">15.81 57.12 0.33 1100.0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POLYGON</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOINT</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"CourierNew, monospace"&gt;<b class="calibre9">MULTIPOINTZM(15.21 57.58 0.31 1000.0,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">15.81 57.12 0.33 1100.0)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTILINESTRING</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">MULTIPOLYGON</b></span></p></td>
+<td class="calibre40"><i class="calibre11">...</i></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTION</b></span></p></td>
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">GEOMETRYCOLLECTIONZM(POINTZM(13.21</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">47.21 0.21 1000.0),</b><br class="calibre12"/>
+<b class="calibre9">LINESTRINGZM(15.21 57.58 0.31 1000.0, 15.81 57.12 0.33</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">1100.0))</b></span></p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">There are several<p class="calibre1"></p>
+<p class="calibre1">Spatial SQL functions supporting <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKT</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKB</b></span> handling;<br class="calibre12"/>
+examining all them one by one will surely be absolutely boring</p>
+<p class="calibre1">(<i class="calibre11">and not really useful for the average user</i>).<br class="calibre12"/>
+So we'll briefly explore just the main (<i class="calibre11">and most often used</i>)</p>
+<p class="calibre1">ones.</p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">Hex(ST_GeomFromText('POINT(1.2345 2.3456)'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">0001FFFFFFFF8D976E1283C0F33F16FBCBEEC9C302408D976E1283C0F33F16FBCBEEC9C302407C010000008D976E1283C0F33F16FBCBEEC9C30240FE</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ST_AsText(x'0001FFFFFFFF8D976E1283C0F33F16FBCBEEC9C302408D976E1283C0F33F16FBCBEEC9C302407C010000008D976E1283C0F33F16FBCBEEC9C30240FE');</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT(1.2345 2.3456)</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">Hex(ST_AsBinary(x'0001FFFFFFFF8D976E1283C0F33F16FBCBEEC9C302408D976E1283C0F33F16FBCBEEC9C302407C010000008D976E1283C0F33F16FBCBEEC9C30240FE'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">01010000008D976E1283C0F33F16FBCBEEC9C30240</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">Hex(ST_AsBinary(ST_GeomFromText('POINT(1.2345</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">2.3456)')));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">01010000008D976E1283C0F33F16FBCBEEC9C30240</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ST_AsText(ST_GeomFromWKB(x'01010000008D976E1283C0F33F16FBCBEEC9C30240'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT(1.2345 2.3456)</b></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<span class="calibre17"><b class="calibre9">Please note well:</b></span> both <b class="calibre9">WKT</b> and <b class="calibre9">WKB</b>
+notations are intended to support standard data exchange<p class="calibre1"></p>
+<p class="calibre1">(import/export);<br class="calibre12"/>
+anyway the actual format internally used by SpatiaLite is a</p>
+<p class="calibre1">different one, i.e. <b class="calibre9">BLOB Geometry</b>.<br class="calibre12"/>
+You must never be concerned about such <i class="calibre11"><span class="calibre17">internal</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">format</span></i>:<br class="calibre12"/>
+you simply have to use the appropriate conversion functions so to</p>
+<p class="calibre1">convert back and forth in standard <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKT</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKB</b></span>.</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">Hex()</b></span>
+function is a standard SQL function allowing to represent binary<p class="calibre1"></p>
+<p class="calibre1">values as hexadecimal encoded text strings.</p></li>
+<li class="calibre22">the Spatial SQL function <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_GeomFromText()</b></span> converts</p>
+<p class="calibre1">any valid <span class="calibre33"><b class="calibre9">WKT</b></span>
+expression into an internal <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BLOB Geometry</b></span> value.</p></li>
+<li class="calibre22"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_GeomFromWKB()</b></span> converts</p>
+<p class="calibre1">any valid <span class="calibre33"><b class="calibre9">WKB</b></span>
+expression into an internal <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BLOB Geometry</b></span> value.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">ST_AsText()</b></span>
+converts an <i class="calibre11">internal</i> <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BLOB Geometry</b></span> value into the</p>
+<p class="calibre1">corresponding <span class="calibre33"><b class="calibre9">WKT</b></span>
+expression.</p></li>
+<li class="calibre22"><span class="calibre33"><b class="calibre9">ST_AsBinary()</b></span>
+converts an <i class="calibre11">internal</i> <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BLOB Geometry</b></span> value into the</p>
+<p class="calibre1">corresponding <span class="calibre33"><b class="calibre9">WKB</b></span>
+expression.</p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_GeometryType(ST_GeomFromText('POINT(1.2345</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">2.3456)'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_GeometryType(ST_GeomFromText('POINTZ(1.2345 2.3456</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">10)'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><div class="calibre33"><b class="calibre9">POINT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">Z</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_GeometryType(ST_GeomFromText('POINT ZM(1.2345 2.3456 10</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">20)'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><div class="calibre33"><b class="calibre9">POINT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ZM</b></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">ST_GeometryType()</b></span>
+will return the Geometry Type from the given <i class="calibre11">internal</i>
+<span class="calibre33"><b class="calibre9">BLOB Geometry</b></span>
+value.<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre17"><b class="calibre9">Please note:</b></span> when using not-2D dimensions,<p class="calibre1"></p>
+<p class="calibre1">declaring e.g. '<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINTZ</b></span>' or '<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT Z</b></span>' is absolutely the</p>
+<p class="calibre1">same: SpatiaLite understands both notations indifferently.</p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">ST_Srid(ST_GeomFromText('POINT(1.2345 2.3456)'));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-1</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+<p class="calibre1">ST_Srid(ST_GeomFromText('POINT(1.2345 2.3456)',</p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b></span></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre50"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">4326</b></span></p></td>
+</tr>
+</tbody></table>
+<span class="calibre33"><b class="calibre9">ST_Srid()</b></span> will<p class="calibre1"></p>
+<p class="calibre1">return the SRID from the given <i class="calibre11">internal</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">BLOB Geometry</b>&gt;</span> value.</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><span class="calibre17"><b class="calibre9">Please note:</b></span> both <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_GeomFromText()</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">ST_GeomFromWKB()</b></span>
+accept an <i class="calibre11">optional</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SRID</b></span> argument.<br class="calibre12"/>
+If the <span class="calibre33"><b class="calibre9">SRID</b></span> is</p>
+<p class="calibre1">unspecified (<i class="calibre11">not at all a good practice</i>), then <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-1</b></span> is assumed.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+</body></html>

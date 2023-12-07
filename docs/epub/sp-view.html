@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">recipe #20</b><br class="calibre12"/>
+<b class="calibre9">Spatial Views</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"union.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="dijkstra_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="dijkstra_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">SpatiaLite supports<p class="calibre1"></p>
+<p class="calibre1">Spatial Views: any properly defined Spatial View can then be used</p>
+<p class="calibre1">as any other <i class="calibre11"><span class="calibre17"><b class="calibre9">map layer</b></span></i>, i.e. can be displayed</p>
+<p class="calibre1">using QGIS .<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note:</b></span> any SQLite <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> can only be accessed in</p>
+<p class="calibre1">read-mode (<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SELECT</b></span>);<br class="calibre12"/>
+and obviously such limitation applies to any Spatial View as well</p>
+<p class="calibre1">(no <span class="calibre33"><b class="calibre9">INSERT</b></span>,</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">DELETE</b></span> or</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">UPDATE</b></span> are</p>
+<p class="calibre1">supported).</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre18"><span class="calibre19"><b class="calibre31">Using</b></span></p><span class="calibre19"><b class="calibre31">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre31">the query composer tool</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">spatialite_gui</b></span>
+supports a <i class="calibre11"><span class="calibre17">query composer tool</span></i>; in this first example</p>
+<p class="calibre1">we'll use exactly this one.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="sp-view1.png" alt="query composer #1" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Step 1:</b></span> selecting the required tables and columns,</p>
+<p class="calibre1">and defining the corresponding <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> condition.<br class="calibre12"/>
+In this first example we'll <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> and the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span>
+tables.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="sp-view2.png" alt="query composer #2" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Step 2:</b></span> now we'll set an appropriate</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">filter</b></i> clause;<br class="calibre12"/>
+in this case only <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> and</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span>
+belonging to Tuscany Region (<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">region_id = 9</b></span>) will be</p>
+<p class="calibre1">extracted.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="sp-view3.png" alt="query composer #3" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Step 3:</b></span> and finally we'll set an appropriate</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW</b></span> name: during</p>
+<p class="calibre1">this latest phase we'll select the Geometry column corresponding to</p>
+<p class="calibre1">this <span class="calibre33"><b class="calibre9">VIEW</b></span>.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="sp-view4.png" alt="query composer #4" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+We are now able to display this Spatial View using QGIS (an</p>
+<p class="calibre1">appropriate <b class="calibre9"><i class="calibre11">thematic rendering</i></b> was applied so to</p>
+<p class="calibre1">evidentiate Counties).</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre18"><span class="calibre19">
+</span></p><p class="calibre1"><span class="calibre19">"font-size: 20pt"&gt;<b class="calibre9">Hand-writing your own Spatial</b></span></p><span class="calibre19"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre19"><b class="calibre9">VIEW</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">VIEW italy AS</b><br class="calibre12"/>
+<b class="calibre9">SELECT lc.ROWID AS ROWID,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_id AS lc_id,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS lc_name,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population,</b><br class="calibre12"/>
+<b class="calibre9">  lc.geometry AS geometry,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id AS county_id,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county_name,</b><br class="calibre12"/>
+<b class="calibre9">  c.car_plate_code AS car_plate_code,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id AS region_id,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS region_name</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (lc.county_id = c.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (c.region_id =</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">r.region_id);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+You are not obligatorily compelled to use the <i class="calibre11"><span class="calibre17">query composer</span></i></p><i class="calibre11"><span class="calibre17">
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">tool</span></i>.<br class="calibre12"/>
+You are absolutely free to define any arbitrary VIEW to be used as</p>
+<p class="calibre1">a Spatial View.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO views_geometry_columns</b><br class="calibre12"/>
+<b class="calibre9">    (view_name, view_geometry, view_rowid,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">f_table_name, f_geometry_column)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('italy', 'geometry', 'ROWID',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'local_councils', 'geometry');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Anyway you must register this <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> into the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">views_geometry_columns</b></span>, so</p>
+<p class="calibre1">to make it become a <i class="calibre11"><b class="calibre9">real Spatial View</b></i>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">* FROM views_geometry_columns;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">view_name</td>
+<td class="calibre13">view_geometry</td>
+<td class="calibre13">view_rowid</td>
+<td class="calibre13">f_table_name</td>
+<td class="calibre13">f_geometry_column</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">tuscany</td>
+<td class="calibre13">geometry</td>
+<td class="calibre13">ROWID</td>
+<td class="calibre13">local_councils</td>
+<td class="calibre13">geometry</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">italy</td>
+<td class="calibre13">geometry</td>
+<td class="calibre13">ROWID</td>
+<td class="calibre13">local_councils</td>
+<td class="calibre13">geometry</td>
+</tr>
+</tbody></table>
+Just a simple check ...<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="sp-view5.png" alt="query composer #5" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+And finally we can display this Spatial View using QGIS (an</p>
+<p class="calibre1">appropriate thematic rendering was applied so to evidentiate</p>
+<p class="calibre1">Regions).</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"union.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="dijkstra_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="dijkstra_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Technical Introduction</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"/>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="start_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="start_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20"><span class="calibre17"><b class="calibre9">Quick<p class="calibre1"></p>
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">Techical Intro:</b></span> in technical terms <b class="calibre9"><i class="calibre11">SpatiaLite</i></b>
+is a <b class="calibre9">Spatial DBMS</b> supporting international standards such as</p>
+<p class="calibre1"><b class="calibre9">SQL92</b> and <b class="calibre9">OGC-SFS</b>.<br class="calibre12"/>
+<br class="calibre12"/>
+I suppose all the above acronyms sounds really obscure and</p>
+<p class="calibre1">(<i class="calibre11">maybe</i>) irritating to you.<br class="calibre12"/>
+Don't be afraid: very often obscure technical jargon hides really</p>
+<p class="calibre1">simple to understand concepts:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a <b class="calibre9">DBMS</b> [<i class="calibre11">Database Management System</i>] is a software<p class="calibre1"></p>
+<p class="calibre1">designed to store and retrieve arbitrary data in the most efficient and generalized way.<br class="calibre12"/>
+Actually, lots and lots of huge and highly structured complex</p>
+<p class="calibre1">data.</p></li>
+<li class="calibre22"><b class="calibre9">SQL</b> [<i class="calibre11">Structured Query Language</i>] is a standardized<p class="calibre1"></p>
+<p class="calibre1">language supporting DBMS handling:<br class="calibre12"/>
+using <i class="calibre11">SQL statements</i> you can define how your data are</p>
+<p class="calibre1">organized.<br class="calibre12"/>
+And you can insert, delete or update your data into the DBMS.<br class="calibre12"/>
+Obviously, you can also retrieve (query) your data in a very</p>
+<p class="calibre1">flexible (and efficient) way.</p></li>
+<li class="calibre22"><b class="calibre9">OGC-SFS</b> [<i class="calibre11">Open Geospatial Consortium - Simple Feature<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">Specification</i>] allows to extend the basic DBMS / SQL</p>
+<p class="calibre1">capabilities so to support a special <b class="calibre9">Geometry</b> data-type,</p>
+<p class="calibre1">thus allowing to deploy a so-called <b class="calibre9">Spatial DBMS</b></p></li>
+</ul>
+<b class="calibre9">SpatiaLite</b> is widely based on the top of the very popular<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">SQLite</b>, a lightweight personal DBMS.<br class="calibre12"/>
+They act as a tight couple: <i class="calibre11">SQLite</i> implements a standard</p>
+<p class="calibre1">SQL92 data engine, while <i class="calibre11">SpatiaLite</i> implements the standard OGC-SFS core.<br class="calibre12"/>
+Using both them combined you'll then get a complete <i class="calibre11">Spatial</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">DBMS</i><br class="calibre12"/>
+<br class="calibre12"/>
+SQLite/SpatiaLite aren't based on the most common</p>
+<p class="calibre1"><b class="calibre9">client-server</b> architecture: they adopt a simpler</p>
+<p class="calibre1"><b class="calibre9">personal</b> architecture. i.e. the whole SQL engine is directly embedded within the application itself.<br class="calibre12"/>
+This elementary simple and unsophisticated architecture widely</p>
+<p class="calibre1">simplifies any task related with database management: you can</p>
+<p class="calibre1">simply open (or create) a <b class="calibre9">database-file</b> exactly in the same way you are accustomed to follow when you open a text document or a spreadsheet. There is absolutely no extra-complexity implied in</p>
+<p class="calibre1">such tasks.<br class="calibre12"/>
+A complete <b class="calibre9">database</b> (<i class="calibre11">maybe, one containing several</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">millions entities</i>) simply is an ordinary file. You can freely</p>
+<p class="calibre1">copy (or even delete) this file at your will without any</p>
+<p class="calibre1">problem.<br class="calibre12"/>
+And that's not all: such <i class="calibre11">database-file</i> supports a</p>
+<p class="calibre1"><b class="calibre9">universal</b> architecture, so you can transfer the whole</p>
+<p class="calibre1"><i class="calibre11">database-file</i> from one computer to a different one without</p>
+<p class="calibre1">any special precaution.<br class="calibre12"/>
+The origin and destination computer can actually use completely</p>
+<p class="calibre1">different operating systems: this has no effect at all, because</p>
+<p class="calibre1">database-files are <b class="calibre9">cross-platform portable</b><br class="calibre12"/>
+<br class="calibre12"/>
+Clearly, all this <i class="calibre11">simplicity</i> and <i class="calibre11">lightness</i> has a</p>
+<p class="calibre1">cost: SQLite/SpatiaLite support for concurrent multiple access is</p>
+<p class="calibre1">very rudimentary and poor.<br class="calibre12"/>
+This is what personal DB exactly means; the underlying paradigm is:</p>
+<p class="calibre1"><b class="calibre9">single user / single application / standalone</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">workstation</b><br class="calibre12"/>
+<br class="calibre12"/>
+If supporting multiple concurrent access is a main goal for you,</p>
+<p class="calibre1">then SQLite/SpatiaLite aren't the better choice for your needing: a most complex <i class="calibre11">client-server</i> DBMS is then strongly</p>
+<p class="calibre1">required.<br class="calibre12"/>
+Anyway, SpatiaLite is very similar to <b class="calibre9">PostgreSQL/PostGIS</b> (a</p>
+<p class="calibre1">heavy-weighted client-server <i class="calibre11">open source</i> Spatial DBMS): so</p>
+<p class="calibre1">you can freely switch (in a relatively painless way) from the one</p>
+<p class="calibre1">to the other accordingly to your actual requirements, choosing each time the best tool to be used.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+Some useful further references:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><a href="http://www.sqlite.org/">SQLite home</a></li>
+<li class="calibre22"><a href="http://www.gaia-gis.it/spatialite">SpatiaLite<p class="calibre1"></p>
+</a><p class="calibre1"><a href="http://www.gaia-gis.it/spatialite">home</a></p></li>
+<li class="calibre22"><a href="http://www.sqlite.org/lang.html">SQL as understood by<p class="calibre1"></p>
+</a><p class="calibre1"><a href="http://www.sqlite.org/lang.html">SQLite</a> (technical reference)</p></li>
+<li class="calibre22"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://www.gaia-gis.it/spatialite/spatialite-manual-2.3.1.html"&gt;SpatiaLite Manual</a> (outdated version, but still userful)</p></li>
+<li class="calibre22"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://www.gaia-gis.it/spatialite/spatialite-tutorial-2.3.1.html"&gt;Old SpatiaLite Tutorial</a> (outdated version, but still userful)</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"/>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="start_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="start_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</p></body></html>

@@ -1,0 +1,710 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">recipe #11</b><br class="calibre12"/>
+<b class="calibre9">Guinness Book of Records</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"rtree.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="neighbours_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="neighbours_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">Local Council</td>
+<td class="calibre13">County</td>
+<td class="calibre13">Region</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ATRANI</td>
+<td class="calibre13">SALERNO</td>
+<td class="calibre13">CAMPANIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">BARDONECCHIA</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">BRIGA ALTA</td>
+<td class="calibre13">CUNEO</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CASAVATORE</td>
+<td class="calibre13">NAPOLI</td>
+<td class="calibre13">CAMPANIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">LAMPEDUSA E LINOSA</td>
+<td class="calibre13">AGRIGENTO</td>
+<td class="calibre13">SICILIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">LU</td>
+<td class="calibre13">ALESSANDRIA</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">MORTERONE</td>
+<td class="calibre13">LECCO</td>
+<td class="calibre13">LOMBARDIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">NE</td>
+<td class="calibre13">GENOVA</td>
+<td class="calibre13">LIGURIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">OTRANTO</td>
+<td class="calibre13">LECCE</td>
+<td class="calibre13">PUGLIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">PINO SULLA SPONDA DEL LAGO MAGGIOR</td>
+<td class="calibre13">VARESE</td>
+<td class="calibre13">LOMBARDIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">PREDOI</td>
+<td class="calibre13">BOLZANO</td>
+<td class="calibre13">TRENTINO-ALTO ADIGE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">RE</td>
+<td class="calibre13">VERBANO-CUSIO-OSSOLA</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">RO</td>
+<td class="calibre13">FERRARA</td>
+<td class="calibre13">EMILIA-ROMAGNA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ROMA</td>
+<td class="calibre13">ROMA</td>
+<td class="calibre13">LAZIO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">SAN VALENTINO IN ABRUZZO CITERIORE</td>
+<td class="calibre13">PESCARA</td>
+<td class="calibre13">ABRUZZO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">VO</td>
+<td class="calibre13">PADOVA</td>
+<td class="calibre13">VENETO</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+The above list of Local Councils really is a kind of <b class="calibre9">Guinness</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Book of Records</b>.<br class="calibre12"/>
+For one reason or the other each one of them really has something</p>
+<p class="calibre1">absolutely exceptional and worth of note.<br class="calibre12"/>
+May well be you are really puzzled and surprised while reading</p>
+<p class="calibre1">this, because (<i class="calibre11">with the notable exception of Rome</i>) none of</p>
+<p class="calibre1">them is within the most renowned places of Italy.<br class="calibre12"/>
+Anyway, the explanation is really simple:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><b class="calibre9">Roma</b> has the biggest population: <b class="calibre9">2,546,804</b>
+peoples</li>
+<li class="calibre22"><b class="calibre9">Morterone</b> has the smallest population: <b class="calibre9">33</b>
+peoples</li>
+<li class="calibre22"><b class="calibre9">Roma</b> (<i class="calibre11">again</i>) has the biggest area: <b class="calibre9">1,287</b>
+km²</li>
+<li class="calibre22"><b class="calibre9">Atrani</b> has the smallest area: <b class="calibre9">0.1</b> km²</li>
+<li class="calibre22"><b class="calibre9">Casavatore</b> has the highest population density:<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">13,627.5</b> peoples/km²</p></li>
+<li class="calibre22"><b class="calibre9">Briga Alta</b> has the lowest population density: <b class="calibre9">1.2</b>
+peoples/km²</li>
+<li class="calibre22"><b class="calibre9">Pino sulla sponda del Lago Maggior</b>(e) and <b class="calibre9">San<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">Valentino in Abruzzo Citeriore</b> share the privilege to have the</p>
+<p class="calibre1">longest name.</p></li>
+<li class="calibre22">on the other side <b class="calibre9">Lu</b>, <b class="calibre9">Ne</b>, <b class="calibre9">Re</b>, <b class="calibre9">Ro</b>
+and <b class="calibre9">Vo</b> have the shortest name.</li>
+<li class="calibre22"><b class="calibre9">Predoi</b> is the northernmost</li>
+<li class="calibre22"><b class="calibre9">Lampedua e Linosa</b> is the southernmost</li>
+<li class="calibre22"><b class="calibre9">Bardonecchia</b> is the westernmost</li>
+<li class="calibre22"><b class="calibre9">Otranto</b> is the easternmost</li>
+</ul>
+Discovering such highly (<i class="calibre11">un</i>)useful Guinness Records<p class="calibre1"></p>
+<p class="calibre1">collection is quite easy.<br class="calibre12"/>
+You simply have to execute the following SQL query.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc.lc_name AS LocalCouncil,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS Region,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS Population,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Area(lc.geometry) / 1000000.0 AS "Area</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sqKm",</b><br class="calibre12"/>
+<b class="calibre9">  lc.population / (ST_Area(lc.geometry) /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000000.0)</b><br class="calibre12"/>
+<b class="calibre9">    AS "PopDensity</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">[peoples/sqKm]",</b><br class="calibre12"/>
+<b class="calibre9">  Length(lc.lc_name) AS NameLength,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMaxY(lc.geometry) AS North,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMinY(lc.geometry) AS South,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMinX(lc.geometry) AS West,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMaxX(lc.geometry) AS East</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (c.county_id = lc.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (r.region_id = c.region_id)</b><br class="calibre12"/>
+<b class="calibre9">WHERE lc.lc_id IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE population IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(population)</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(population)</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE ST_Area(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(ST_area(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(ST_Area(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE population / (ST_Area(geometry) /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000000.0) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT Max(population /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(ST_Area(geometry) / 1000000.0))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT MIN(population /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(ST_Area(geometry) / 1000000.0))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE Length(lc_name) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(Length(lc_name))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(Length(lc_name))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMaxY(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(MbrMaxY(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMinY(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(MbrMinY(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMaxX(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(MbrMaxX(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMinX(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(MbrMinX(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">local_councils));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Oh yes, this one surely isn't a simple and plain query.<br class="calibre12"/>
+But you are now consulting the <b class="calibre9">High Cuisine Recipes</b>.<br class="calibre12"/>
+So I suppose your intention was exactly the one to look for some</p>
+<p class="calibre1">really tasty and spicy SQL query:<br class="calibre12"/>
+and you've just got it. Feel happy.<br class="calibre12"/>
+<br class="calibre12"/>
+After all the above SQL query is only apparently complex, but it</p>
+<p class="calibre1">real structure is surprisingly simple.<br class="calibre12"/>
+Let try rewriting the SQL query in a simplified form:<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc.lc_name AS LocalCouncil,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS Region,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS Population,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Area(lc.geometry) / 1000000.0 AS "Area</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sqKm",</b><br class="calibre12"/>
+<b class="calibre9">  lc.population / (ST_Area(lc.geometry) /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000000.0)</b><br class="calibre12"/>
+<b class="calibre9">    AS "PopDensity</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">[peoples/sqKm]",</b><br class="calibre12"/>
+<b class="calibre9">  Length(lc.lc_name) AS NameLength,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMaxY(lc.geometry) AS North,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMinY(lc.geometry) AS South,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMinX(lc.geometry) AS West,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMaxX(lc.geometry) AS East</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (c.county_id = lc.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (r.region_id = c.region_id)</b><br class="calibre12"/>
+<b class="calibre9">WHERE lc.lc_id IN (<span class="calibre57">... <i class="calibre11">some list of</i></span></b></p><b class="calibre9"><span class="calibre57"><i class="calibre11">
+</i></span></b></div><p class="calibre1"><span class="calibre33"><b class="calibre9"><span class="calibre57"><i class="calibre11">values</i> ...</span>);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+I suppose you can now easily understand what is the meaning of this</p>
+<p class="calibre1">SQL query.<br class="calibre12"/>
+There is absolutely nothing too much complex or difficult in this:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils</b></span> table is</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span>ed to the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span>
+table.</p></li>
+<li class="calibre22">and the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">counties</b></span> table is then</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">JOIN</b></span>ed to the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">regions</b></span>
+table.</p></li>
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">ST_Area()</b></span>
+Spatial function is used to calculate areas: an appropriate scale<p class="calibre1"></p>
+<p class="calibre1">factor is applied so to get measures expressed in <b class="calibre9">km²</b> rather</p>
+<p class="calibre1">than in <b class="calibre9">m²</b>.</p></li>
+<li class="calibre22">a numeric expression (<i class="calibre11">not at all sophisticated or<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">complex</i>) is used to calculate population density expressed in</p>
+<p class="calibre1"><b class="calibre9">peoples/km²</b></p></li>
+<li class="calibre22">a <div class="calibre33"><b class="calibre9">WHERE ... IN<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(...)</b></span> clause is then used so to filter someway the</p>
+<p class="calibre1">result-set.</p></li>
+</ul>
+But you already know all this, so I suppose you are very little<p class="calibre1"></p>
+<p class="calibre1">interested to get any further detail.<br class="calibre12"/>
+Quite obviously the most interesting things happen within the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">WHERE ... IN</b></span></p><span class="calibre33"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre33"><b class="calibre9">(...)</b></span> clause;<br class="calibre12"/>
+and exactly here we'll now focus our attention.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">SELECT Max(population)</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">SELECT Min(population)</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This SQL snippet is really simple: each query simply computes a</p>
+<p class="calibre1"><b class="calibre9">Min</b> / <b class="calibre9">Max</b> value.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">  SELECT Max(population)</b><br class="calibre12"/>
+<b class="calibre9">  FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">UNION</b><br class="calibre12"/>
+<b class="calibre9">  SELECT Min(population)</b><br class="calibre12"/>
+<b class="calibre9">  FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+This is the first time we introduce an <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UNION</b></span> statement:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">this allows <i class="calibre11"><b class="calibre9">merging</b></i> together two result-sets, so<p class="calibre1"></p>
+<p class="calibre1">to get an unique result-set.</p></li>
+<li class="calibre22">there is a condition to be satisfied: both the<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">left-sided</b></i> and the <i class="calibre11"><b class="calibre9">right-sided</b></i>
+<span class="calibre33"><b class="calibre9">SELECT</b></span>s must</p>
+<p class="calibre1">return the same number of columns, and corresponding columns must</p>
+<p class="calibre1">have the same value-type.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">WHERE population IN (</b><br class="calibre12"/>
+<b class="calibre9">    SELECT Max(population)</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">  UNION</b><br class="calibre12"/>
+<b class="calibre9">    SELECT Min(population)</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils)</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+SQL supports a wonderful mechanism: the one known as<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">sub-query</b>.<br class="calibre12"/>
+You can define an <i class="calibre11"><b class="calibre9">inner</b></i> query (<i class="calibre11">which is executed</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">first</i>), then using any returned value into the</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">outer</b></i> (<i class="calibre11">main</i>) query.<br class="calibre12"/>
+Now the previous SQL snippet doesn't looks too much mysterious:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">in this case the <b class="calibre9">sub-query</b> actually is an <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UNION</b></span> query.</p></li>
+<li class="calibre22">the <i class="calibre11"><b class="calibre9">left-sided</b></i> query will return the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Max(population)</b></span> value.</p></li>
+<li class="calibre22">the <i class="calibre11"><b class="calibre9">right-sided</b></i> query will return the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Min(population)</b></span> value.</p></li>
+<li class="calibre22">then <span class="calibre33"><b class="calibre9">UNION</b></span>
+will merge both values into an unique result-set:<br class="calibre12"/>
+and this one is the result-set returned by the<p class="calibre1"></p>
+<p class="calibre1">(<i class="calibre11"><b class="calibre9">inner</b></i>) <i class="calibre11"><b class="calibre9">sub-query</b></i>.</p></li>
+<li class="calibre22">so the <div class="calibre33"><b class="calibre9">WHERE population<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">IN (...)</b></span> clause in the (<i class="calibre11"><b class="calibre9">outer</b></i>)</p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">main</b></i> query will simply receive two <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">population</b></span>-values to be</p>
+<p class="calibre1">checked.</p></li>
+<li class="calibre22">after all this, the (<i class="calibre11"><b class="calibre9">outer</b></i>) <i class="calibre11"><b class="calibre9">main</b></i>
+query will return a result-set which actually simply is a list of<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">lc_id</b></span></p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace"&gt;<b class="calibre9">...</b><br class="calibre12"/>
+<b class="calibre9">  SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">  FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">  WHERE population IN (</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(population)</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(population)</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">UNION</b><br class="calibre12"/>
+<b class="calibre9">  SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">  FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">  WHERE ST_Area(geometry) IN</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(ST_area(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(ST_Area(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre32"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">...</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+Nothing forbid us to nest more than one single <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UNION</b></span> clauses: this one is a</p>
+<p class="calibre1">fully legitimate option.<br class="calibre12"/>
+Accordingly to this, the above SQL snippet has to be interpreted as</p>
+<p class="calibre1">follows:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">we've already explained the <i class="calibre11"><b class="calibre9">leftmost</b></i> query in the<p class="calibre1"></p>
+<p class="calibre1">previous paragraph:<br class="calibre12"/>
+this will return a result-set containing a list of <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">lc_id</b></span>-values (<b class="calibre9">Max/Min</b>
+<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">population</b></span>-values).</p></li>
+<li class="calibre22">the <i class="calibre11"><b class="calibre9">rightmost</b></i> query performs a similar<p class="calibre1"></p>
+<p class="calibre1">task:<br class="calibre12"/>
+this will return another result-set containing a further list of</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">lc_id</b></span>-values</p>
+<p class="calibre1">(<b class="calibre9">Max/Min</b> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Area(geometry)</b></span>-values).</p></li>
+<li class="calibre22">so the <i class="calibre11"><b class="calibre9">second-level</b></i> <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UNION</b></span> clause will simply</p>
+<p class="calibre1">return a longer list of <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">lc_id</b></span>-values, i.e. the one</p>
+<p class="calibre1">resulting by merging all together any previous intermediate</p>
+<p class="calibre1">result.</p></li>
+<li class="calibre22">and so on ...</li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">lc.lc_name AS LocalCouncil,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS Region,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS Population,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Area(lc.geometry) / 1000000.0 AS "Area</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">sqKm",</b><br class="calibre12"/>
+<b class="calibre9">  lc.population / (ST_Area(lc.geometry) /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000000.0)</b><br class="calibre12"/>
+<b class="calibre9">    AS "PopDensity</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">[peoples/sqKm]",</b><br class="calibre12"/>
+<b class="calibre9">  Length(lc.lc_name) AS NameLength,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMaxY(lc.geometry) AS North,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMinY(lc.geometry) AS South,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMinX(lc.geometry) AS West,</b><br class="calibre12"/>
+<b class="calibre9">  MbrMaxX(lc.geometry) AS East</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (c.county_id = lc.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (r.region_id = c.region_id)</b><br class="calibre12"/>
+<b class="calibre9">WHERE lc.lc_id IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- a list of lc.lc_id values will be</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">returned</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- by this complex</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">sub-query</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE population IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Min/Max POPULATION</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(population)</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(population)</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE ST_Area(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Min/Max ST_AREA()</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(ST_area(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(ST_Area(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE population / (ST_Area(geometry) /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000000.0) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Min/Max POP-DENSITY</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT Max(population /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(ST_Area(geometry) / 1000000.0))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT MIN(population /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">(ST_Area(geometry) / 1000000.0))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE Length(lc_name) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Min/Max NAME-LENGTH</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(Length(lc_name))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils</b><br class="calibre12"/>
+<b class="calibre9">    UNION</b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(Length(lc_name))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMaxY(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Max NORTH</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(MbrMaxY(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMinY(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Max SOUTH</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(MbrMinY(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMaxX(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Max WEST</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Max(MbrMaxX(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">local_councils)</b><br class="calibre12"/>
+<b class="calibre9">  UNION <span class="calibre57">-- merging into</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">first-level sub-query</span></b><br class="calibre12"/>
+<b class="calibre9">    SELECT lc_id</b><br class="calibre12"/>
+<b class="calibre9">    FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">    WHERE MbrMinX(geometry) IN (</b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- this further sub-query will</span></b></p><b class="calibre9"><span class="calibre57">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre57">return</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">-- Max EAST</span></b><br class="calibre12"/>
+<b class="calibre9"><span class="calibre57">--</span></b><br class="calibre12"/>
+<b class="calibre9">      SELECT</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Min(MbrMinX(geometry))</b><br class="calibre12"/>
+<b class="calibre9">      FROM</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">local_councils));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+According to SQL syntax, using two consecutive <i class="calibre11">hyphens</i>
+(<span class="calibre33"><b class="calibre9">--</b></span>) you can mark<p class="calibre1"></p>
+<p class="calibre1">a <b class="calibre9">comment</b>.<br class="calibre12"/>
+i.e. any further text until the next line terminator is absolutely</p>
+<p class="calibre1">ignored by the SQL parser.<br class="calibre12"/>
+Placing appropriate <b class="calibre9"><i class="calibre11">comments</i></b> within really complex</p>
+<p class="calibre1">SQL queries surely enhances readibility.<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<span class="calibre17"><b class="calibre9">Conclusion:</b></span> SQL is a wonderful language, fully<p class="calibre1"></p>
+<p class="calibre1">supporting a regular and easily predictable syntax.<br class="calibre12"/>
+Each time you'll encounter some intimidating complex SQL query</p>
+<p class="calibre1">don't panic and don't be afraid:<br class="calibre12"/>
+simply attempt to break the complex statement into several smallest</p>
+<p class="calibre1">and simplest blocks, and you'll soon discover that complexity was</p>
+<p class="calibre1">more apparent than real.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Useful hint:</b></span> attempting to debug some very complex</p>
+<p class="calibre1">SQL statement is obviously a difficult and defatigating task.<br class="calibre12"/>
+Breaking down a complex query into smallest chunks, then testing</p>
+<p class="calibre1">each one of them individually usually is the best approach you can</p>
+<p class="calibre1">follow.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"rtree.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="neighbours_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="neighbours_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

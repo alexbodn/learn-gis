@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #4:</b><br class="calibre12"/>
+<b class="calibre9">About VIEW</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"join-2.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="tables_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="tables_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">SQL supports a<p class="calibre1"></p>
+<p class="calibre1">really useful feature, the so called <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span>.<br class="calibre12"/>
+Very shortly explained, a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> is something falling</p>
+<p class="calibre1">half-way between a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span> and a <b class="calibre9">query</b>:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a <span class="calibre33"><b class="calibre9">VIEW</b></span> is a<p class="calibre1"></p>
+<p class="calibre1">persistent objects (exactly as <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span>s are).</p></li>
+<li class="calibre22">you can query a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> exactly in the same way you can query a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span>:<br class="calibre12"/>
+there is no difference at all distinguishing a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> and a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span> from the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SELECT</b></span> own perspective.</p></li>
+<li class="calibre22">but after all a <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> simply is like a kind of <i class="calibre11">glorified</i> query.<br class="calibre12"/>
+A <span class="calibre33"><b class="calibre9">VIEW</b></span> has</p>
+<p class="calibre1">absolutely no data by itself.<br class="calibre12"/>
+Data <i class="calibre11">apparently</i> belonging to some <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> are simply retrieved</p>
+<p class="calibre1">from some other <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span> each time they are</p>
+<p class="calibre1">actually required.</p></li>
+<li class="calibre22">in the SQLite's own implementation any <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> strictly is a</p>
+<p class="calibre1"><b class="calibre9">read-only</b> object:<br class="calibre12"/>
+you can freely reference any <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> in <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SELECT</b></span> statements.<br class="calibre12"/>
+But attempting to perform an <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UPDATE</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DELETE</b></span> statement on behalf of a <span class="calibre33"><b class="calibre9">VIEW</b></span> isn't allowed.</p></li>
+</ul>
+Anyway, performing some practical exercise surely is the best way<p class="calibre1"></p>
+<p class="calibre1">to introduce Views.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW view_lc AS</b><br class="calibre12"/>
+<b class="calibre9">SELECT lc.lc_id AS lc_id,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS lc_name,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id AS county_id,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county_name,</b><br class="calibre12"/>
+<b class="calibre9">  c.car_plate_code AS car_plate_code,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id AS region_id,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS region_name,</b><br class="calibre12"/>
+<b class="calibre9">  lc.geometry AS geometry</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc</b><br class="calibre12"/>
+<b class="calibre9">JOIN counties AS c ON (</b><br class="calibre12"/>
+<b class="calibre9">  lc.county_id = c.county_id)</b><br class="calibre12"/>
+<b class="calibre9">JOIN regions AS r ON (</b><br class="calibre12"/>
+<b class="calibre9">  c.region_id = r.region_id);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<i class="calibre11">Et voila</i>, here is your first <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span>:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">basically, this looks exactly as any <b class="calibre9">query</b> you've<p class="calibre1"></p>
+<p class="calibre1">already seen since now.</p></li>
+<li class="calibre22">except in this; this time the first line is: <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">CREATE VIEW ... AS</b></span></p></li>
+<li class="calibre22">and this one is unique syntactical difference transforming a<p class="calibre1"></p>
+<p class="calibre1">plain query into a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> definition.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">lc_name, population, county_name</b><br class="calibre12"/>
+<b class="calibre9">FROM view_lc</b><br class="calibre12"/>
+<b class="calibre9">WHERE region_name = 'LAZIO'</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY lc_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">lc_name</td>
+<td class="calibre13">population</td>
+<td class="calibre13">county_name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ACCUMOLI</td>
+<td class="ce">724</td>
+<td class="calibre13">RIETI</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ACQUAFONDATA</td>
+<td class="ce">316</td>
+<td class="calibre13">FROSINONE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ACQUAPENDENTE</td>
+<td class="ce">5788</td>
+<td class="calibre13">VITERBO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ACUTO</td>
+<td class="ce">1857</td>
+<td class="calibre13">FROSINONE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">AFFILE</td>
+<td class="ce">1644</td>
+<td class="calibre13">ROMA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+You can actually query this <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">region_name,</b><br class="calibre12"/>
+<b class="calibre9">  Sum(population) AS population,</b><br class="calibre12"/>
+<b class="calibre9">  (Sum(ST_Area(geometry)) / 1000000.0)</b><br class="calibre12"/>
+<b class="calibre9">    AS "area (sq.Km)",</b><br class="calibre12"/>
+<b class="calibre9">  (Sum(population) /</b><br class="calibre12"/>
+<b class="calibre9">    (Sum(ST_Area(geometry)) /</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">1000000.0))</b><br class="calibre12"/>
+<b class="calibre9">      AS "popDensity</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(peoples/sq.Km)"</b><br class="calibre12"/>
+<b class="calibre9">FROM view_lc</b><br class="calibre12"/>
+<b class="calibre9">GROUP BY region_id</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY 4;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">region_name</td>
+<td class="calibre13">population</td>
+<td class="calibre13">area (sq.Km)</td>
+<td class="calibre13">popDensity (peoples/sq.Km)</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">VALLE D'AOSTA</td>
+<td class="ce">119548</td>
+<td class="ce">3258.405868</td>
+<td class="ce">36.689107</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">BASILICATA</td>
+<td class="ce">597768</td>
+<td class="ce">10070.896921</td>
+<td class="ce">59.355984</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">MARCHE</td>
+<td class="ce">1470581</td>
+<td class="ce">9729.862860</td>
+<td class="ce">151.140979</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">TOSCANA</td>
+<td class="ce">3497806</td>
+<td class="ce">22956.355019</td>
+<td class="ce">152.367656</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">LOMBARDIA</td>
+<td class="ce">9032554</td>
+<td class="ce">23866,529331</td>
+<td class="ce">378.461144</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CAMPANIA</td>
+<td class="ce">5701931</td>
+<td class="ce">13666.322146</td>
+<td class="ce">417.224981</td>
+</tr>
+</tbody></table>
+You can really perform any arbitrary complex query using a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW</b></span>.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">v.lc_name AS LocalCouncil,</b><br class="calibre12"/>
+<b class="calibre9">  v.county_name AS County,</b><br class="calibre12"/>
+<b class="calibre9">  v.region_name AS Region</b><br class="calibre12"/>
+<b class="calibre9">FROM view_lc AS v</b><br class="calibre12"/>
+<b class="calibre9">JOIN local_councils AS lc ON (</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name = 'NORCIA'</b><br class="calibre12"/>
+<b class="calibre9">    AND ST_Touches(v.geometry,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">lc.geometry))</b><br class="calibre12"/>
+<b class="calibre9">ORDER BY v.lc_name, v.county_name,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">v.region_name;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">LocalCouncil</td>
+<td class="calibre13">County</td>
+<td class="calibre13">Region</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ACCUMOLI</td>
+<td class="calibre13">RIETI</td>
+<td class="calibre13">LAZIO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">ARQUATA DEL TRONTO</td>
+<td class="calibre13">ASCOLI PICENO</td>
+<td class="calibre13">MARCHE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CASCIA</td>
+<td class="calibre13">PERUGIA</td>
+<td class="calibre13">UMBRIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CASTELSANTANGELO SUL NERA</td>
+<td class="calibre13">MACERATA</td>
+<td class="calibre13">MARCHE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CERRETO DI SPOLETO</td>
+<td class="calibre13">PERUGIA</td>
+<td class="calibre13">UMBRIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">CITTAREALE</td>
+<td class="calibre13">RIETI</td>
+<td class="calibre13">LAZIO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">MONTEMONACO</td>
+<td class="calibre13">ASCOLI PICENO</td>
+<td class="calibre13">MARCHE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">PRECI</td>
+<td class="calibre13">PERUGIA</td>
+<td class="calibre13">UMBRIA</td>
+</tr>
+</tbody></table>
+You can <span class="calibre33"><b class="calibre9">JOIN</b></span> a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW</b></span> and a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE</b></span> (or two</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW</b></span>s, and so on ...)<br class="calibre12"/>
+Just a simple explanation: this <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> actually is one based on Spatial relationships:<br class="calibre12"/>
+the result-set represents the list of Local Councils sharing a</p>
+<p class="calibre1">common boundary with the <b class="calibre9">Norcia</b> one.<br class="calibre12"/>
+You can get a much more complete example <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"neighbours.html"&gt;here</a> (<i class="calibre11">Haute cuisine</i> recipes).</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><b class="calibre9">VIEW</b> is one<p class="calibre1"></p>
+<p class="calibre1">of the many powerful and wonderful features supported by SQL.<br class="calibre12"/>
+And SQLite's own implementation for <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> surely is a first class one.<br class="calibre12"/>
+You should use <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> as often as you can:</p>
+<p class="calibre1">and you'll soon discover that following this way handling really</p>
+<p class="calibre1">complex DB layouts will become a piece of cake.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Please note:</b></span> querying a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span> can actually be as fast and efficient as querying a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">TABLE</b></span>.<br class="calibre12"/>
+But a <span class="calibre33"><b class="calibre9">VIEW</b></span> cannot</p>
+<p class="calibre1">anyway be more efficient than the underlying query is; any poorly designed and badly optimized query surely will translate into a</p>
+<p class="calibre1">very slow <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span>.<br class="calibre12"/></p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"join-2.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="tables_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="tables_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

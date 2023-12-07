@@ -1,0 +1,463 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">GETTING STARTED</b></h2>
+<p class="calibre1"></p>
+<p class="calibre1"><table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">TABLE mothers (</b><br class="calibre12"/>
+<b class="calibre9">  first_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  last_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  CONSTRAINT pk_mothers</b><br class="calibre12"/>
+<b class="calibre9">    PRIMARY KEY (last_name,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">first_name));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn('mothers', 'home_location',</b><br class="calibre12"/>
+<b class="calibre9">  4326, 'POINT', 'XY', 1);</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">CREATE TABLE children<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">(</b><br class="calibre12"/>
+<b class="calibre9">  first_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  last_name TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  mom_first_nm TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  mom_last_nm TEXT NOT NULL,</b><br class="calibre12"/>
+<b class="calibre9">  gender TEXT NOT NULL</b><br class="calibre12"/>
+<b class="calibre9">    CONSTRAINT sex CHECK (</b><br class="calibre12"/>
+<b class="calibre9">      gender IN ('M',</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">'F')),</b><br class="calibre12"/>
+<b class="calibre9">  CONSTRAINT pk_childs</b><br class="calibre12"/>
+<b class="calibre9">    PRIMARY KEY (last_name,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">first_name),</b><br class="calibre12"/>
+<b class="calibre9">  CONSTRAINT fk_childs</b><br class="calibre12"/>
+<b class="calibre9">    FOREIGN KEY (mom_last_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_first_nm)</b><br class="calibre12"/>
+<b class="calibre9">      REFERENCES mothers</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(last_name, first_name));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO mothers<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">(first_name, last_name, home_location)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Stephanie', 'Smith',</b><br class="calibre12"/>
+<b class="calibre9">    ST_GeomFromText('POINT(0.8 52.1)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO mothers<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">(first_name, last_name, home_location)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Antoinette', 'Dupont',</b><br class="calibre12"/>
+<b class="calibre9">    ST_GeomFromText('POINT(4.7 45.6)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO mothers<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">(first_name, last_name, home_location)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Maria', 'Rossi',</b><br class="calibre12"/>
+<b class="calibre9">    ST_GeomFromText('POINT(11.2 43.2)',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326));</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('George', 'Brown', 'Stephanie', 'Smith',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'M');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Janet', 'Brown', 'Stephanie', 'Smith',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'F');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Chantal', 'Petit', 'Antoinette', 'Dupont',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'F');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Henry', 'Petit', 'Antoinette', 'Dupont',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'M');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Luigi', 'Bianchi', 'Maria', 'Rossi',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'M');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Nothing too much complex: we simply have created two tables:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">mothers</b></span>
+table contains a Geometry column</li>
+<li class="calibre22">a relation exists between <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">mothers</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">children</b></span>: and consequently a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">FOREIGN KEY</b></span> has</p>
+<p class="calibre1">been defined.</p></li>
+<li class="calibre22">just a last point to be noted: in this example we'll use<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">PRIMARY KEY</b></span>s</p>
+<p class="calibre1">spanning across two columns:<br class="calibre12"/>
+but there isn't nothing odd in this ... it's a fully legitimate SQL</p>
+<p class="calibre1">option.</p></li>
+</ul>
+And then we have inserted very few rows into these tables.<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">m.last_name AS MomLastName,</b><br class="calibre12"/>
+<b class="calibre9">  m.first_name AS MomFirstName,</b><br class="calibre12"/>
+<b class="calibre9">  ST_X(m.home_location) AS HomeLongitude,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Y(m.home_location) AS HomeLatitude,</b><br class="calibre12"/>
+<b class="calibre9">  c.last_name AS ChildLastName,</b><br class="calibre12"/>
+<b class="calibre9">  c.first_name AS ChildFirstName,</b><br class="calibre12"/>
+<b class="calibre9">  c.gender AS ChildGender</b><br class="calibre12"/>
+<b class="calibre9">FROM mothers AS m</b><br class="calibre12"/>
+<b class="calibre9">JOIN children AS c ON (</b><br class="calibre12"/>
+<b class="calibre9">  m.first_name = c.mom_first_nm</b><br class="calibre12"/>
+<b class="calibre9">  AND m.last_name =</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">c.mom_last_nm);</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">MomLastName</td>
+<td class="calibre13">MomFirstName</td>
+<td class="calibre13">HomeLongitude</td>
+<td class="calibre13">HomeLatitude</td>
+<td class="calibre13">ChildLastName</td>
+<td class="calibre13">ChildFirstName</td>
+<td class="calibre13">ChildGender</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Smith</td>
+<td class="calibre13">Stephanie</td>
+<td class="ce">0.8</td>
+<td class="ce">52.1</td>
+<td class="calibre13">Brown</td>
+<td class="calibre13">George</td>
+<td class="calibre13">M</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Smith</td>
+<td class="calibre13">Stephanie</td>
+<td class="ce">0.8</td>
+<td class="ce">52.1</td>
+<td class="calibre13">Brown</td>
+<td class="calibre13">Janet</td>
+<td class="calibre13">F</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dupont</td>
+<td class="calibre13">Antoinette</td>
+<td class="ce">4.7</td>
+<td class="ce">45.6</td>
+<td class="calibre13">Petit</td>
+<td class="calibre13">Chantal</td>
+<td class="calibre13">F</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Dupont</td>
+<td class="calibre13">Antoinette</td>
+<td class="ce">4.7</td>
+<td class="ce">45.6</td>
+<td class="calibre13">Petit</td>
+<td class="calibre13">Henry</td>
+<td class="calibre13">M</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">Rossi</td>
+<td class="calibre13">Maria</td>
+<td class="ce">11.2</td>
+<td class="ce">43.2</td>
+<td class="calibre13">Bianchi</td>
+<td class="calibre13">Luigi</td>
+<td class="calibre13">M</td>
+</tr>
+</tbody></table>
+Just a simple check; and then you are now ready to start.<p class="calibre1"></p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<table width="100%" class="calibre54">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">
+<p class="calibre18"><b class="calibre9"><span class="calibre55">QUESTIONS</span></b></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<b class="calibre9">Q1:</b> why this SQL statement will actually fail, raising a<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">constraint failed</b> exception ?<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Silvia', 'Bianchi', 'Maria',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'Rossi');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q2:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Silvia', 'Bianchi', 'Maria', 'Rossi',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'f');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q3:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Silvia', 'Bianchi', 'Giovanna', 'Rossi',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'F');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q4:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO children</b><br class="calibre12"/>
+<b class="calibre9">    (first_name, last_name, mom_first_nm,</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">mom_last_nm, gender)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Henry', 'Petit', 'Stephanie', 'Smith',</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">'M');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q5:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO mothers (first_name, last_name, home_location)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Pilar', 'Fernandez',</b><br class="calibre12"/>
+<b class="calibre9">    ST_GeomFromText('POINT(4.7</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">45.6)'));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q6:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO mothers (first_name, last_name, home_location)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Pilar', 'Fernandez',</b><br class="calibre12"/>
+<b class="calibre9">    ST_GeomFromText('MULTIPOINT(4.7 45.6,</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4.75 45.32)', 4326));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q7:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">INTO mothers (first_name, last_name)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Pilar', 'Fernandez');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q8:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">INSERT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">INTO mothers (first_name, last_name, home_location)</b><br class="calibre12"/>
+<b class="calibre9">  VALUES ('Pilar', 'Fernandez',</b><br class="calibre12"/>
+<b class="calibre9">    ST_GeomFromText('POINT(4.7 45.6),</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">4326'));</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q9:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">DELETE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">FROM mothers</b><br class="calibre12"/>
+<b class="calibre9">WHERE last_name = 'Dupont';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<b class="calibre9">Q10:</b> ... <i class="calibre11">same question</i> ...<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">UPDATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">mothers SET first_name = 'Marianne'</b><br class="calibre12"/>
+<b class="calibre9">WHERE last_name = 'Dupont';</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<table width="100%" class="calibre54">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">
+<p class="calibre18"><b class="calibre9"><span class="calibre55">ANSWERS</span></b></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<b class="calibre9">A1:</b> missing/undefined <b class="calibre9"><span class="calibre32">
+</span></b><p class="calibre1"><b class="calibre9"><span class="calibre32">"Courier New, monospace"&gt;gender</span></b>: so a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">NULL</b></span> value is implicitly</p>
+<p class="calibre1">assumed.<br class="calibre12"/>
+But a <span class="calibre33"><b class="calibre9">NOT NULL</b></span>
+constraint has been defined for the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">gender</b></span> column.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A2:</b> wrong <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">gender</b></span> value (<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">'f'</b></span>): SQLite text strings</p>
+<p class="calibre1">are <b class="calibre9"><i class="calibre11">case-sensitive</i></b>.<br class="calibre12"/>
+The <span class="calibre33"><b class="calibre9">sex</b></span>
+constraint can only validate <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">'M'</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">'F'</b></span> values: <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">'f'</b></span> isn't an acceptable</p>
+<p class="calibre1">value.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A3</b>: FOREIGN KEY failure.<br class="calibre12"/>
+No matching entry <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">{'Rossi','Giovanna'}</b></span> was</p>
+<p class="calibre1">found into the corresponding table [<span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">mothers</b></span>].<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A4</b>: PRIMARY KEY failure.<br class="calibre12"/>
+An entry <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">{'Petit','Henry'}</b></span> is already</p>
+<p class="calibre1">stored into the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">children</b></span> table.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A5</b>: missing/undefined <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">SRID</b></span>: so a <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">-1</b></span> value is implicitly</p>
+<p class="calibre1">assumed.<br class="calibre12"/>
+But a <b class="calibre9">Geometry</b> constraint has been defined for the</p>
+<p class="calibre1">corresponding column; an explicitly set <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">4326 SRID</b></span> value is expected</p>
+<p class="calibre1">anyway for <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">home_location</b></span>
+geometries.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A6</b>: wrong Geometry-type: only <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">POINT</b></span>-type Geometries will</p>
+<p class="calibre1">pass validation for the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">home_location</b></span> column.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A7:</b> missing/undefined <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">home_location</b></span>: so a</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">NULL</b></span> value is</p>
+<p class="calibre1">implicitly assumed.<br class="calibre12"/>
+But a <span class="calibre33"><b class="calibre9">NOT NULL</b></span>
+constraint has been defined for the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">home_location</b></span> column.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A8:</b> malformed WKT expression: <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_GeomFromText()</b></span> will</p>
+<p class="calibre1">return <span class="calibre33"><b class="calibre9">NULL</b></span>
+(<i class="calibre11">same as above</i>).<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A9:</b> FOREIGN KEY failure: yes, the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">mothers</b></span> table has no FOREIGN</p>
+<p class="calibre1">KEY.<br class="calibre12"/>
+But the <span class="calibre33"><b class="calibre9">children</b></span>
+table instead has a corresponding FOREIGN KEY.<br class="calibre12"/>
+Deleting this entry from <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">mothers</b></span> will break</p>
+<p class="calibre1"><b class="calibre9"><i class="calibre11">referential integrity</i></b>, so this one isn't an allowed</p>
+<p class="calibre1">operation.<br class="calibre12"/>
+<br class="calibre12"/>
+<b class="calibre9">A10:</b> FOREIGN KEY failure: more or less, the same of</p>
+<p class="calibre1">before.<br class="calibre12"/>
+Modifying a PRIMARY KEY entry into the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">mothers</b></span> table will break</p>
+<p class="calibre1"><b class="calibre9"><i class="calibre11">referential integrity</i></b>, so this operation as well</p>
+<p class="calibre1">isn't admissible.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16"><span class="calibre17"><b class="calibre9">Lesson to<p class="calibre1"></p>
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">learn #1:</b></span><br class="calibre12"/>
+An appropriate use of SQL constraints strongly helps to fully</p>
+<p class="calibre1">preserve your data in a well checked and absolutely consistent</p>
+<p class="calibre1">state.<br class="calibre12"/>
+Anyway, defining too much constraints may easily transform your</p>
+<p class="calibre1">database into a kind of inexpugnable fortress surrounded by</p>
+<p class="calibre1">trenches, pillboxes, barbed wire and minefields.<br class="calibre12"/>
+i.e. into something that surely nobody will define as <b class="calibre9">user</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">friendly</b>.<br class="calibre12"/>
+Use sound common sense, and possibly avoid any excess.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Lesson to lean #2:</b></span><br class="calibre12"/>
+Each time the <i class="calibre11"><b class="calibre9">SQL-engine</b></i> detects some constraint</p>
+<p class="calibre1">violation, a <b class="calibre9">constraint failed</b> exception will be immediately</p>
+<p class="calibre1">raised.<br class="calibre12"/>
+But this one is an absolutely <b class="calibre9">generic</b> error condition: so</p>
+<p class="calibre1">you have to use your experience and skilled knowledge in order to</p>
+<p class="calibre1">correctly understand (<i class="calibre11">and possibly resolve</i>) any possible</p>
+<p class="calibre1">glitch.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"ins-upd-del.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="acid_split_000.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="acid_split_000.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+<p class="calibre1">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike</p>
+</a><p class="calibre1"><a href="&lt;/p">3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

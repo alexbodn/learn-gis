@@ -1,0 +1,350 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Recipe #2:</b><br class="calibre12"/>
+<b class="calibre9">Your first JOIN queries</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"create-db.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#family"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="join-2.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="join-2.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">You already know<p class="calibre1"></p>
+<p class="calibre1">the basic foundations about <i class="calibre11">simple</i> SQL queries.<br class="calibre12"/>
+Any previous example encountered since now simply queried a single</p>
+<p class="calibre1">table:<br class="calibre12"/>
+anyway SQL has no imposed limits, so you can query an arbitrary</p>
+<p class="calibre1">number of tables at the same time.<br class="calibre12"/>
+But in order to do this you must understand how to correctly handle</p>
+<p class="calibre1">a <span class="calibre33"><b class="calibre9">JOIN</b></span>.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM counties, regions;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">county_id</td>
+<td class="calibre13">county_name</td>
+<td class="calibre13">car_plate_code</td>
+<td class="calibre13">region_id</td>
+<td class="calibre13">region_id</td>
+<td class="calibre13">region_name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">2</td>
+<td class="calibre13">VALLE D'AOSTA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">3</td>
+<td class="calibre13">LOMBARDIA</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">4</td>
+<td class="calibre13">TRENTINO-ALTO ADIGE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">5</td>
+<td class="calibre13">VENETO</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+Apparently this query immediately works;<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+but once you get a quick glance at the result-set you'll<p class="calibre1"></p>
+<p class="calibre1">immediately discover something really puzzling:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">an unexpected huge number of rows has been returned.</li>
+<li class="calibre22">and each single County seems to be related with any possible<p class="calibre1"></p>
+<p class="calibre1">Region.</p></li>
+</ul>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">Every time SQL<p class="calibre1"></p>
+<p class="calibre1">queries two different tables at the same time, the <b class="calibre9">Cartesian</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Product</b> of both datasets is calculated.<br class="calibre12"/>
+i.e. each row coming from the first dataset is <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span>ed with any possible row</p>
+<p class="calibre1">coming from the second dataset.<br class="calibre12"/>
+This one is a <i class="calibre11"><span class="calibre17"><b class="calibre9">blind</b></span></i> combinatorial process, so</p>
+<p class="calibre1">it very difficultly can produce useful results.<br class="calibre12"/>
+And this process can easily generate a <i class="calibre11"><b class="calibre9">really huge</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">result-set</b></i>: this must absolutely be avoided, because:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">a very long (<i class="calibre11">very, very long</i>) time may be required to<p class="calibre1"></p>
+<p class="calibre1">complete the operation.</p></li>
+<li class="calibre22">you can easily exhaust operating system resources before<p class="calibre1"></p>
+<p class="calibre1">completion.</p></li>
+</ul>
+All this said, it's quite obvious that some appropriate <b class="calibre9">JOIN<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">condition</b> has to be set in order to maintain under control the</p>
+<p class="calibre1">Cartesian Product, so to actually return only meaningful rows.</p></td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b><p class="calibre1"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM counties, regions</b><br class="calibre12"/>
+<b class="calibre9">WHERE counties.region_id =</b></p><b class="calibre9">
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">regions.region_id;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+This query is exactly the same of the previous one: but this time<p class="calibre1"></p>
+<p class="calibre1">we introduced an appropriate <b class="calibre9">JOIN condition</b>.<br class="calibre12"/>
+Some points to be noted:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">using two (<i class="calibre11">or more</i>) tables can easily lead to <i class="calibre11"><span class="calibre17">name<p class="calibre1"></p>
+</span></i><p class="calibre1"><i class="calibre11"><span class="calibre17">ambiguity</span></i>:<br class="calibre12"/>
+e.g. in this case we have two different columns named <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">region_id</b></span>, one in the</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">counties</b></span> table,</p>
+<p class="calibre1">the other in the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span> table.</p></li>
+<li class="calibre22">we must use <i class="calibre11"><span class="calibre17">fully qualified names</span></i> to avoid any<p class="calibre1"></p>
+<p class="calibre1">possible ambiguity:<br class="calibre12"/>
+e.g. <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">counties.region_id</b></span>
+identifies the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">region_id</b></span> column belonging</p>
+<p class="calibre1">to the <span class="calibre33"><b class="calibre9">counties</b></span>
+table, in an absolutely unambiguous way.</p></li>
+<li class="calibre22">defining the <div class="calibre33"><b class="calibre9">WHERE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">counties.region_id = regions.region_id</b></span> clause we impose</p>
+<p class="calibre1">an appropriate <i class="calibre11"><b class="calibre9">JOIN condition</b></i>.<br class="calibre12"/>
+After this the Cartesian Product will be accordingly filtered, so</p>
+<p class="calibre1">to insert into the result-set only the rows actually satisfying the</p>
+<p class="calibre1">imposed condition, ignoring any other.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">c.county_id AS county_id,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county_name,</b><br class="calibre12"/>
+<b class="calibre9">  c.car_plate_code AS car_plate_code,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id AS region_id,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS region_name</b><br class="calibre12"/>
+<b class="calibre9">FROM counties AS c,</b><br class="calibre12"/>
+<b class="calibre9">  regions AS r</b><br class="calibre12"/>
+<b class="calibre9">WHERE c.region_id = r.region_id;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">county_id</td>
+<td class="calibre13">county_name</td>
+<td class="calibre13">car_plate_code</td>
+<td class="calibre13">region_id</td>
+<td class="calibre13">region_name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">VERCELLI</td>
+<td class="calibre13">VC</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">NOVARA</td>
+<td class="calibre13">NO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">4</td>
+<td class="calibre13">CUNEO</td>
+<td class="calibre13">CN</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">5</td>
+<td class="calibre13">ASTI</td>
+<td class="calibre13">AT</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">6</td>
+<td class="calibre13">ALESSANDRIA</td>
+<td class="calibre13">AL</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+And this one always is the same as above, simply written adopting a<p class="calibre1"></p>
+<p class="calibre1">most polite syntax:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">using extensively the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AS</b></span> clause so to define alias</p>
+<p class="calibre1">names for both columns and tables make <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">JOIN</b></span> queries to be much more</p>
+<p class="calibre1">concise and readable, and easiest to understand.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">lc.lc_id AS lc_id,</b><br class="calibre12"/>
+<b class="calibre9">  lc.lc_name AS lc_name,</b><br class="calibre12"/>
+<b class="calibre9">  lc.population AS population,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_id AS county_id,</b><br class="calibre12"/>
+<b class="calibre9">  c.county_name AS county_name,</b><br class="calibre12"/>
+<b class="calibre9">  c.car_plate_code AS car_plate_code,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_id AS region_id,</b><br class="calibre12"/>
+<b class="calibre9">  r.region_name AS region_name</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils AS lc,</b><br class="calibre12"/>
+<b class="calibre9">  counties AS c,</b><br class="calibre12"/>
+<b class="calibre9">  regions AS r</b><br class="calibre12"/>
+<b class="calibre9">WHERE lc.county_id = c.county_id</b><br class="calibre12"/>
+<b class="calibre9">  AND c.region_id = r.region_id;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">lc_id</td>
+<td class="calibre13">lc_name</td>
+<td class="calibre13">population</td>
+<td class="calibre13">county_id</td>
+<td class="calibre13">county_name</td>
+<td class="calibre13">car_plate_code</td>
+<td class="calibre13">region_id</td>
+<td class="calibre13">region_name</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1001</td>
+<td class="calibre13">AGLIE'</td>
+<td class="calibre13">2574</td>
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1002</td>
+<td class="calibre13">AIRASCA</td>
+<td class="calibre13">3554</td>
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1003</td>
+<td class="calibre13">ALA DI STURA</td>
+<td class="calibre13">479</td>
+<td class="calibre13">1</td>
+<td class="calibre13">TORINO</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+Joining three (<i class="calibre11">or even more</i>) tables isn't much more<p class="calibre1"></p>
+<p class="calibre1">difficult:<br class="calibre12"/>
+you simply have to apply any required <b class="calibre9">JOIN condition</b> as</p>
+<p class="calibre1">appropriate.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+</body></html>

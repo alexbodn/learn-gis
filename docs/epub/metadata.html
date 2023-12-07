@@ -1,0 +1,312 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+</p>
+<p class="calibre1"><table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Spatial MetaData Tables</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"wkt-wkb.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#common"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="qgis.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="qgis.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">SpatiaLite requires<p class="calibre1"></p>
+<p class="calibre1">several <i class="calibre11"><b class="calibre9">metadata tables</b></i> in order to work</p>
+<p class="calibre1">properly.<br class="calibre12"/>
+There is absolutely nothing strange in such tables; they simply are</p>
+<p class="calibre1">tables as any other one.<br class="calibre12"/>
+They are collectively as <i class="calibre11"><b class="calibre9">metadata</b></i> because they are</p>
+<p class="calibre1">collectively intended to support an extended and complete</p>
+<p class="calibre1">qualification of Geometries.<br class="calibre12"/>
+<br class="calibre12"/>
+Quite any Spatial SQL function strongly relies on such tables: so</p>
+<p class="calibre1">they are absolutely required for internal management</p>
+<p class="calibre1">purposes.<br class="calibre12"/>
+Any attempt to <i class="calibre11"><b class="calibre9">hack</b></i> someway such tables will quite</p>
+<p class="calibre1">surely result in a severely corrupted (<i class="calibre11">and malfunctioning</i>) database.<br class="calibre12"/>
+<br class="calibre12"/>
+There is a unique safe way to interact with <i class="calibre11"><b class="calibre9">metadata</b></i></p><i class="calibre11"><b class="calibre9">
+</b></i><p class="calibre1"><i class="calibre11"><b class="calibre9">tables</b></i>, i.e. using as far as possible the appropriate</p>
+<p class="calibre1">Spatial SQL functions.<br class="calibre12"/>
+Directly performing <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UPDATE</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DELETE</b></span> on their behalf is a completely <span class="calibre17"><b class="calibre9">unsafe</b></span> and <span class="calibre17"><b class="calibre9">strongly</b></span></p><span class="calibre17"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre17"><b class="calibre9">discouraged</b></span> practice.</p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">InitSpatialMetaData();</b></span></p></td>
+</tr>
+</tbody></table>
+The <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">InitSpatialMetaData()</b></span>
+function must be called immediately after creating a new database,</p>
+<p class="calibre1">and before attempting to call any other Spatial SQL function:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the scope of this function is exactly the one to create (<i class="calibre11">and<p class="calibre1"></p>
+</i><p class="calibre1"><i class="calibre11">populate</i>) any <i class="calibre11">metadata</i> <i class="calibre11">table</i> internally required by SpatiaLite.</p></li>
+<li class="calibre22">if any <i class="calibre11">metadata table</i> already exist, this function<p class="calibre1"></p>
+<p class="calibre1">doesn't apply any action at all:<br class="calibre12"/>
+so, calling more times <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">InitSpatialMetaData()</b></span> is</p>
+<p class="calibre1">useless but completely harmless.</p></li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">please note:</b></span> <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> will</p>
+<p class="calibre1">automatically perform any required initialization task every time a new database is created:<br class="calibre12"/>
+so (<i class="calibre11">using this tool</i>) there is no need at all to explicitly</p>
+<p class="calibre1">call this function.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM spatial_ref_sys;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">srid</td>
+<td class="calibre13">auth_name</td>
+<td class="calibre13">auth_srid</td>
+<td class="calibre13">ref_sys_name</td>
+<td class="calibre13">proj4text</td>
+<td class="calibre13">srs_wkt</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2000</td>
+<td class="calibre13">epsg</td>
+<td class="calibre13">2000</td>
+<td class="calibre13">Anguilla 1957 / British West Indies Grid</td>
+<td class="calibre13">+proj=tmerc +lat_0=0 +lon_0=-62<p class="calibre1"></p>
+<p class="calibre1">+k=0.9995000000000001 +x_0=400000 +y_0=0 +ellps=clrk80 +units=m</p>
+<p class="calibre1">+no_defs</p></td>
+<td class="calibre13">PROJCS["Anguilla 1957 / British West Indies<p class="calibre1"></p>
+<p class="calibre1">Grid",<br class="calibre12"/>
+GEOGCS["Anguilla 1957",<br class="calibre12"/>
+DATUM["Anguilla_1957",<br class="calibre12"/>
+SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,<br class="calibre12"/>
+AUTHORITY["EPSG","7012"]],<br class="calibre12"/>
+AUTHORITY["EPSG","6600"]],<br class="calibre12"/>
+PRIMEM["Greenwich",0,<br class="calibre12"/>
+AUTHORITY["EPSG","8901"]],<br class="calibre12"/>
+UNIT["degree",0.01745329251994328,<br class="calibre12"/>
+AUTHORITY["EPSG","9122"]],<br class="calibre12"/>
+AUTHORITY["EPSG","4600"]],<br class="calibre12"/>
+UNIT["metre",1,<br class="calibre12"/>
+AUTHORITY["EPSG","9001"]],<br class="calibre12"/>
+PROJECTION["Transverse_Mercator"],<br class="calibre12"/>
+PARAMETER["latitude_of_origin",0],<br class="calibre12"/>
+PARAMETER["central_meridian",-62],<br class="calibre12"/>
+PARAMETER["scale_factor",0.9995],<br class="calibre12"/>
+PARAMETER["false_easting",400000],<br class="calibre12"/>
+PARAMETER["false_northing",0],<br class="calibre12"/>
+AUTHORITY["EPSG","2000"],<br class="calibre12"/>
+AXIS["Easting",EAST],<br class="calibre12"/>
+AXIS["Northing",NORTH]]</p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+The <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatial_ref_sys</b></span> table does actually contains the whole <span class="calibre17"><b class="calibre9">EPSG dataset</b></span> (<i class="calibre11">Spatial Reference System definitions</i>).</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">SRID</b></span>
+column is the <div class="calibre33"><b class="calibre9">PRIMARY<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">KEY</b></span> uniquely identifying each item.</p></li>
+<li class="calibre22">the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">auth_name</b></span>&lt;, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">auth_srid</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ref_sys_name</b></span> columns usually contains a reference to the original EPSG definition (<i class="calibre11">mainly for documentation purposes</i>).</p></li>
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">proj4text</b></span>
+column contains <span class="calibre17"><b class="calibre9">geodesic parameters</b></span> required by the<p class="calibre1"></p>
+<p class="calibre1"><a href="http://trac.osgeo.org/proj/">PROJ.4</a> library.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">these parameters are absolutely required by the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">Transform()</b></span> function,</p>
+<p class="calibre1">because any coordinate re-projection will be actually performed</p>
+<p class="calibre1">invoking the appropriate <b class="calibre9">PROJ.4</b> functions.</p></li>
+</ul>
+</li>
+<li class="calibre22">the <span class="calibre33"><b class="calibre9">srs_wkt</b></span>
+column contains a complete definition of the corresponding<p class="calibre1"></p>
+<p class="calibre1"><b class="calibre9">SRS</b> using the (<i class="calibre11">obnoxiously verbose</i>) <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKT</b></span> format.</p>
+<p class="calibre1"></p><ul class="calibre46">
+<li class="calibre22">SpatiaLite itself doesn't requires this information to be<p class="calibre1"></p>
+<p class="calibre1">present: but if this <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKT</b></span> string is available,</p>
+<p class="calibre1">then a <span class="calibre33"><b class="calibre9">.PRJ</b></span> file will be created when exporting any Shapefile<br class="calibre12"/>
+(<i class="calibre11">many GIS packages require a</i> <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<i class="calibre11"><b class="calibre9">.PRJ</b></i></span> <i class="calibre11">file to be</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">present for each Shapefile</i>).</p></li>
+<li class="calibre22">please, don't be confused: this <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKT</b></span> for SRS has nothing to do with the better known <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">WKT</b></span> used to represent</p>
+<p class="calibre1">geometries.</p></li>
+</ul>
+</li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">important notice:</b></span> altering the original EPSG<p class="calibre1"></p>
+<p class="calibre1">definitions is unsafe and strongly discouraged, and must be</p>
+<p class="calibre1">absolutely avoided.<br class="calibre12"/>
+Anyway you are absolutely free to insert further</p>
+<p class="calibre1"><i class="calibre11"><span class="calibre17"><b class="calibre9">custom</b></span></i> definitions by your own:<br class="calibre12"/>
+in this case using SRID values <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">&gt; 32768</b></span> is strongly</p>
+<p class="calibre1">suggested.</p></li>
+</ul>
+<hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">*</b><br class="calibre12"/>
+<b class="calibre9">FROM geometry_columns;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">f_table_name</td>
+<td class="calibre13">f_geometry_column</td>
+<td class="calibre13">type</td>
+<td class="calibre13">coord_dimension</td>
+<td class="calibre13">srid</td>
+<td class="calibre13">spatial_index_enabled</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">local_councils</td>
+<td class="calibre13">geometry</td>
+<td class="calibre13">MULTIPOLYGON</td>
+<td class="calibre13">XY</td>
+<td class="calibre13">23032</td>
+<td class="calibre13">1</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">populated_places</td>
+<td class="calibre13">geometry</td>
+<td class="calibre13">POINT</td>
+<td class="calibre13">XY</td>
+<td class="calibre13">4326</td>
+<td class="calibre13">1</td>
+</tr>
+</tbody></table>
+The <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">geometry_columns</b></span> table</p>
+<p class="calibre1">supports each Geometry column defined into the database:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">any column not supported by a corresponding entry within this<p class="calibre1"></p>
+<p class="calibre1">table, for sure cannot be considered as a <i class="calibre11">genuine</i>
+Geometry.</p></li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">important notice:</b></span> any attempt to<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">hack</b></i> this table by directly performing <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT</b></span>, <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">UPDATE</b></span> or <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">DELETE</b></span> will quite surely end into a <i class="calibre11"><b class="calibre9">major disaster</b></i><br class="calibre12"/>
+(<i class="calibre11">i.e. a corrupted and malfunctioning database</i>).<br class="calibre12"/>
+Use the appropriate SQL functions instead: <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span>,</p>
+<p class="calibre1"><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">RecoverGeometryColumn()</b></span> and so on.</p></li>
+</ul>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">The <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">geometry_columns</b></span> table is</p>
+<p class="calibre1">intended to support <i class="calibre11">ordinary</i> tables.<br class="calibre12"/>
+Anyway two further similar tables exist as well:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">views_geometry_columns</b></span> is</p>
+<p class="calibre1">intended to support Geometry <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">VIEW</b></span>s.<br class="calibre12"/></p></li>
+<li class="calibre22">and the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">virts_geometry_columns</b></span> is</p>
+<p class="calibre1">intended to support Virtual Shapefiles.</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"wkt-wkb.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#common"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="qgis.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="qgis.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

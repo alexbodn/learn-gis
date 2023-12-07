@@ -1,0 +1,587 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">Language bindings: Java / JDBC</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre27"><a href="lang_split_001.html#toc">Back<p class="calibre1"></p>
+</a><p class="calibre1"><a href="lang_split_001.html#toc">to Language Bindings</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+</p><p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Test environment</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre17"><b class="calibre9">Linux Debian:</b></span><br class="calibre12"/>
+just to be sure to test the up-to-date state-of-the-art I've</p>
+<p class="calibre1">actually used <b class="calibre9">Debian Squeeze</b> (32 bit).<br class="calibre12"/>
+This way I'm sure that all required packages are reasonably using</p>
+<p class="calibre1">the most recent version.<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Java:</b></span><br class="calibre12"/>
+I was really curious about <b class="calibre9">OpenJava</b> (I had never used it</p>
+<p class="calibre1">before), so I decided not to use Sun Java.<br class="calibre12"/>
+After the first initial troubles I discovered I had to install the</p>
+<p class="calibre1">following packages:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><b class="calibre9">openjdk-6-jre</b> (Java JDK)</li>
+<li class="calibre22"><b class="calibre9">gcj</b> (Java compiler)</li>
+</ul>
+<span class="calibre17"><b class="calibre9">SQLite's JDBC connector:</b></span><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+I used the one from <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC"&gt;http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC</a><br class="calibre12"/>
+</p>
+<p class="calibre1">I've actually downloaded the latest supported version: <a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar"&gt;
+http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar</a><br class="calibre12"/>
+</p>
+<p class="calibre1">Btw this one isn't the latest version supported by SQLite, because</p>
+<p class="calibre1">v.3.7.3 was released on 2010 October 8, and v.3.7.4 is available</p>
+<p class="calibre1">since 2010 December 8: so the Xerial support seems to be slightly</p>
+<p class="calibre1">outdated. Not a big issue, anyway.<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">My first test</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+Just to check if my environment was a valid one at first I simply</p>
+<p class="calibre1">compiled and then ran the standard Xerial demo. You'll easily find</p>
+<p class="calibre1">the code on their main HTML page about JDBC.<br class="calibre12"/>
+I simply copied the Java code from the HTML page into a text file</p>
+<p class="calibre1">named <b class="calibre9">Sample.java</b><br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Important notice:</b></span> following Xerial instructions I</p>
+<p class="calibre1">simply copied the <b class="calibre9">sqlite-jdbc-3.7.2.jar</b> file directly under</p>
+<p class="calibre1">the same directory where I placed the <b class="calibre9">Sample.java</b> source, so</p>
+<p class="calibre1">to avoid any CLASSPATH related headache.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre62"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" color="#FFFFFF"&gt;$ javac</p>
+</div><p class="calibre1"><span class="calibre32">Sample.java</span><br class="calibre12"/>
+<span class="calibre63">$ java</span></p><span class="calibre63">
+</span><p class="calibre1"><span class="calibre63">-classpath ".:sqlite-jdbc.3.7.2.jar" Sample</span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+All right: everything worked as expected. Anyway this first test</p>
+<p class="calibre1">simply stressed basic SQLite capabilities.<br class="calibre12"/>
+I had now going further on, attempting to test if the Xerial JDBC</p>
+<p class="calibre1">connector could actually support SpatiaLite.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">First SpatiaLite test (failure)</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><br class="calibre12"/>
+The most recent <b class="calibre9">libspatialite-2.4.0-RC4</b> was already</p>
+<p class="calibre1">installed on my test platform (actually this is one of the Linux</p>
+<p class="calibre1">workhorses I currently use for development and testing).<br class="calibre12"/>
+I had built this package by myself, so the corresponding shared</p>
+<p class="calibre1">library was <b class="calibre9">/usr/local/lib/libspatialite.so</b><br class="calibre12"/>
+The first obvious thing to be done was loading the SpatiaLite's</p>
+<p class="calibre1">shared library, so to enable the JDBC connector supporting</p>
+<p class="calibre1">SpatiaLite.<br class="calibre12"/>
+So I simply added the following line to the souce code (immediately</p>
+<p class="calibre1">after establishing the connection).<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre29"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" size="2"&gt;stmt.execute("SELECT</p>
+</div><p class="calibre1"><span class="calibre32">load_extension('/usr/local/lib/libspatialite.so');</span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Too much simplistic: this way I've got a discouraging error</p>
+<p class="calibre1">message: <b class="calibre9">NOT AUTHORIZED</b>.<br class="calibre12"/>
+After a little while I've found an useful suggestion browsing the</p>
+<p class="calibre1">Web: a preliminary step is absolutely required in order to enable</p>
+<p class="calibre1">extension dynamic loading.<br class="calibre12"/>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre29"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" size="2"&gt;<span>
+</span></p><p class="calibre1">"background: #ffff00"&gt;import</p>
+</div><p class="calibre1"><span class="calibre32">org.sqlite.SQLiteConfig;</span><br class="calibre12"/>
+<span class="calibre64">...</span><br class="calibre12"/>
+<span class="calibre64"><span>
+</span></span></p><p class="calibre1"><span class="calibre64">"background: #ffff00"&gt;SQLiteConfig config = new</span></p><span class="calibre64">
+</span><p class="calibre1"><span class="calibre64">SQLiteConfig;</span><br class="calibre12"/>
+<span class="calibre64"><span>
+</span></span></p><p class="calibre1"><span class="calibre64">"background: #ffff00"&gt;config.enableLoadExtension(true);</span><br class="calibre12"/>
+</p>
+<p class="calibre1"><span class="calibre64">Connection conn =</span></p><div class="calibre64">
+<p class="calibre1">DriverManager.getConnection("path"<span>
+</span></p></div><p class="calibre1"><span class="calibre64">"background: #ffff00"&gt;, config.toProperties);</span><br class="calibre12"/>
+<span class="calibre64">Statement stmt =</span></p><span class="calibre64">
+</span><p class="calibre1"><span class="calibre64">conn.createStatement();</span><br class="calibre12"/>
+<span class="calibre64">stmt.execute("SELECT</span></p><span class="calibre64">
+</span><p class="calibre1"><span class="calibre64">load_extension('/usr/local/lib/libspatialite.so')");</span><br class="calibre12"/></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+All right; now the SpatiaLite's shared library was successfully</p>
+<p class="calibre1">loaded.<br class="calibre12"/>
+And this one was the unique misadventure I experienced during my</p>
+<p class="calibre1">JDBC testing: once I was able resolving this issue then anything</p>
+<p class="calibre1">ran absolutely smooth and without any further accident.<br class="calibre12"/>
+<b class="calibre9"><span class="calibre34"><span class="calibre65">Except</span></span></b></p><b class="calibre9"><div class="calibre34">
+<p class="calibre1">for one JDBC oddity I noticed: but I'll account for this at the end</p>
+</div></b><p class="calibre1"><b class="calibre9"><span class="calibre34">of the story.</span></b><br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre7"><span class="calibre8">
+</span></p><p class="calibre1"><span class="calibre8">"font-size: 22pt"&gt;<b class="calibre9">Java sample program</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre37"><b class="calibre9">SpatialiteSample.java</b></span><br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre29"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" size="2"&gt;import java.sql.Connection;<br class="calibre12"/>
+import java.sql.DriverManager;<br class="calibre12"/>
+import java.sql.ResultSet;<br class="calibre12"/>
+import java.sql.SQLException;<br class="calibre12"/>
+import java.sql.Statement;<br class="calibre12"/>
+import java.sql.PreparedStatement;<br class="calibre12"/>
+import org.sqlite.SQLiteConfig;<br class="calibre12"/>
+<br class="calibre12"/>
+public class SpatialiteSample<br class="calibre12"/>
+{<br class="calibre12"/>
+  public static void main(String[] args) throws</p>
+<p class="calibre1">ClassNotFoundException<br class="calibre12"/>
+  {<br class="calibre12"/>
+    // load the sqlite-JDBC driver using the</p>
+<p class="calibre1">current class loader<br class="calibre12"/>
+    Class.forName("org.sqlite.JDBC");<br class="calibre12"/>
+<br class="calibre12"/>
+    Connection conn = null;<br class="calibre12"/>
+    try<br class="calibre12"/>
+    {<br class="calibre12"/>
+      // enabling dynamic extension</p>
+<p class="calibre1">loading<br class="calibre12"/>
+      // absolutely required by</p>
+<p class="calibre1">SpatiaLite<br class="calibre12"/>
+      SQLiteConfig config = new</p>
+<p class="calibre1">SQLiteConfig();<br class="calibre12"/>
+      config.enableLoadExtension(true);<br class="calibre12"/>
+</p>
+<p class="calibre1"><br class="calibre12"/>
+      // create a database</p>
+<p class="calibre1">connection<br class="calibre12"/>
+      conn =</p>
+<p class="calibre1">DriverManager.getConnection("jdbc:sqlite:spatialite.sample",<br class="calibre12"/>
+      config.toProperties());<br class="calibre12"/>
+      Statement stmt =</p>
+<p class="calibre1">conn.createStatement();<br class="calibre12"/>
+      stmt.setQueryTimeout(30); //</p>
+<p class="calibre1">set timeout to 30 sec.<br class="calibre12"/>
+<br class="calibre12"/>
+      // loading SpatiaLite<br class="calibre12"/>
+      stmt.execute("SELECT</p>
+<p class="calibre1">load_extension('/usr/local/lib/libspatialite.so')");<br class="calibre12"/>
+<br class="calibre12"/>
+      // enabling Spatial</p>
+<p class="calibre1">Metadata<br class="calibre12"/>
+      // using v.2.4.0 this</p>
+<p class="calibre1">automatically initializes SPATIAL_REF_SYS and</p>
+<p class="calibre1">GEOMETRY_COLUMNS<br class="calibre12"/>
+      String sql = "SELECT</p>
+<p class="calibre1">InitSpatialMetadata()";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+<br class="calibre12"/>
+      // creating a POINT table<br class="calibre12"/>
+      sql = "CREATE TABLE test_pt</p>
+<p class="calibre1">(";<br class="calibre12"/>
+      sql += "id INTEGER NOT NULL</p>
+<p class="calibre1">PRIMARY KEY,";<br class="calibre12"/>
+      sql += "name TEXT NOT</p>
+<p class="calibre1">NULL)";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+      // creating a POINT Geometry</p>
+<p class="calibre1">column<br class="calibre12"/>
+      sql = "SELECT</p>
+<p class="calibre1">AddGeometryColumn('test_pt', ";<br class="calibre12"/>
+      sql += "'geom', 4326, 'POINT',</p>
+<p class="calibre1">'XY')";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+<br class="calibre12"/>
+      // creating a LINESTRING</p>
+<p class="calibre1">table<br class="calibre12"/>
+      sql = "CREATE TABLE test_ln</p>
+<p class="calibre1">(";<br class="calibre12"/>
+      sql += "id INTEGER NOT NULL</p>
+<p class="calibre1">PRIMARY KEY,";<br class="calibre12"/>
+      sql += "name TEXT NOT</p>
+<p class="calibre1">NULL)";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+      // creating a LINESTRING</p>
+<p class="calibre1">Geometry column<br class="calibre12"/>
+      sql = "SELECT</p>
+<p class="calibre1">AddGeometryColumn('test_ln', ";<br class="calibre12"/>
+      sql += "'geom', 4326,</p>
+<p class="calibre1">'LINESTRING', 'XY')";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+<br class="calibre12"/>
+      // creating a POLYGON</p>
+<p class="calibre1">table<br class="calibre12"/>
+      sql = "CREATE TABLE test_pg</p>
+<p class="calibre1">(";<br class="calibre12"/>
+      sql += "id INTEGER NOT NULL</p>
+<p class="calibre1">PRIMARY KEY,";<br class="calibre12"/>
+      sql += "name TEXT NOT</p>
+<p class="calibre1">NULL)";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+      // creating a POLYGON Geometry</p>
+<p class="calibre1">column<br class="calibre12"/>
+      sql = "SELECT</p>
+<p class="calibre1">AddGeometryColumn('test_pg', ";<br class="calibre12"/>
+      sql += "'geom', 4326,</p>
+<p class="calibre1">'POLYGON', 'XY')";<br class="calibre12"/>
+      stmt.execute(sql);<br class="calibre12"/>
+<br class="calibre12"/>
+      // inserting some POINTs<br class="calibre12"/>
+      // please note well: SQLite is</p>
+<p class="calibre1">ACID and Transactional,<br class="calibre12"/>
+      // so (to get best performance)</p>
+<p class="calibre1">the whole insert cycle<br class="calibre12"/>
+      // will be handled as a single</p>
+<p class="calibre1">TRANSACTION<br class="calibre12"/>
+      conn.setAutoCommit(false);<br class="calibre12"/>
+</p>
+<p class="calibre66">int i;<br class="calibre12"/>
+      for (i = 0; i &lt; 100000;</p>
+<p class="calibre1">i++)<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // for POINTs we'll</p>
+<p class="calibre1">use full text sql statements<br class="calibre12"/>
+        sql = "INSERT INTO</p>
+<p class="calibre1">test_pt (id, name, geom) VALUES (";<br class="calibre12"/>
+        sql += i + 1;<br class="calibre12"/>
+        sql += ", 'test</p>
+<p class="calibre1">POINT #";<br class="calibre12"/>
+        sql += i + 1;<br class="calibre12"/>
+        sql += "',</p>
+<p class="calibre1">GeomFromText('POINT(";<br class="calibre12"/>
+        sql += i /</p>
+<p class="calibre1">1000.0;<br class="calibre12"/>
+        sql += " ";<br class="calibre12"/>
+        sql += i /</p>
+<p class="calibre1">1000.0;<br class="calibre12"/>
+        sql += ")',</p>
+<p class="calibre1">4326))";<br class="calibre12"/>
+        stmt.executeUpdate(sql);<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+      conn.commit();<br class="calibre12"/>
+<br class="calibre12"/>
+      // checking POINTs<br class="calibre12"/>
+      sql = "SELECT DISTINCT</p>
+<p class="calibre1">Count(*), ST_GeometryType(geom), ";<br class="calibre12"/>
+      sql += "ST_Srid(geom) FROM</p>
+<p class="calibre1">test_pt";<br class="calibre12"/>
+      ResultSet rs =</p>
+<p class="calibre1">stmt.executeQuery(sql);<br class="calibre12"/>
+      while(rs.next())<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // read the result</p>
+<p class="calibre1">set<br class="calibre12"/>
+        String msg = "&gt;</p>
+<p class="calibre1">Inserted ";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getInt(1);<br class="calibre12"/>
+        msg += " entities</p>
+<p class="calibre1">of type ";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getString(2);<br class="calibre12"/>
+        msg += "</p>
+<p class="calibre1">SRID=";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getInt(3);<br class="calibre12"/>
+        System.out.println(msg);<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+<br class="calibre12"/>
+      // inserting some</p>
+<p class="calibre1">LINESTRINGs<br class="calibre12"/>
+      // this time we'll use a</p>
+<p class="calibre1">Prepared Statement<br class="calibre12"/>
+      sql = "INSERT INTO test_ln (id,</p>
+<p class="calibre1">name, geom) ";<br class="calibre12"/>
+      sql += "VALUES (?, ?,</p>
+<p class="calibre1">GeomFromText(?, 4326))";<br class="calibre12"/>
+      PreparedStatement ins_stmt =</p>
+<p class="calibre1">conn.prepareStatement(sql);<br class="calibre12"/>
+      conn.setAutoCommit(false);<br class="calibre12"/>
+</p>
+<p class="calibre66">for (i = 0; i &lt; 100000;</p>
+<p class="calibre1">i++)<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // setting up</p>
+<p class="calibre1">values / binding<br class="calibre12"/>
+        String name = "test</p>
+<p class="calibre1">LINESTRING #";<br class="calibre12"/>
+        name += i +</p>
+<p class="calibre1">1;<br class="calibre12"/>
+        String geom =</p>
+<p class="calibre1">"LINESTRING (";<br class="calibre12"/>
+        if ((i%2) ==</p>
+<p class="calibre1">1)<br class="calibre12"/>
+        {<br class="calibre12"/>
+          // odd</p>
+<p class="calibre1">row: five points<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">"-180.0 -90.0, ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">-10.0 - (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">" ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">-10.0 - (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">", ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">-10.0 - (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">" ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">10.0 + (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">", ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">10.0 + (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">" ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">10.0 + (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">", 180.0 90.0";<br class="calibre12"/>
+        }<br class="calibre12"/>
+        else<br class="calibre12"/>
+        {<br class="calibre12"/>
+          // even</p>
+<p class="calibre1">row: two points<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">-10.0 - (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">" ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">-10.0 - (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">", ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">10.0 + (i / 1000.0);<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">" ";<br class="calibre12"/>
+          geom +=</p>
+<p class="calibre1">10.0 + (i / 1000.0);<br class="calibre12"/>
+        }<br class="calibre12"/>
+        geom += ")";<br class="calibre12"/>
+        ins_stmt.setInt(1,</p>
+<p class="calibre1">i+1);<br class="calibre12"/>
+        ins_stmt.setString(2,</p>
+<p class="calibre1">name);<br class="calibre12"/>
+        ins_stmt.setString(3,</p>
+<p class="calibre1">geom);<br class="calibre12"/>
+        ins_stmt.executeUpdate();<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+      conn.commit();<br class="calibre12"/>
+<br class="calibre12"/>
+      // checking LINESTRINGs<br class="calibre12"/>
+      sql = "SELECT DISTINCT</p>
+<p class="calibre1">Count(*), ST_GeometryType(geom), ";<br class="calibre12"/>
+      sql += "ST_Srid(geom) FROM</p>
+<p class="calibre1">test_ln";<br class="calibre12"/>
+      rs =</p>
+<p class="calibre1">stmt.executeQuery(sql);<br class="calibre12"/>
+      while(rs.next())<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // read the result</p>
+<p class="calibre1">set<br class="calibre12"/>
+        String msg = "&gt;</p>
+<p class="calibre1">Inserted ";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getInt(1);<br class="calibre12"/>
+        msg += " entities</p>
+<p class="calibre1">of type ";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getString(2);<br class="calibre12"/>
+        msg += "</p>
+<p class="calibre1">SRID=";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getInt(3);<br class="calibre12"/>
+        System.out.println(msg);<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+<br class="calibre12"/>
+      // inserting some</p>
+<p class="calibre1">POLYGONs<br class="calibre12"/>
+      // this time too we'll use a</p>
+<p class="calibre1">Prepared Statement<br class="calibre12"/>
+      sql = "INSERT INTO test_pg (id,</p>
+<p class="calibre1">name, geom) ";<br class="calibre12"/>
+      sql += "VALUES (?, ?,</p>
+<p class="calibre1">GeomFromText(?, 4326))";<br class="calibre12"/>
+      ins_stmt =</p>
+<p class="calibre1">conn.prepareStatement(sql);<br class="calibre12"/>
+      conn.setAutoCommit(false);<br class="calibre12"/>
+</p>
+<p class="calibre66">for (i = 0; i &lt; 100000;</p>
+<p class="calibre1">i++)<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // setting up</p>
+<p class="calibre1">values / binding<br class="calibre12"/>
+        String name = "test</p>
+<p class="calibre1">POLYGON #";<br class="calibre12"/>
+        name += i +</p>
+<p class="calibre1">1;<br class="calibre12"/>
+        ins_stmt.setInt(1,</p>
+<p class="calibre1">i+1);<br class="calibre12"/>
+        ins_stmt.setString(2,</p>
+<p class="calibre1">name);<br class="calibre12"/>
+        String geom =</p>
+<p class="calibre1">"POLYGON((";<br class="calibre12"/>
+        geom += -10.0 - (i</p>
+<p class="calibre1">/ 1000.0);<br class="calibre12"/>
+        geom += " ";<br class="calibre12"/>
+        geom += -10.0 - (i</p>
+<p class="calibre1">/ 1000.0);<br class="calibre12"/>
+        geom += ", ";<br class="calibre12"/>
+        geom += 10.0 + (i /</p>
+<p class="calibre1">1000.0);<br class="calibre12"/>
+        geom += " ";<br class="calibre12"/>
+        geom += -10.0 - (i</p>
+<p class="calibre1">/ 1000.0);<br class="calibre12"/>
+        geom += ", ";<br class="calibre12"/>
+        geom += 10.0 + (i /</p>
+<p class="calibre1">1000.0);<br class="calibre12"/>
+        geom += " ";<br class="calibre12"/>
+        geom += 10.0 + (i /</p>
+<p class="calibre1">1000.0);<br class="calibre12"/>
+        geom += ", ";<br class="calibre12"/>
+        geom += -10.0 - (i</p>
+<p class="calibre1">/ 1000.0);<br class="calibre12"/>
+        geom += " ";<br class="calibre12"/>
+        geom += 10.0 + (i /</p>
+<p class="calibre1">1000.0);<br class="calibre12"/>
+        geom += ", ";<br class="calibre12"/>
+        geom += -10.0 - (i</p>
+<p class="calibre1">/ 1000.0);<br class="calibre12"/>
+        geom += " ";<br class="calibre12"/>
+        geom += -10.0 - (i</p>
+<p class="calibre1">/ 1000.0);<br class="calibre12"/>
+        geom += "))";<br class="calibre12"/>
+        ins_stmt.setInt(1,</p>
+<p class="calibre1">i+1);<br class="calibre12"/>
+        ins_stmt.setString(2,</p>
+<p class="calibre1">name);<br class="calibre12"/>
+        ins_stmt.setString(3,</p>
+<p class="calibre1">geom);<br class="calibre12"/>
+        ins_stmt.executeUpdate();<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+      conn.commit();<br class="calibre12"/>
+<br class="calibre12"/>
+      // checking POLYGONs<br class="calibre12"/>
+      sql = "SELECT DISTINCT</p>
+<p class="calibre1">Count(*), ST_GeometryType(geom), ";<br class="calibre12"/>
+      sql += "ST_Srid(geom) FROM</p>
+<p class="calibre1">test_pg";<br class="calibre12"/>
+      rs =</p>
+<p class="calibre1">stmt.executeQuery(sql);<br class="calibre12"/>
+      while(rs.next())<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // read the result</p>
+<p class="calibre1">set<br class="calibre12"/>
+        String msg = "&gt;</p>
+<p class="calibre1">Inserted ";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getInt(1);<br class="calibre12"/>
+        msg += " entities</p>
+<p class="calibre1">of type ";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getString(2);<br class="calibre12"/>
+        msg += "</p>
+<p class="calibre1">SRID=";<br class="calibre12"/>
+        msg +=</p>
+<p class="calibre1">rs.getInt(3);<br class="calibre12"/>
+        System.out.println(msg);<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+    }<br class="calibre12"/>
+    catch(SQLException e)<br class="calibre12"/>
+    {<br class="calibre12"/>
+      // if the error message is "out</p>
+<p class="calibre1">of memory",<br class="calibre12"/>
+      // it probably means no</p>
+<p class="calibre1">database file is found<br class="calibre12"/>
+      System.err.println(e.getMessage());<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+    finally<br class="calibre12"/>
+    {<br class="calibre12"/>
+      try<br class="calibre12"/>
+      {<br class="calibre12"/>
+        if(conn !=</p>
+<p class="calibre1">null)<br class="calibre12"/>
+          conn.close();<br class="calibre12"/>
+</p>
+<p class="calibre66">}<br class="calibre12"/>
+      catch(SQLException e)<br class="calibre12"/>
+      {<br class="calibre12"/>
+        // connection close</p>
+<p class="calibre1">failed.<br class="calibre12"/>
+        System.err.println(e);<br class="calibre12"/>
+</p>
+</div><p class="calibre66"><span class="calibre32">}<br class="calibre12"/>
+    }<br class="calibre12"/>
+  }<br class="calibre12"/>
+}<br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre62"><div class="calibre32">
+<p class="calibre1">"Courier New, monospace" color="#FFFFFF"&gt;$ javac -classpath</p>
+</div><p class="calibre1"><span class="calibre32">".:sqlite-jdbc.3.7.2.jar" SpatialiteSample.java</span><br class="calibre12"/>
+<span class="calibre63">$ java</span></p><div class="calibre63">
+<p class="calibre1">-classpath ".:sqlite-jdbc.3.7.2.jar"</p>
+</div><p class="calibre1"><span class="calibre63">SpatialiteSample</span><br class="calibre12"/></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+Telling the full story is boring and very few interesting: you can</p>
+<p class="calibre1">study and test the sample code by yourself, and that's absolutely</p>
+<p class="calibre1">all.<br class="calibre12"/>
+<br class="calibre12"/>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+</body></html>

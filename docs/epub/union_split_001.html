@@ -1,0 +1,382 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre">
+<p class="calibre1">
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre16">
+<h2 class="calibre30" id="calibre_pb_0"><b class="calibre31">The problem</b></h2>
+<p lang="en-US" class="calibre58">
+</p><p class="calibre1">"font-style: normal; font-weight: normal" xml:lang="en-US"&gt;Local</p>
+<p class="calibre1">Councils, Counties and Regions follow a well defined <i class="calibre11"><b class="calibre9">order of hierarchy</b></i>.<br class="calibre12"/>
+For administrative purposes Italy is subdivided into Regions;</p>
+<p class="calibre1">Regions are subdivided into Counties; and Counties are subdivided</p>
+<p class="calibre1">into Local Councils.<br class="calibre12"/>
+Following the appropriate Spatial SQL procedures you can start from</p>
+<p class="calibre1">Local Councils geometries and then generate corresponding Counties geometries. And so on ...<br class="calibre12"/>
+<br class="calibre12"/>
+<span class="calibre17"><b class="calibre9">Important notice:</b></span> the <i class="calibre11"><b class="calibre9">ISTAT 2001 census</b></i>
+dataset isn't well suited for this task, because it is plagued by</p>
+<p class="calibre1">several topology inconsistencies.<br class="calibre12"/>
+We'll use instead the latest <i class="calibre11"><b class="calibre9">ISTAT 2010</b></i> dataset,</p>
+<p class="calibre1">presenting a much better quality and consistency.<br class="calibre12"/>
+<a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.istat.it/ambiente/cartografia/comuni2010.zip"&gt;http://www.istat.it/ambiente/cartografia/comuni2010.zip</a><br class="calibre12"/>
+</p>
+<p class="calibre1"><a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.istat.it/ambiente/cartografia/province2010.zip"&gt;http://www.istat.it/ambiente/cartografia/province2010.zip</a><br class="calibre12"/>
+</p>
+<p class="calibre1"><a href="&lt;/p">
+</a></p><p class="calibre1"><a href="&lt;/p">"http://www.istat.it/ambiente/cartografia/regioni2010.zip"&gt;http://www.istat.it/ambiente/cartografia/regioni2010.zip</a><br class="calibre12"/></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+</tbody></table>
+</p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="union1.png" alt="Union 1" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+You'll start creating a new DB; then using <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">spatialite_gui</b></span> you'll import the <span class="calibre33"><b class="calibre9">com2010_s</b></span>
+<i class="calibre11"><b class="calibre9">shapefile</b></i>.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="union2.png" alt="Union 2" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+The next step is the one to load the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">prov2010_s</b></span> dataset: yes,</p>
+<p class="calibre1">this one too actually is a <i class="calibre11">shapefile</i>.<br class="calibre12"/>
+But for your specific purposes you can ignore at all Counties</p>
+<p class="calibre1">Geometries.<br class="calibre12"/>
+(<i class="calibre11">generating all them by yourself is the specific task assigned</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">to you this time, isn't ?</i>).<br class="calibre12"/>
+You can simply import the corresponding <i class="calibre11"><b class="calibre9">.DBF</b></i> file, so</p>
+<p class="calibre1">to import any data but discarding and ignoring at all related</p>
+<p class="calibre1">Geometries.<br class="calibre12"/>
+<br class="calibre12"/>
+Then you can import the Regions <i class="calibre11"><b class="calibre9">.DBF</b></i> file from</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">reg2010_s</b></span>.</p>
+<p class="calibre1">exactly in the same way.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW local_councils AS</b><br class="calibre12"/>
+<b class="calibre9">SELECT c.cod_reg AS cod_reg,</b><br class="calibre12"/>
+<b class="calibre9">  c.cod_pro AS cod_pro,</b><br class="calibre12"/>
+<b class="calibre9">  c.cod_com AS cod_com,</b><br class="calibre12"/>
+<b class="calibre9">  c.nome_com AS nome_com,</b><br class="calibre12"/>
+<b class="calibre9">  p.nome_pro AS nome_pro,</b><br class="calibre12"/>
+<b class="calibre9">  p.sigla AS sigla,</b><br class="calibre12"/>
+<b class="calibre9">  r.nome_reg AS nome_reg,</b><br class="calibre12"/>
+<b class="calibre9">  c.geometry AS geometry</b><br class="calibre12"/>
+<b class="calibre9">FROM com2010_s AS c</b><br class="calibre12"/>
+<b class="calibre9">JOIN prov2010_s AS p USING (cod_pro)</b><br class="calibre12"/>
+<b class="calibre9">JOIN reg2010_s AS r USING(cod_reg);</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">SELECT * FROM<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">local_councils;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">cod_reg</td>
+<td class="calibre13">cod_pro</td>
+<td class="calibre13">cod_com</td>
+<td class="calibre13">nome_com</td>
+<td class="calibre13">nome_pro</td>
+<td class="calibre13">sigla</td>
+<td class="calibre13">nome_reg</td>
+<td class="calibre13">geometry</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="calibre13">Agli�</td>
+<td class="calibre13">Torino</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=1117 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="calibre13">2</td>
+<td class="calibre13">Airasca</td>
+<td class="calibre13">Torino</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=1149 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">1</td>
+<td class="calibre13">3</td>
+<td class="calibre13">Ala di Stura</td>
+<td class="calibre13">Torino</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=1933 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+This will create the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">local_councils VIEW</b></span>; this</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">VIEW</b></span> represents a <i class="calibre11"><b class="calibre9">nicely de-normalized flat table</b></i>, so to make any</p>
+<p class="calibre1">subsequent activity absolutely painless.<br class="calibre12"/>
+<br class="calibre12"/>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE counties AS</b><br class="calibre12"/>
+<b class="calibre9">SELECT cod_pro, nome_pro, sigla, cod_reg, nome_reg,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Union(geometry) AS geometry</b><br class="calibre12"/>
+<b class="calibre9">FROM local_councils</b><br class="calibre12"/>
+<b class="calibre9">GROUP BY cod_pro;</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">RecoverGeometryColumn('counties', 'geometry',</b><br class="calibre12"/>
+<b class="calibre9">  23032, 'MULTIPOLYGON', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Now you'll create and populate the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">countries</b></span> table:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Union()</b></span> SQL Spatial</p>
+<p class="calibre1">function is used to aggregate / merge Geometries.</p></li>
+<li class="calibre22">by defining a <div class="calibre33"><b class="calibre9">GROUP BY<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">cod_pro</b></span> clause then <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Union()</b></span> will work as an</p>
+<p class="calibre1"><i class="calibre11">aggregate function</i>, thus effectively building the Geometry</p>
+<p class="calibre1">representation corresponding to each single County.</p></li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">please note well</b></span>: you must absolutely call<p class="calibre1"></p>
+<p class="calibre1"><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">RecoverGeometryColumn()</b></span> so</p>
+<p class="calibre1">to properly register the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">counties.geometry</b></span> column</p>
+<p class="calibre1">into the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">geometry_columns</b></span>
+<i class="calibre11">metadata</i> table.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">* FROM counties;</b></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">cod_pro</td>
+<td class="calibre13">nome_pro</td>
+<td class="calibre13">sigla</td>
+<td class="calibre13">cod_reg</td>
+<td class="calibre13">nome_reg</td>
+<td class="calibre13">geometry</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">Torino</td>
+<td class="calibre13">TO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=36337 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">Vercelli</td>
+<td class="calibre13">VC</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=27357 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">Novara</td>
+<td class="calibre13">NO</td>
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=15341 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+Just a quick check ...<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="union3.png" alt="Union 3" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+And then you are ready to display the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">counties</b></span> map layer using</p>
+<p class="calibre1">QGIS.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE regions (</b><br class="calibre12"/>
+<b class="calibre9">  cod_reg INTEGER NOT NULL PRIMARY KEY,</b><br class="calibre12"/>
+<b class="calibre9">  nome_reg TEXT NOT NULL);</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">AddGeometryColumn('regions', 'geometry',</b><br class="calibre12"/>
+<b class="calibre9">  23032, 'MULTIPOLYGON', 'XY');</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">INSERT INTO regions<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">(cod_reg, nome_reg, geometry)</b><br class="calibre12"/>
+<b class="calibre9">SELECT cod_reg, nome_reg, ST_Union(geometry)</b><br class="calibre12"/>
+<b class="calibre9">FROM counties</b><br class="calibre12"/>
+<b class="calibre9">GROUP BY cod_reg;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+Now you'll create and populate the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span> table:</p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22">as in the previous step you'll use <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">ST_Union()</b></span> and <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">GROUP BY</b></span> to aggregate</p>
+<p class="calibre1"><span class="calibre33"><b class="calibre9">regions</b></span>
+Geometries.</p></li>
+<li class="calibre22"><span class="calibre17"><b class="calibre9">please note well</b></span>: in this example you have<p class="calibre1"></p>
+<p class="calibre1">explicitly created the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span> table, then using</p>
+<p class="calibre1"><span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">AddGeometryColumn()</b></span> so to</p>
+<p class="calibre1">create the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions.geometry</b></span>
+column.<br class="calibre12"/>
+And finally you have used <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">INSERT INTO ... (...) SELECT</b></span></p><span class="calibre32"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre32"><b class="calibre9">...</b></span> in order to populate the table.<br class="calibre12"/>
+The procedure is different, but the final result is exactly the</p>
+<p class="calibre1">same one as in the previous example.</p></li>
+</ul>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">* FROM regions;</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellspacing="0" cellpadding="4" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13">cod_reg</td>
+<td class="calibre13">nome_reg</td>
+<td class="calibre13">geometry</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">1</td>
+<td class="calibre13">PIEMONTE</td>
+<td class="calibre13">BLOB sz=75349 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">2</td>
+<td class="calibre13">VALLE D'AOSTA/VALL�E D'AOSTE</td>
+<td class="calibre13">BLOB sz=18909 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">3</td>
+<td class="calibre13">LOMBARDIA</td>
+<td class="calibre13">BLOB sz=83084 GEOMETRY</td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+<td class="calibre13">...</td>
+</tr>
+</tbody></table>
+Just a quick check ...<p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<img src="union4.png" alt="Union 4" class="calibre14"/><p class="calibre12" style="margin:0pt; border:0pt; height:0pt"> </p>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+And then you can display the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">regions</b></span> map layer using</p>
+<p class="calibre1">QGIS.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre40"><div class="calibre33"><b class="calibre9">CREATE<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">TABLE italy AS</b><br class="calibre12"/>
+<b class="calibre9">SELECT 'Italy' AS country,</b><br class="calibre12"/>
+<b class="calibre9">  ST_Union(geometry) AS geometry</b><br class="calibre12"/>
+<b class="calibre9">FROM regions;</b><br class="calibre12"/></span>
+</p><hr class="calibre23"/>
+<div class="calibre33"><b class="calibre9">SELECT<p class="calibre1"></p>
+</b></div><p class="calibre1"><span class="calibre33"><b class="calibre9">RecoverGeometryColumn('italy', 'geometry',</b><br class="calibre12"/>
+<b class="calibre9">  23032, 'MULTIPOLYGON', 'XY');</b><br class="calibre12"/></span></p></td>
+</tr>
+</tbody></table>
+As a final step you can now create the <span class="calibre32">
+</span><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">italy</b></span> table representing the whole Italian Republic international boundaries.<br class="calibre12"/>
+<br class="calibre12"/>
+<img src="union5.png" alt="Union 5" class="calibre14"/><br class="calibre12"/>
+<br class="calibre12"/>
+Then you can display the <span class="calibre32">
+</span></p><p class="calibre1"><span class="calibre32">"Courier New, monospace"&gt;<b class="calibre9">italy</b></span> map layer using QGIS …</p>
+<p class="calibre1">and that's all.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"railways-buf.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#haute_cuisine"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="sp-view.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="sp-view.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<p class="calibre12" style="margin:0pt; border:0pt; height:1em"> </p>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover</p>
+<p class="calibre1">Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</body></html>

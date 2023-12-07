@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="&lt;/p"/>
+    <title>Unknown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="page_styles.css"/>
+</head>
+  <body class="calibre"><p class="calibre1">"HTML Tidy for HTML5 for Linux version 5.6.0" /&gt;
+</p>
+<p class="calibre1"><title class="calibre2">SpatiaLite Cookbook</title>
+
+
+<table width="100%" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td class="calibre13"><img src="spatialite.png" alt="SpatiaLite logo" class="calibre14"/></td>
+<td class="calibre13">
+<p class="calibre7"><span class="calibre15">
+</span></p><p class="calibre1"><span class="calibre15">"font-size: 32pt"&gt;<b class="calibre9">About ESRI Shapefiles and Virtual</b></span></p><span class="calibre15"><b class="calibre9">
+</b></span><p class="calibre1"><span class="calibre15"><b class="calibre9">Tables</b></span></p>
+<p class="calibre1"></p>
+<p class="calibre1"></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><i class="calibre11">2011 January 28</i></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"first-db.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="charset.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="charset.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre18"><b class="calibre9">What's a Shapefile ?</b></p>
+<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11">Shapefile</i> is a plain, unsophisticated GIS (geographic data) file format invented many years ago by ESRI: although initially born in a proprietary environment, this file format has been later publicly disclosed and fully documented, so it's now really like an <i class="calibre11">open standard format</i>.<br class="calibre12"/>
+<br class="calibre12"/>
+It's rather obsolescent nowadays, but it's universally supported.</p>
+<p class="calibre1">So it represents the <i class="calibre11">lingua franca</i> every GIS application can surely understand: and not at all surprisingly, SHP is widely used for cross platform neutral data exchange.<br class="calibre12"/>
+<br class="calibre12"/>
+The name itself is rather misleading: after all, <i class="calibre11">Shapefile</i>
+isn't a simple file. At least three distinct files are required</p>
+<p class="calibre1">(identified by <b class="calibre9">.shp .shx .dbf</b> suffixes): if a single file is missing (<i class="calibre11">misnamed / misplaced / malformed / whatsoever</i></p><i class="calibre11">
+</i><p class="calibre1"><i class="calibre11">else</i>), then the whole dataset is corrupted and completely not usable.</p>
+<p class="calibre1"></p><hr class="calibre23"/>
+Some useful further references:<p class="calibre1"></p>
+<p class="calibre1"></p><ul class="calibre21">
+<li class="calibre22"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://en.wikipedia.org/wiki/Shapefile"&gt;http://en.wikipedia.org/wiki/Shapefile</a>
+(simple introduction)</p></li>
+<li class="calibre22"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf"&gt;http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf</a>
+(technical reference)</p></li>
+</ul>
+</td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" border="1" cellpadding="4" cellspacing="0" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="100%" class="calibre20">
+<p class="calibre18"><b class="calibre9">What's a Virtual Shapefile (and Virtual</b></p><b class="calibre9">
+</b><p class="calibre1"><b class="calibre9">Tables) ?</b></p>
+<p class="calibre1"></p>
+<p class="calibre1"><i class="calibre11"><b class="calibre9">SpatiaLite</b></i> supports a Virtual Shapefile driver: i.e.</p>
+<p class="calibre1">it has the capability to support SQL access (<i class="calibre11">read-only</i> mode) for an external <i class="calibre11">Shapefile</i>, with no need to load any data within the DB itself.<br class="calibre12"/>
+This is really useful during any preliminary database construction step (as in our case).<br class="calibre12"/>
+SQLite/SpatiaLite supports several other different Virtual drivers, such as the Virtual CSV/TXT, the Virtual DBF and so on ...<br class="calibre12"/>
+<br class="calibre12"/>
+Anyway, <span class="calibre34"><b class="calibre9"><span>
+</span></b></span></p><p class="calibre1"><span class="calibre34"><b class="calibre9">"background: #0000ff"&gt;be warned</b></span>: Virtual Tables suffer from several limitations (<i class="calibre11">and are often much slower than using internal DB storage</i>), so <span class="calibre35">
+</span></p><p class="calibre1"><span class="calibre35">"#FFFFFF"&gt;<b class="calibre9"><span class="calibre36">they are not at all intended for any serious production task</span></b></span>.</p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table width="100%" cellpadding="8" cellspacing="8" class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td width="33%" class="calibre26"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"first-db.html"&gt;Previous Slide</a></p></td>
+<td class="calibre27"><a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"../index.html#toc"&gt;Table of Contents</a></p></td>
+<td class="calibre28"><a href="charset.html">Next<p class="calibre1"></p>
+</a><p class="calibre1"><a href="charset.html">Slide</a></p></td>
+</tr>
+</tbody></table>
+<br class="calibre12"/>
+<table class="calibre3">
+<tbody class="calibre4"><tr class="calibre5">
+<td rowspan="2" class="calibre13"><img src="cc-by-sa.png" alt="&lt;/p" class="calibre14"/>
+<p class="calibre1">"CC-BY-SA logo" /&gt;</p></td>
+<td class="calibre13"><b class="calibre9">Author:</b> Alessandro Furieri <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"mailto:a.furieri@lqt.it"&gt;a.furieri@lqt.it</a></p></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13">This work is licensed under the <a href="&lt;/p">
+</a><p class="calibre1"><a href="&lt;/p">"http://creativecommons.org/licenses/by-sa/3.0/"&gt;Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</a> license.</p></td>
+</tr>
+<tr class="calibre5">
+<td colspan="2" class="calibre13">
+<hr class="calibre23"/></td>
+</tr>
+<tr class="calibre5">
+<td class="calibre13"><img src="gnu.png" alt="GNU logo" class="calibre14"/></td>
+<td class="calibre13">Permission is granted to copy, distribute and/or modify this<p class="calibre1"></p>
+<p class="calibre1">document under the terms of the<br class="calibre12"/>
+<a href="http://www.gnu.org/licenses/fdl.html">GNU Free</a></p><a href="http://www.gnu.org/licenses/fdl.html">
+</a><p class="calibre1"><a href="http://www.gnu.org/licenses/fdl.html">Documentation License</a>, Version 1.3 or any later version</p>
+<p class="calibre1">published by the Free Software Foundation;<br class="calibre12"/>
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.</p></td>
+</tr>
+</tbody></table>
+
+
+</p></body></html>
