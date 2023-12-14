@@ -35,8 +35,8 @@ class SQLQuery {
 			SELECT
 				flatstyle, 
 				makepoint(
-					100 + 40 * sin(value * radians(360) / 5),
-					100 + 40 * cos(value * radians(360) / 5),
+					100 + 40 * sin((value % 5) * radians(360) / 5),
+					100 + 40 * cos((value % 5) * radians(360) / 5),
 					3857
 				) as feature
 			FROM generate_series as ctr
@@ -282,27 +282,15 @@ class SQLQuery {
 				name => 
 				`<tr>
 				<td class="snippet-name">${name}</td>
-				<td><button class="snippet-paste">paste</button></td>
-				<td><button class="snippet-copy">cp</button></td>
-				<td><button class="snippet-pp">pp</button></td>
-				<td><button class="snippet-run">run</button></td>
-				<td><button class="snippet-map">map</button></td>
+				<td><button class="snippet-cp">cp</button></td>
 				</tr>`
 			)
 			.reduce((a, b) => a + b, '');
 		let target = this.sqlQuery.querySelector('.snippetsMenu');
 		target.textContent = '';
 		target.insertAdjacentHTML('beforeend', snippets);
-		target.querySelectorAll('button.snippet-paste').forEach(
-			button => button.addEventListener('click', e => {this.pasteSnippet(null, e.currentTarget);}));
-		target.querySelectorAll('button.snippet-copy').forEach(
-			button => button.addEventListener('click', e => {this.copySnippet(null, e.currentTarget);}));
-		target.querySelectorAll('button.snippet-pp').forEach(
-			button => button.addEventListener('click', e => {this.unfoldSnippet(null, e.currentTarget);}));
-		target.querySelectorAll('button.snippet-run').forEach(
-			button => button.addEventListener('click', e => {this.runSnippet(null, e.currentTarget);}));
-		target.querySelectorAll('button.snippet-map').forEach(
-			button => button.addEventListener('click', e => {this.mapSnippet(null, e.currentTarget);}));
+		target.querySelectorAll('button.snippet-cp').forEach(
+			button => button.addEventListener('click', e => {this.cpSnippet(null, e.currentTarget);}));
 	}
 	
 	snippetQuery(snippet, preprocessed=false) {
@@ -311,7 +299,7 @@ class SQLQuery {
 			query = this.prepQuery(query);
 		}
 		if (query) {
-			query = query.replace(/\n\s+/g, '\n');
+			query = this.unindent(query);
 		}
 	}
 	
@@ -325,17 +313,10 @@ class SQLQuery {
 		return snippet;
 	}
 	
-	pasteSnippet(snippet, currentTarget) {
+	cpSnippet(snippet, currentTarget, data) {
 		snippet = this.currentSnippet(snippet, currentTarget);
-		if (snippet in this.snippets) {
-			let queryElem = this.sqlQuery.querySelector('.query');
-			queryElem.value = this.snippets[snippet].replace(/\n\s+/g, '\n');
-		}
-	}
-	
-	copySnippet(snippet, currentTarget, data) {
-		snippet = this.currentSnippet(snippet, currentTarget);
-		let query = data || this.snippets[snippet].replace(/\n\s+/g, '\n');
+		let query = data || this.snippets[snippet];
+		query = this.unindent(query);
 		navigator.clipboard.writeText(query).then(
 			() => {
 				//alert('clipboard successfully set');
@@ -346,38 +327,58 @@ class SQLQuery {
 		);
 	}
 	
-	unfoldSnippet(snippet, currentTarget) {
-		snippet = this.currentSnippet(snippet, currentTarget);
-		let query = this.snippets[snippet];
+	ppQuery() {
+		let queryElem = this.sqlQuery.querySelector('.query');
+		let query = queryElem.value;
 		query = this.prepQuery(query);
-		return this.copySnippet(
-			snippet, currentTarget,
-			query.replace(/\n\s+/g, '\n'));
+		queryElem.value = query;
 	}
 	
-	runSnippet(snippet, currentTarget) {
-		snippet = this.currentSnippet(snippet, currentTarget);
-		if (snippet in this.snippets) {
-			return this.runQuery(this.snippets[snippet]);
-		}
+	logQuery() {
+		let queryElem = this.sqlQuery.querySelector('.query');
+		let query = queryElem.value;
+		console.log('query0:', queryElem, query);
+		query = this.prepQuery(query);
+		console.log('query:', query);
 	}
 	
-	mapSnippet(snippet, currentTarget) {
-		snippet = this.currentSnippet(snippet, currentTarget);
-		if (snippet in this.snippets) {
-			return this.mapQuery(this.snippets[snippet]);
-		}
-	}
-	
-	async runQuery(query) {
+	async runQuery(query, timeLabel) {
 		let params = this.buildParams();
 		let queryElem = this.sqlQuery.querySelector('.query');
 		
-		let [rows, cols] = await this.sql(query || queryElem.value, params);
-		this.showTable(rows, cols);
+		let started = Date.now();
+		let [rows, cols] = await this.sql(query || queryElem.value, params, timeLabel);
+		this.showTable(rows, cols, Date.now() - started);
 	}
 	
-	showTable(results, colnames, logRows=false) {
+	hexBytes() {
+		if (!this.byteToHex) {
+			this.byteToHex = [];
+			for (let n = 0; n <= 0xff; ++n) {
+				const hexOctet = n.toString(16).padStart(2, '0').toUpperCase();
+				this.byteToHex.push(hexOctet);
+			}
+		}
+		return this.byteToHex;
+	}
+	
+	hex(arrayBuffer) {
+		const buff = new Uint8Array(arrayBuffer);
+		return this.hexUint(buff);
+	}
+	
+	hexUint(buff) {
+		const hexOctets = []; // new Array(buff.length) is even faster (preallocates necessary array size), then use hexOctets[i] instead of .push()
+		let byteToHex = this.hexBytes();
+		
+		for (let i = 0; i < buff.length; ++i) {
+			hexOctets.push(byteToHex[buff[i]]);
+		}
+		return hexOctets.join('');
+	}
+	
+	showTable(results, colnames, duration=0) {
+		let logRows=false;
 		let target = this.sqlQuery.querySelector('.sqlResults');
 		target.textContent = '';
 		if (results.length) {
@@ -394,20 +395,38 @@ class SQLQuery {
 					console.log(row);
 				}
 				row = colnames
-					//.map(col => `<td>${row[col]}</td>`)
 					.map(col => row[col])
-					.map(col => `<td>${typeof col === 'object' ? JSON.stringify(col) : col}</td>`)
+					.map(col => {
+						if (typeof col === 'object') {
+							if (col.constructor == Uint8Array) {
+								col = `x'${this.hexUint(col)}'`;
+							}
+							else if (col.constructor == ArrayBuffer) {
+								col = `x'${this.hex(col)}'`;
+							}
+							else {
+								col = JSON.stringify(col);
+							}
+						}
+						return `<td>${col}</td>`;
+					})
 					.reduce((acc, curr) => acc + curr, '');
 				target.insertAdjacentHTML(
 					'beforeend',
 					`<tr>${row}</tr>`
 				);
 			}
+			target.insertAdjacentHTML(
+				'beforeend',
+				`<tr><td colspan="${colnames.length || 1}">
+					<span style="background-color: 'green';">${duration} ms</span>
+				</td></tr>`
+			);
 		}
 		else {
 			target.insertAdjacentHTML(
 				'beforeend',
-				`<tr><td>no results</td></tr>`
+				`<tr><td><span style="background-color: 'green';">no results</span></td></tr>`
 			);
 		}
 	}
@@ -418,7 +437,7 @@ class SQLQuery {
 		
 		let [rows, cols] = await this.sql(query || queryElem.value, params);
 		if (!cols.includes('feature')) {
-			console.error('provide a geojson column named "feature"');
+			alert('provide a geojson column named "feature"');
 			return;
 		}
 		this.showLayer(rows);
@@ -426,9 +445,12 @@ class SQLQuery {
 	
 	showLayer(rows) {
 		let title = prompt(
-			'the layer title please',
+			'the layer title please. required',
 			'query layer',
 		);
+		if (!title) {
+			return;
+		}
 		let vectorSource = new ol.source.Vector();
 		let dataProjection = 'EPSG:900913';
 		let featureProjection = 'EPSG:3857';
@@ -490,6 +512,34 @@ class SQLQuery {
 		}
 	}
 	
+	unindent(text, tabSpaces=4) {
+		let spaceRep = ' '.repeat(tabSpaces);
+		let minIndent = text.match(/^\s+/gm)
+			.map(indent => indent
+				.replaceAll(spaceRep, '\t')
+				.length)
+			.reduce((a, b) => Math.min(a, b));
+		text = text.replace(
+			/^\s+/gm,
+			match => match.replaceAll(spaceRep, '\t')
+		);
+		return text.replaceAll(
+			new RegExp('^' + '\t'.repeat(minIndent), 'gm'), '');
+	}
+	
+	indent = (text, nTabs=0, tabSpaces=4) => {
+		const nlRe = /\r\n|(?!\r\n)[\n-\r\x85\u2028\u2029]/;
+		text = this.unindent(text, tabSpaces);
+		let prefix = '\t'.repeat(nTabs);
+		text = text.split(nlRe)
+			.map(line => prefix + line)
+			.reduce((a, b) => a + '\n' + b)
+			;
+		console.log(nTabs, text);
+		//console.log(text);
+		return text;
+	}
+	
 	uncomment(text) {
 		let commentRe = /(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)|(--.*)/g;
 		return text.replaceAll(commentRe, '');
@@ -500,14 +550,18 @@ class SQLQuery {
 		if (uncomment) {
 			query = this.uncomment(query);
 		}
+		let depth = 0;
 		const replacer = (match, snippet) => {
-			let replaced = this.snippets[snippet].replace(snippetRe, replacer)
+			let replaced = this.snippets[snippet];
+			++depth;
+			replaced = this.indent(replaced, depth);
+			replaced = `(\n${replaced})`;
+			replaced = replaced.replace(snippetRe, replacer);
+			--depth;
 			if (uncomment) {
 				replaced = this.uncomment(replaced);
 			}
-			return `(
-				${replaced}
-			)`;
+			return replaced;
 		};
 		return query.replace(snippetRe, replacer);
 	}
@@ -539,34 +593,114 @@ class SQLQuery {
 		return [params, query];
 	}
 	
-	async sql(query, params={}) {
+	async sql(query, params={}, timeLabel) {
 		[params, query] = this.prepKeys(params, query);
+		if (timeLabel) {
+			console.time(timeLabel);
+		}
 		let rs = this.db.exec(query, params).get;
+		console.log('rs', rs);
 		let cols = await rs.cols;
 		let rows = await rs.objs;
+		if (timeLabel) {
+			console.timeEnd(timeLabel);
+		}
 		return [rows, cols];
 	}
 	
 	buildForm() {
 		let html = `
-			<table border="0"><tbody class="sqlParams"></tbody></table>
-			<div>
-				<button class="add-param">add param</button>
-				<button class="make-params">make params</button>
-				<button class="run-query">run</button>
-				<button class="map-query">map</button>
+			<style>
+				/*
+				* {
+					margin: 0;
+					padding: 0;
+				}
+				body {
+					background: white;
+				}
+				.container {
+					border: 1px solid grey;
+					margin: 1rem;
+				}
+				*/
+				[data-tab-info] {
+					display: none;
+				}
+				.active[data-tab-info] {
+					display: block;
+				}
+				.tab-content {
+					margin-top: 1rem;
+					padding-left: 1rem;
+					font-size: 20px;
+					font-family: sans-serif;
+					font-weight: bold;
+					color: rgb(0, 0, 0);
+				}
+				.tabs {
+					border-bottom: 1px solid grey;
+					background-color: rgb(16, 153, 9);
+					font-size: 25px;
+					color: rgb(0, 0, 0);
+					display: flex;
+					margin: 0;
+				}
+				.tabs span {
+					background: rgb(16, 153, 9);
+					padding: 10px;
+					border: 1px solid rgb(255, 255, 255);
+				}
+				.tabs span:hover {
+					background: rgb(55, 219, 46);
+					cursor: pointer;
+					color: black;
+				}
+			</style>
+			<div class="tabs">
+				<span data-tab-value=".tab_1">snippets</span>
+				<span data-tab-value=".tab_2">query 1</span>
 			</div>
-			<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
-			<table border="1"><tbody class="snippetsMenu"></tbody></table>
-			<table border="1"><tbody class="sqlResults"></tbody></table>
+			<div class="tab-content">
+				<div class="tabs__tab active tab_1" data-tab-info>
+					<table border="1"><tbody class="snippetsMenu"></tbody></table>
+				</div>
+				<div class="tabs__tab tab_2" data-tab-info>
+					<table border="0"><tbody class="sqlParams"></tbody></table>
+					<div>
+						<button class="add-param">add param</button>
+						<button class="make-params">make params</button>
+						<button class="pp-query">pp</button>
+						<button class="log-query">log</button>
+						<button class="run-query">run</button>
+						<button class="map-query">map</button>
+					</div>
+					<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
+					<table border="1"><tbody class="sqlResults"></tbody></table>
+				</div>
+			</div>
 		`;
 		this.sqlQuery.textContent = '';
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
 		this.buildSnippetsMenu();
 		this.sqlQuery.querySelector('button.add-param').addEventListener('click', e => {this.addParam();});
 		this.sqlQuery.querySelector('button.make-params').addEventListener('click', e => {this.makeParams();});
+		this.sqlQuery.querySelector('button.pp-query').addEventListener('click', e => {this.ppQuery();});
+		this.sqlQuery.querySelector('button.log-query').addEventListener('click', e => {this.logQuery();});
 		this.sqlQuery.querySelector('button.run-query').addEventListener('click', e => {this.runQuery();});
 		this.sqlQuery.querySelector('button.map-query').addEventListener('click', e => {this.mapQuery();});
+		const tabs = this.sqlQuery.querySelectorAll('[data-tab-value]');
+		const tabInfos = this.sqlQuery.querySelectorAll('[data-tab-info]');
+		tabs.forEach(tab => {
+			tab.addEventListener('click', () => {
+				const target = this.sqlQuery
+					.querySelector(tab.dataset.tabValue);
+				tabInfos.forEach(tabInfo => {
+					tabInfo.classList.remove('active')
+				});
+				target.classList.add('active');
+			});
+		});
 	}
 };
 

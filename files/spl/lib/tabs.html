@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<style>
+/*This code is styling the HTML elements in the document. Here is a breakdown of
+  what each part of the code does:*/
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			background: white;
+		}
+		.container {
+			border: 1px solid grey;
+			margin: 1rem;
+		}
+		[data-tab-info] {
+			display: none;
+		}
+		.active[data-tab-info] {
+			display: block;
+		}
+		.tab-content {
+			margin-top: 1rem;
+			padding-left: 1rem;
+			font-size: 20px;
+			font-family: sans-serif;
+			font-weight: bold;
+			color: rgb(0, 0, 0);
+		}
+		.tabs {
+			border-bottom: 1px solid grey;
+			background-color: rgb(16, 153, 9);
+			font-size: 25px;
+			color: rgb(0, 0, 0);
+			display: flex;
+			margin: 0;
+		}
+		.tabs span {
+			background: rgb(16, 153, 9);
+			padding: 10px;
+			border: 1px solid rgb(255, 255, 255);
+		}
+		.tabs span:hover {
+			background: rgb(55, 219, 46);
+			cursor: pointer;
+			color: black;
+		}
+	</style>
+</head>
+<body>
+	<!-- Body Container -->
+	<div class="container">
+		<!-- Tabs Detail -->
+		<div class="tabs">
+			<span data-tab-value="#tab_1">Tab 1</span>
+			<span data-tab-value="#tab_2">Tab 2</span>
+			<span data-tab-value="#tab_3">Tab 3</span>
+		</div>
+		<!-- Tab content -->
+		<div class="tab-content">
+			<div class="tabs__tab active" id="tab_1" data-tab-info>
+				<p>Welcome to GeeksforGeek.</p>
+			</div>
+			<div class="tabs__tab" id="tab_2" data-tab-info>
+				<p>Hello Everyone.</p>
+			</div>
+			<div class="tabs__tab" id="tab_3" data-tab-info>
+				<p>Learn cool stuff.</p>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		// function to get each tab details
+		const tabs = document.querySelectorAll('[data-tab-value]')
+		const tabInfos = document.querySelectorAll('[data-tab-info]')
+		tabs.forEach(tab => {
+			tab.addEventListener('click', () => {
+				const target = document
+					.querySelector(tab.dataset.tabValue);
+				tabInfos.forEach(tabInfo => {
+					tabInfo.classList.remove('active')
+				})
+				target.classList.add('active');
+			})
+		})
+	</script>
+</body>
+</html>
