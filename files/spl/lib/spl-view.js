@@ -566,8 +566,8 @@ async function london_gpkg(map) {
 let map = build_map('map');
 map.addLayer(osm_layer());
 
-let db = await london_gpkg(map);
-//let db = await spl_db();
+//let db = await london_gpkg(map);
+let db = await spl_db();
 
 
 show_map(map, displayProjection, "#hit-tolerance");

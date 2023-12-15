@@ -177,6 +177,7 @@ class SQLQuery {
 		if (map) {
 			this.map = map;
 		}
+		this.tabCounter = 0;
 		this.buildForm();
 	}
 	
@@ -190,7 +191,12 @@ class SQLQuery {
 		val.placeholder = placeholder;
 	}
 	
-	addParam(name='') {
+	queryTab(_this) {
+		let tab = _this.closest('div[data-tab-info]');
+		return tab;
+	}
+	
+	addParam(button, name='') {
 		function typeOptions(fieldTypes) {
 			return Object.keys(fieldTypes)
 				.map(type => `<option value="${type}" ${type == 'NULL' ? 'selected="selected"' : ''}>${type}</option>`)
@@ -213,18 +219,20 @@ class SQLQuery {
 				<td style="width: 10%"><button class="del-param">del</button></td>
 			</tr>
 			`;
-		let params = this.sqlQuery.querySelector('.sqlParams');
+		let params = this.queryTab(button)
+			.querySelector('.sqlParams');
 		params.insertAdjacentHTML('beforeend', row);
 		let newVar = params.querySelector('tr:last-child');
-		newVar.querySelector('input.variable').addEventListener('blur', e => {this.buildParams(false);});
+		newVar.querySelector('input.variable').addEventListener('blur', e => {this.buildParams(e.currentTarget, false);});
 		newVar.querySelector('select.type').addEventListener('change', e => {this.paramType(e.currentTarget);});
-		newVar.querySelector('input.value').addEventListener('blur', e => {this.buildParams();});
+		newVar.querySelector('input.value').addEventListener('blur', e => {this.buildParams(e.currentTarget);});
 		newVar.querySelector('button.del-param').addEventListener('click', e => {this.delParam(e.currentTarget);});
 		newVar.querySelector('input.variable').focus();
 	}
 	
-	buildParams(testValues=true) {
-		let paramsDiv = this.sqlQuery.querySelector('.sqlParams');
+	buildParams(button, testValues=true) {
+		let paramsDiv = this.queryTab(button)
+			.querySelector('.sqlParams');
 		let rows = paramsDiv.querySelectorAll('tr');
 		let params = {};
 		const nameRegex = /^[a-z_A-Z][a-z_A-Z0-9]*$/;
@@ -256,14 +264,15 @@ class SQLQuery {
 		return params;
 	}
 	
-	makeParams() {
-		let params = this.buildParams(false);
-		let query = this.sqlQuery.querySelector('.query').value;
+	makeParams(button) {
+		let params = this.buildParams(button, false);
+		let query = this.queryTab(button)
+			.querySelector('.query').value;
 		let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
 		let param;
 		while (param = paramRe.exec(query)) {
 			if (!(param[1] in params)) {
-				this.addParam(param[1]);
+				this.addParam(button, param[1]);
 				params[param[1]] = null;
 			}
 		}
@@ -283,14 +292,18 @@ class SQLQuery {
 				`<tr>
 				<td class="snippet-name">${name}</td>
 				<td><button class="snippet-cp">cp</button></td>
+				<td><button class="snippet-open">open</button></td>
 				</tr>`
 			)
 			.reduce((a, b) => a + b, '');
-		let target = this.sqlQuery.querySelector('.snippetsMenu');
+		let target = this.sqlQuery
+			.querySelector('.snippetsMenu');
 		target.textContent = '';
 		target.insertAdjacentHTML('beforeend', snippets);
 		target.querySelectorAll('button.snippet-cp').forEach(
 			button => button.addEventListener('click', e => {this.cpSnippet(null, e.currentTarget);}));
+		target.querySelectorAll('button.snippet-open').forEach(
+			button => button.addEventListener('click', e => {this.openSnippet(null, e.currentTarget);}));
 	}
 	
 	snippetQuery(snippet, preprocessed=false) {
@@ -327,28 +340,40 @@ class SQLQuery {
 		);
 	}
 	
-	ppQuery() {
-		let queryElem = this.sqlQuery.querySelector('.query');
+	openSnippet(snippet, currentTarget, data) {
+		snippet = this.currentSnippet(snippet, currentTarget);
+		let query = data || this.snippets[snippet];
+		query = this.unindent(query);
+		this.addQueryTab(snippet, query);
+	}
+	
+	ppQuery(button) {
+		let queryElem = this.queryTab(button)
+			.querySelector('.query');
 		let query = queryElem.value;
 		query = this.prepQuery(query);
 		queryElem.value = query;
 	}
 	
-	logQuery() {
-		let queryElem = this.sqlQuery.querySelector('.query');
+	logQuery(button) {
+		let queryElem = this.queryTab(button)
+			.querySelector('.query');
 		let query = queryElem.value;
 		console.log('query0:', queryElem, query);
 		query = this.prepQuery(query);
 		console.log('query:', query);
 	}
 	
-	async runQuery(query, timeLabel) {
-		let params = this.buildParams();
-		let queryElem = this.sqlQuery.querySelector('.query');
+	async runQuery(button, query, timeLabel) {
+		let params = this.buildParams(button);
+		let queryElem = this.queryTab(button)
+			.querySelector('.query');
+		let target = this.queryTab(button)
+			.querySelector('.sqlResults');
 		
 		let started = Date.now();
 		let [rows, cols] = await this.sql(query || queryElem.value, params, timeLabel);
-		this.showTable(rows, cols, Date.now() - started);
+		this.showTable(target, rows, cols, Date.now() - started);
 	}
 	
 	hexBytes() {
@@ -367,7 +392,7 @@ class SQLQuery {
 		return this.hexUint(buff);
 	}
 	
-	hexUint(buff) {
+	hexUint8(buff) {
 		const hexOctets = []; // new Array(buff.length) is even faster (preallocates necessary array size), then use hexOctets[i] instead of .push()
 		let byteToHex = this.hexBytes();
 		
@@ -377,9 +402,8 @@ class SQLQuery {
 		return hexOctets.join('');
 	}
 	
-	showTable(results, colnames, duration=0) {
+	showTable(target, results, colnames, duration=0) {
 		let logRows=false;
-		let target = this.sqlQuery.querySelector('.sqlResults');
 		target.textContent = '';
 		if (results.length) {
 			//let colnames = Object.keys(results[0]);
@@ -399,7 +423,7 @@ class SQLQuery {
 					.map(col => {
 						if (typeof col === 'object') {
 							if (col.constructor == Uint8Array) {
-								col = `x'${this.hexUint(col)}'`;
+								col = `x'${this.hexUint8(col)}'`;
 							}
 							else if (col.constructor == ArrayBuffer) {
 								col = `x'${this.hex(col)}'`;
@@ -431,9 +455,10 @@ class SQLQuery {
 		}
 	}
 	
-	async mapQuery(query) {
-		let params = this.buildParams();
-		let queryElem = this.sqlQuery.querySelector('.query');
+	async mapQuery(button, query) {
+		let params = this.buildParams(button);
+		let queryElem = this.queryTab(button)
+			.querySelector('.query');
 		
 		let [rows, cols] = await this.sql(query || queryElem.value, params);
 		if (!cols.includes('feature')) {
@@ -632,75 +657,169 @@ class SQLQuery {
 				}
 				.tab-content {
 					margin-top: 1rem;
+					/*
 					padding-left: 1rem;
 					font-size: 20px;
 					font-family: sans-serif;
 					font-weight: bold;
 					color: rgb(0, 0, 0);
+					*/
 				}
 				.tabs {
 					border-bottom: 1px solid grey;
 					background-color: rgb(16, 153, 9);
+					/*
 					font-size: 25px;
+					*/
 					color: rgb(0, 0, 0);
+					/***
 					display: flex;
+					***/
 					margin: 0;
 				}
 				.tabs span {
 					background: rgb(16, 153, 9);
 					padding: 10px;
 					border: 1px solid rgb(255, 255, 255);
+					
+					float: inline-start;
 				}
-				.tabs span:hover {
+				.tabs span:hover, .tabs span.active {
 					background: rgb(55, 219, 46);
 					cursor: pointer;
 					color: black;
 				}
+				.tabs span.new-query {
+					float: inline-end !important;
+				}
+				.tabs span.tab-close {
+					padding: 0;
+					margin: 0;
+					border: 0;
+					float: none;
+				}
+				.tab-content {
+					clear: both;
+				}
 			</style>
 			<div class="tabs">
-				<span data-tab-value=".tab_1">snippets</span>
-				<span data-tab-value=".tab_2">query 1</span>
+				<span class="new-query">+</span>
 			</div>
 			<div class="tab-content">
-				<div class="tabs__tab active tab_1" data-tab-info>
-					<table border="1"><tbody class="snippetsMenu"></tbody></table>
-				</div>
-				<div class="tabs__tab tab_2" data-tab-info>
-					<table border="0"><tbody class="sqlParams"></tbody></table>
-					<div>
-						<button class="add-param">add param</button>
-						<button class="make-params">make params</button>
-						<button class="pp-query">pp</button>
-						<button class="log-query">log</button>
-						<button class="run-query">run</button>
-						<button class="map-query">map</button>
-					</div>
-					<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
-					<table border="1"><tbody class="sqlResults"></tbody></table>
-				</div>
 			</div>
 		`;
 		this.sqlQuery.textContent = '';
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
+		this.createTab(
+			'snippets', `
+			<table border="1"><tbody class="snippetsMenu"></tbody></table>`
+		);
+		this.sqlQuery.querySelector('.new-query')
+			.addEventListener('click', e => {this.addQueryTab()});
 		this.buildSnippetsMenu();
-		this.sqlQuery.querySelector('button.add-param').addEventListener('click', e => {this.addParam();});
-		this.sqlQuery.querySelector('button.make-params').addEventListener('click', e => {this.makeParams();});
-		this.sqlQuery.querySelector('button.pp-query').addEventListener('click', e => {this.ppQuery();});
-		this.sqlQuery.querySelector('button.log-query').addEventListener('click', e => {this.logQuery();});
-		this.sqlQuery.querySelector('button.run-query').addEventListener('click', e => {this.runQuery();});
-		this.sqlQuery.querySelector('button.map-query').addEventListener('click', e => {this.mapQuery();});
-		const tabs = this.sqlQuery.querySelectorAll('[data-tab-value]');
-		const tabInfos = this.sqlQuery.querySelectorAll('[data-tab-info]');
+		this.addQueryTab();
+	}
+	
+	tabClick = tab => {
+		const tabs = this.sqlQuery
+			.querySelectorAll('[data-tab-value]');
 		tabs.forEach(tab => {
-			tab.addEventListener('click', () => {
-				const target = this.sqlQuery
-					.querySelector(tab.dataset.tabValue);
-				tabInfos.forEach(tabInfo => {
-					tabInfo.classList.remove('active')
-				});
-				target.classList.add('active');
-			});
+			tab.classList.remove('active')
 		});
+		const target = this.sqlQuery
+			.querySelector(tab.dataset.tabValue);
+		const tabInfos = this.sqlQuery
+			.querySelectorAll('[data-tab-info]');
+		tabInfos.forEach(tabInfo => {
+			tabInfo.classList.remove('active')
+		});
+		if (tab && target) {
+			tab.classList.add('active');
+			target.classList.add('active');
+		}
+	}
+	
+	tabOnClick = tab => {
+		tab.addEventListener('click', e => {this.tabClick(tab)});
+	}
+	
+	createTab(label, content, withClose=false) {
+		let _class = `tab_${++this.tabCounter}`;
+		if (!label) {
+			label = `query ${this.tabCounter}`;
+		}
+		let tabs = this.sqlQuery.querySelector('.tabs');
+		let closeX = withClose ? '&nbsp;<span class="tab-close">x</span>' : '';
+		tabs.insertAdjacentHTML(
+			'beforeend',
+			`<span data-tab-value=".${_class}">
+				${label}${closeX}
+			</span>`
+		);
+		let tabInfos = this.sqlQuery.querySelector('.tab-content');
+		tabInfos.insertAdjacentHTML(
+			'beforeend',
+			`<div class="tabs__tab ${_class}" data-tab-info="${_class}">
+				${content}
+			</div>`
+		);
+		let tab = tabs.querySelector(`span[data-tab-value=".${_class}"]`);
+		if (withClose) {
+			tab.querySelector('.tab-close')
+				.addEventListener('click', e => {
+					this.tabClose(e.currentTarget);
+					e.stopPropagation();
+				});
+		}
+		let tabInfo = tabInfos.querySelector(`div[data-tab-info="${_class}"]`);
+		this.tabOnClick(tab);
+		return [tab, tabInfo];
+	}
+	
+	addQueryTab = (label, query='') => {
+		let html = `
+			<table border="0"><tbody class="sqlParams"></tbody></table>
+			<div>
+				<button class="add-param">add param</button>
+				<button class="make-params">make params</button>
+				<button class="pp-query">pp</button>
+				<button class="log-query">log</button>
+				<button class="run-query">run</button>
+				<button class="map-query">map</button>
+			</div>
+			<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
+			<table border="1"><tbody class="sqlResults"></tbody></table>
+			`;
+		let [tab, tabInfo] = this.createTab(label, html, true);
+		tabInfo.querySelector('.query').value = query;
+		tabInfo.querySelector('button.add-param')
+			.addEventListener('click', e => {this.addParam(e.currentTarget);});
+		tabInfo.querySelector('button.make-params')
+			.addEventListener('click', e => {this.makeParams(e.currentTarget);});
+		tabInfo.querySelector('button.pp-query')
+			.addEventListener('click', e => {this.ppQuery(e.currentTarget);});
+		tabInfo.querySelector('button.log-query')
+			.addEventListener('click', e => {this.logQuery(e.currentTarget);});
+		tabInfo.querySelector('button.run-query')
+			.addEventListener('click', e => {this.runQuery(e.currentTarget);});
+		tabInfo.querySelector('button.map-query')
+			.addEventListener('click', e => {this.mapQuery(e.currentTarget);});
+		this.tabClick(tab);
+	}
+		
+	tabClose = button => {
+		let tab = button.closest('span[data-tab-value]');
+		let target = this.sqlQuery
+			.querySelector(tab.dataset.tabValue);
+		let tab_1;
+		if (Object.values(target.classList).includes('active')) {
+			tab_1 = this.sqlQuery.querySelector('span[data-tab-value=".tab_1"]');
+		}
+		tab.remove();
+		target.remove();
+		if (tab_1) {
+			this.tabClick(tab_1);
+		}
 	}
 };
 
