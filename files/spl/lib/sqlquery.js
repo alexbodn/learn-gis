@@ -13,11 +13,14 @@ class SQLQuery {
 	};
 	
 	snippets = {
-		sqliteAllTables: `
+		allTables: `
 			SELECT name
 			FROM sqlite_schema
 			WHERE type ='table' AND 
 				name NOT LIKE 'sqlite_%';`,
+		tableFields: `
+			SELECT *
+			FROM pragma_table_info('table_name')`,
 		allDbs: `
 			select * 
 			from PRAGMA_database_list`,
@@ -408,7 +411,7 @@ class SQLQuery {
 		if (results.length) {
 			//let colnames = Object.keys(results[0]);
 			let columns = colnames
-				.map(col => `<th>${col}</th>`)
+				.map(col => `<th style="position: sticky;">${col}</th>`)
 				.reduce((acc, curr) => acc + curr, '');
 			target.insertAdjacentHTML(
 				'beforeend',
@@ -422,7 +425,10 @@ class SQLQuery {
 					.map(col => row[col])
 					.map(col => {
 						if (typeof col === 'object') {
-							if (col.constructor == Uint8Array) {
+							if (col === null) {
+								col = '&lt;null&gt;'
+							}
+							else if (col.constructor == Uint8Array) {
 								col = `x'${this.hexUint8(col)}'`;
 							}
 							else if (col.constructor == ArrayBuffer) {
@@ -624,7 +630,6 @@ class SQLQuery {
 			console.time(timeLabel);
 		}
 		let rs = this.db.exec(query, params).get;
-		console.log('rs', rs);
 		let cols = await rs.cols;
 		let rows = await rs.objs;
 		if (timeLabel) {

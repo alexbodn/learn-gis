@@ -138,6 +138,7 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 		trash: true,
 	});
 	map.addControl(layerSwitcher);
+	/**/
 	let scaleLine = new ol.control.ScaleLine({
 		//units: 'degrees',
 		//units: 'imperial',
@@ -145,6 +146,7 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 		bar: true,
 	});
 	map.addControl(scaleLine);
+	/**/
 	
 	function styleOnClick(feature, resolution, dom) {
 		let style = commonClickStyle;

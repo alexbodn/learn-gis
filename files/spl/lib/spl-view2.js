@@ -1,122 +1,220 @@
 
 import SPL from '../dist/index.js';
 
-async function build_source(db, tableInfo, displayProjection) {
+async function load_features(db, tableInfo, target_srs) {
+	let tableDataProjection = tableInfo.srs_code;
 	let table_name = tableInfo.table_name;
-	let tableDataProjection = tableInfo.srs_name;
-	// Check if we have a definition for the data projection (SRS)
-	if (!ol.proj.get(tableDataProjection)) {
-		throw new Error("Missing data projection [" +
-			tableDataProjection + '] for table "' + table_name +
-			'" - can be added beforehand with ol/proj/proj4');
-	}
 	
-	let vectorSource = new ol.source.Vector();
-	let geometry_column_name = tableInfo.geometry_column_name;
+	let geometry_columns = tableInfo.geometry_columns;
 	let label = `select ${table_name}`;
 	console.time(label);
-	let allProperties = await db.exec(`
-		SELECT *
+	let colnames = await db.exec(`
+		SELECT name
+		FROM pragma_table_info('${table_name}')
+	`).get.flat;
+	
+	let geometryColumns = geometry_columns
+		.reduce((a, b) => {
+			a[b.column_name] = {
+				srs_id: b.srs_id,
+				srs_code: b.srs_code,
+			};
+			return a;
+		}, {});
+	
+	if (!target_srs) {
+		if (geometry_columns.length > 1) {
+			for (let c in geometry_columns) {
+				if (c > 0 && geometry_columns[c].srs_id !== geometry_columns[0].srs_id) {
+					target_srs = {
+						srs_code: tableInfo.srs_code,
+						srs_id: tableInfo.srs_id,
+					};
+				}
+			}
+		}
+		else {
+			target_srs = geometry_columns[0];
+		}
+	}
+	
+	let selectColumns = colnames
+		.map(name => {
+			let prefix = '';
+			if (
+				name in geometryColumns &&
+				geometryColumns[name].srs_id !== target_srs.srs_id
+			) {
+				prefix = `
+					asgeojson(
+					st_transform(
+						[${name}],
+						${target_srs.srs_id}
+					)
+					)
+					as `;
+			}
+			return prefix + `[${name}]`;
+		})
+		.join(', ');
+	let sqlData = await db.exec(`
+		SELECT ${selectColumns}
 		FROM [${table_name}]
 	`).get.objs;
 	console.timeEnd(label);
 	
-	label = `source ${table_name}`;
-	console.time(label);
-	let features;
-	const formatWKB = new ol.format.WKB();
-	const formatJson = new ol.format.GeoJSON({
-		dataProjection: tableDataProjection,
-		featureProjection: displayProjection,
-	});
-	for (let properties of allProperties) {
-		// Extract properties & geometry for a single feature
-		let geomProp = properties[geometry_column_name];
-		delete properties[geometry_column_name];
-		if (geomProp.hasOwnProperty('coordinates')) {
-			features = formatJson.readFeatures(geomProp);
+	let propertyColumns = colnames
+		.filter(name => !(name in geometryColumns));
+	
+	let features = [];
+	for (let sqlRow of sqlData) {
+		for (let [column_name, srs] of Object.entries(geometryColumns)) {
+			// Extract properties & geometry for a single feature
+			let properties = propertyColumns
+				.reduce((a, b) => {
+					a[b] = sqlRow[b];
+					return a;
+				}, {
+					origProjection: srs.srs_code
+				});
+			let feature = {
+				type: 'Feature',
+				properties: properties,
+				geometry: sqlRow[column_name],
+			};
+			features.push(feature);
 		}
-		else {
-			if (geomProp.constructor == ArrayBuffer) {
-				geomProp = new Uint8Array(geomProp);
+	}
+	let collection = {
+		type: 'FeatureCollection',
+		crs: {
+			type: "name",
+			properties: {
+				name: target_srs.srs_code
 			}
-			let featureWkb = parseGpkgGeom(geomProp);
-			/*
-			// DEBUG: show endianness of WKB data (can differ from header)
-			if (!vectorSource.getFeatures().length) {
-				console.log('WKB Geometry: ' +
-					(featureWkb[0] ? 'NDR (Little' : 'XDR (Big') + ' Endian)');
-			}
-			*/
-			// Put the feature into the vector source for the current table
-			features = formatWKB.readFeatures(featureWkb, {
-				dataProjection: tableDataProjection,
-				featureProjection: displayProjection
-			});
-		}
-		features[0].setProperties(properties);
-		vectorSource.addFeatures(features);
+		},
+		features: features,
+	};
+	if (0) {
+		let zip = new JSZip();
+		zip.file(
+			`${table_name}.geojson`,
+			JSON.stringify(collection, null, '\t'));
+		zip.generateAsync({
+			type: "blob",
+			compression: "DEFLATE"
+		})
+		.then((arc) => {
+			// see FileSaver.js
+			//saveAs(content, `${table_name}.zip`);
+			saveAs(arc, `${table_name}.zip`);
+		});
 	}
 	
-	// For information only, save details of original projection (SRS)
-	vectorSource.setProperties({origProjection: tableDataProjection});
-	console.timeEnd(label);
-	
-	return vectorSource;
+	return collection;
 }
 
-/**
- * Extract (SRS ID &) WKB from an OGC GeoPackage feature
- * (i.e. strip off the variable length header)
- * @param {object} gpkgBinGeom feature geometry property (includes header)
- * @returns feature geometry in WKB (Well Known Binary) format
- */
-function parseGpkgGeom(gpkgBinGeom) {
-	var flags = gpkgBinGeom[3];
-	var eFlags = (flags >> 1) & 7;
-	var envelopeSize;
-	switch (eFlags) {
-		case 0:
-			envelopeSize = 0;
-			break;
-		case 1:
-			envelopeSize = 32;
-			break;
-		case 2:
-		case 3:
-			envelopeSize = 48;
-			break;
-		case 4:
-			envelopeSize = 64;
-			break;
-		default:
-			throw new Error("Invalid geometry envelope size flag in GeoPackage");
+async function read_gpkg(db, target_srs) {
+	// table associated SLD styles loaded from GPKG
+	var sldsFromGpkg = {};
+	
+	// Extract all feature tables, SRS IDs and their geometry types
+	// Note the following fields are not extracted:
+	//	 gpkg_contents.identifier - title (QGIS: same as table_name)
+	//	 gpkg_contents.description - human readable (QGIS: blank)
+	//	 gpkg_geometry_columns.geometry_type_name
+	//	 - e.g. LINESTRING (but info also embedded in each feature)
+	let featureTable = await db.exec(`
+		SELECT
+			gpkg_contents.table_name,
+			CASE WHEN organization IS NULL THEN
+			'EPSG:'||cast(gpkg_contents.srs_id as text)
+			ELSE
+			organization||':'||organization_coordsys_id
+			END
+			AS srs_code,
+			gpkg_contents.srs_id
+		FROM gpkg_contents
+		LEFT OUTER JOIN gpkg_spatial_ref_sys
+			ON gpkg_spatial_ref_sys.srs_id=gpkg_contents.srs_id
+		WHERE gpkg_contents.data_type='features'
+	`).get.objs;
+	
+	let featureColumns = await db.exec(`
+		SELECT
+			table_name,
+			column_name,
+			CASE WHEN organization IS NULL
+			THEN
+			'EPSG:'||cast(gpkg_geometry_columns.srs_id as text)
+			ELSE
+			organization||':'||cast(organization_coordsys_id as text)
+			END
+			AS srs_code,
+			gpkg_geometry_columns.srs_id
+		FROM gpkg_geometry_columns
+		LEFT OUTER JOIN gpkg_spatial_ref_sys
+			ON gpkg_spatial_ref_sys.srs_id=gpkg_geometry_columns.srs_id
+	`).get.objs
+		.then(objs => {
+			return objs.reduce((a, b) => {
+				if (!(b.table_name in a)) {
+					a[b.table_name] = [];
+				}
+				a[b.table_name].push({
+					column_name: b.column_name,
+					srs_id: b.srs_id,
+					srs_code: b.srs_code,
+				});
+				return a;
+			}, {});
+		});
+	
+	for (let tableInfo of featureTable) {
+		if (tableInfo.table_name in featureColumns) {
+			tableInfo.geometry_columns = featureColumns[tableInfo.table_name];
+		}
 	}
-/*
-	// Extract SRS (EPSG code)
-	// (not required as given for whole table in gpkg_contents table)
-	var littleEndian = flags & 1;
-	var srs = gpkgBinGeom.subarray(4,8);
-	var srsId;
-	if (littleEndian) {
-		srsId = srs[0] + (srs[1]<<8) + (srs[2]<<16) + (srs[3]<<24);
-	} else {
-		srsId = srs[3] + (srs[2]<<8) + (srs[1]<<16) + (srs[0]<<24);
+	
+	let projections = await db.exec(`
+		SELECT
+			organization||':'||cast(organization_coordsys_id as text) as srs,
+			definition
+		FROM gpkg_spatial_ref_sys
+		WHERE srs_id>0 AND srs_id NOT IN (4326, 3857);
+	`).get.rows;
+	//todo run this with each loaded geojson
+	proj4.defs(projections);
+	
+	// Extract SLD styles for each layer (if styles included in the gpkg)
+	let has_layer_styles = await db.exec(`
+		SELECT count(*)
+		FROM gpkg_contents
+		WHERE table_name='layer_styles'
+	`).get.first;
+	//console.log('has_layer_styles', has_layer_styles);
+	if (has_layer_styles) {
+		let layer_styles = await db.exec(`
+			SELECT f_table_name, styleSLD
+			FROM layer_styles`).get.objs;
+		for (let row of layer_styles) {
+			sldsFromGpkg[row.f_table_name] = row.styleSLD;
+		}
 	}
-*/
-/*
-	// DEBUG: display other properties of the feature
-	console.log('gpkgBinGeom Header: ' + (littleEndian ? 'Little' : 'Big')
-		+ ' Endian');
-	console.log("gpkgBinGeom Magic: 0x${gpkgBinGeom[0].toString(16)}${gpkgBinGeom[1].toString(16)}");
-	console.log("gpkgBinGeom Version:", gpkgBinGeom[2]);
-	console.log("gpkgBinGeom Flags:", flags);
-	console.log("gpkgBinGeom srs_id:", srsId);
-	console.log("gpkgBinGeom envelope size (bytes):", envelopeSize);
-*/
-	// Extract WKB which starts after variable-size "envelope" field
-	var wkbOffset = envelopeSize + 8;
-	return gpkgBinGeom.subarray(wkbOffset);
+	
+	// For each table, extract geometry and other properties
+	// (Note: becomes OpenLayers-specific from here)
+	for (let tableInfo of featureTable) {
+		let table_name = tableInfo.table_name;
+
+		tableInfo.features = await load_features(
+			db, tableInfo, target_srs);
+		if (table_name in sldsFromGpkg) {
+			tableInfo.style = sldsFromGpkg[table_name];
+		}
+	}
+	
+	return featureTable;
 }
 
 /**
@@ -150,10 +248,14 @@ function init_sql() {
 		PRAGMA foreign_keys = 1;
 		PRAGMA recursive_triggers = 1;`;
 	let gpkg = `
+		/**/
+		SELECT EnableGpkgAmphibiousMode()
+		WHERE getgpkgmode()=0;
+		SELECT enablegpkgmode()
+		WHERE GetGpkgAmphibiousMode()=0;
+		/**/
 		SELECT
-			EnableGpkgAmphibiousMode(),
 			AutoGPKGStart(),
-			--enablegpkgmode(),
 			--AutoGPKGStop(),
 			''
 			WHERE EXISTS (
@@ -172,7 +274,7 @@ async function spl_db() {
 	const spl = await SPL(
 		{
 			autoGeoJSON: 0 ? false : {
-				precision: 6,
+				precision: 15,
 				options: 0,
 			},
 		},
@@ -212,7 +314,7 @@ async function spl_loadgpkg(gpkgUrl, fileName) {
 	const spl = await SPL(
 		{
 			autoGeoJSON: 0 ? false : {
-				precision: 6,
+				//precision: 6,
 				options: 0,
 			},
 		},
@@ -244,142 +346,19 @@ async function spl_loadgpkg(gpkgUrl, fileName) {
 			{ name: 'proj.db', data: projdbArrayBuffer }
 		]);
 	if (gpkgUrl && fileName) {
+		/*
 		await db.mount('data', [
 			{ name: fileName, data: gpkgArrayBuffer }
 		]);
+		db = await spl.db()
+			.load(`file:data/${fileName}?immutable=1`)
+		*/
+		db = await spl.db(gpkgArrayBuffer);
 	}
-	db = 
-	//spl.db()
-	//	.load(`file:data/${fileName}?immutable=1`)
-	spl.db(gpkgArrayBuffer)
-		.read(init_sql());
+	await db.read(init_sql());
 	//console.log('db loaded', db);
 	
 	return db;
-}
-
-async function read_gpkg(db, displayProjection) {
-	// Data and associated SLD styles loaded both from GPKG
-	var dataFromGpkg = {};
-	var sldsFromGpkg = {};
-	
-	// Extract all feature tables, SRS IDs and their geometry types
-	// Note the following fields are not extracted:
-	//	 gpkg_contents.identifier - title (QGIS: same as table_name)
-	//	 gpkg_contents.description - human readable (QGIS: blank)
-	//	 gpkg_geometry_columns.geometry_type_name
-	//	 - e.g. LINESTRING (but info also embedded in each feature)
-	let featureTable = await db.exec(`
-		SELECT
-			gpkg_contents.table_name,
-			CASE WHEN organization IS NULL THEN
-			'EPSG:'||cast(gpkg_contents.srs_id as text)
-			ELSE
-			organization||':'||organization_coordsys_id
-			END
-			AS srs_name,
-			gpkg_contents.srs_id,
-			min_x, min_y, max_x, max_y, 
-			gpkg_geometry_columns.column_name as geometry_column_name,
-			geometry_type_name
-		FROM gpkg_contents
-		INNER JOIN gpkg_geometry_columns
-			ON gpkg_contents.table_name=gpkg_geometry_columns.table_name
-		LEFT OUTER JOIN gpkg_spatial_ref_sys
-			ON gpkg_spatial_ref_sys.srs_id=gpkg_contents.srs_id
-		WHERE gpkg_contents.data_type='features'
-	`).get.objs;
-	
-	let projections = await db.exec(`
-		SELECT
-			organization||':'||organization_coordsys_id as srs,
-			definition
-		FROM gpkg_spatial_ref_sys
-		WHERE srs_id>0 AND srs_id NOT IN (4326, 3857);
-	`).get.rows;
-	proj4.defs(projections);
-	// Make non-built-in projections defined in proj4 available in OpenLayers.
-	// (must be done before GeoPackages are loaded)
-	ol.proj.proj4.register(proj4);
-	
-	// Extract SLD styles for each layer (if styles included in the gpkg)
-	let has_layer_styles = await db.exec(`
-		SELECT count(*)
-		FROM gpkg_contents
-		WHERE table_name='layer_styles'
-	`).get.first;
-	//console.log(has_layer_styles);
-	if (has_layer_styles) {
-		let layer_styles = await db.exec(`
-			SELECT f_table_name, styleSLD
-			FROM layer_styles`).get.objs;
-		for (let row of layer_styles) {
-			sldsFromGpkg[row.f_table_name] = row.styleSLD;
-		}
-	}
-	
-	// For each table, extract geometry and other properties
-	// (Note: becomes OpenLayers-specific from here)
-	for (let tableInfo of featureTable) {
-		let table_name = tableInfo.table_name;
-		let tableDataProjection = tableInfo.srs_name;
-		
-		tableInfo.vectorSource = await build_source(db, tableInfo, displayProjection);
-		if (table_name in sldsFromGpkg) {
-			tableInfo.style = sldsFromGpkg[table_name];
-		}
-	}
-	
-	return featureTable;
-}
-
-function extent_feature(tableInfo) {
-	return {
-		type: 'Feature',
-		geometry: {
-			type: 'Polygon',
-			coordinates: [
-				[
-					[tableInfo.min_x, tableInfo.min_y],
-					[tableInfo.max_x, tableInfo.min_y],
-					[tableInfo.max_x, tableInfo.max_y],
-					[tableInfo.min_x, tableInfo.max_y],
-					[tableInfo.min_x, tableInfo.min_y],
-				],
-			],
-		},
-	};
-}
-
-function extent_layer(tableInfo, displayProjection) {
-	let table_name = tableInfo.table_name;
-	let tableDataProjection = tableInfo.srs_name;
-	const extentObject = extent_feature(tableInfo);
-console.log(
-	'extents',
-	extentObject.geometry.coordinates[0],
-	tableInfo.vectorSource.getExtent()
-);
-	const formatJson = new ol.format.GeoJSON({
-			dataProjection: tableDataProjection,
-			featureProjection: displayProjection,
-		});
-	const extentSource = new ol.source.Vector({
-		features: formatJson.readFeatures(extentObject),
-	});
-	extentSource.setProperties({
-		origProjection: tableDataProjection
-	});
-	
-	const extentLayer = new ol.layer.Vector({
-		title: `extent ${table_name}`,
-		source: extentSource,
-	});
-	
-	if ('style' in tableInfo) {
-		applySLD(extentLayer, tableInfo.style);
-	}
-	return extentLayer;
 }
 
 function osm_layer() {
@@ -405,20 +384,33 @@ function build_map(target='map') {
 	});
 }
 
-async function gpkg_layers(db, displayProjection) {
-	let vectorLayers = [];
-	// For each table, extract geometry and other properties
-	let featureTable = await read_gpkg(db, displayProjection);
+async function gpkg_layers(featureTable, target_srs) {
 	// (Note: becomes OpenLayers-specific from here)
+	// Make non-built-in projections defined in proj4 available in OpenLayers.
+	// (must be done before GeoPackages are loaded)
+	ol.proj.proj4.register(proj4);
+	let vectorLayers = [];
 	for (let tableInfo of featureTable) {
+		let tableDataProjection = tableInfo.srs_code;
+		const formatJson = new ol.format.GeoJSON({
+			dataProjection: (tableInfo.features?.crs?.properties?.name) || 'CRS:84',
+			featureProjection: target_srs.srs_code,
+		});
 		let table_name = tableInfo.table_name;
-		let tableDataProjection = tableInfo.srs_name;
 		
 		let label = `layer ${table_name}`;
 		console.time(label);
+		
+		let features = formatJson.readFeatures(tableInfo.features);
+		let vectorSource = new ol.source.Vector({
+			features: features,
+		});
+		// For information only, save details of original projection (SRS)
+		vectorSource.setProperties({origProjection: tableDataProjection});
+		
 		const vectorLayer = new ol.layer.Vector({
 			title: table_name,
-			source: tableInfo.vectorSource,
+			source: vectorSource,
 			//style: colorStyle(),
 		});
 		console.timeEnd(label);
@@ -427,7 +419,6 @@ async function gpkg_layers(db, displayProjection) {
 			applySLD(vectorLayer, tableInfo.style);
 		}
 		vectorLayers.push(vectorLayer);
-		vectorLayers.push(extent_layer(tableInfo, displayProjection));
 	}
 	
 	return vectorLayers;
@@ -545,21 +536,38 @@ function handleJson(responses) {
 const url = new URL('./test/files/dbs/london.gpkg', window.location.href).toString();
 //const url = new URL('./test/files/dbs/Natural_Earth_QGIS_layers_and_styles.gpkg', window.location.href).toString();
 // Map View Projection
-const displayProjection = 'EPSG:3857';
-
+let displayProjection = {
+	srs_id: 3857,
+	srs_code: 'EPSG:3857',
+};
 
 async function london_gpkg(map) {
 	let db = await spl_loadgpkg(url, 'london_boroughs.gpkg');
-	let layers = await gpkg_layers(db, displayProjection);
+	// For each table, extract geometry and other properties
+	let featureTable = await read_gpkg(
+		db, /*displayProjection*/);
+	let layers = await gpkg_layers(
+		featureTable, displayProjection);
 	for (let layer of layers) {
 		map.addLayer(layer);
 	}
 	
+	//return db;
+	
 	let jsonUrls = [
 		'tfl_lines.json',
 		'tfl_stations.json',
-	].map(file => new URL(`./test/files/dbs/${file}`, window.location.href).toString());
-	await fetchAll(jsonUrls, 'json', {map, displayProjection}).then(handleJson);
+	].map(file => new URL(
+		`./test/files/dbs/${file}`,
+		window.location.href).toString());
+	await fetchAll(
+		jsonUrls,
+		'json',
+		{
+			map,
+			displayProjection: displayProjection.srs_code,
+		}
+	).then(handleJson);
 	
 	return db;
 }
@@ -571,7 +579,7 @@ let db = await london_gpkg(map);
 //let db = await spl_db();
 
 
-show_map(map, displayProjection, "#hit-tolerance");
+show_map(map, displayProjection.srs_code, "#hit-tolerance");
 
 let sqlConsole = new SQLQuery('div#sqlQuery', db, undefined, map);
 sqlConsole.addSnippets({

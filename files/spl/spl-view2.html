@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="./lib/leaflet.css">
+		<!--
+		<script src="./lib/leaflet-src.js"></script>
+		<script src="./lib/proj4.min.js"></script>
+		<script src="./lib/proj4leaflet.js"></script>
+		-->
+		
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css" />
+		<!--
+		<link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css" />
+		<link rel="stylesheet" href="./lib/ol.css" />
+		-->
+		<link rel="stylesheet" href="./lib/ol-layerswitcher.css" />
+		
+		<!--
+		<script src="./lib/lib.js"></script>
+		-->
+		<!--script type="text/javascript" src="./lib/build/index.js"></script-->
+		<!--
+		<script type="text/javascript" src="./lib/ol.js"></script>
+		-->
+		<script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
+		<!--
+		<script src="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js"></script>
+		-->
+		
+		<script type="text/javascript" src="./lib/ol-layerswitcher.js"></script>
+		<script type="text/javascript" src="./sld/sldreader.js"></script>
+		<!--
+		-->
+		
+		<script src="./lib/proj4.js"></script>
+		<style>
+			body {
+				/*margin: 0px;*/
+			}
+			.map {
+				width: 96vw;
+				height: 60vh;
+				border: solid 1px grey;
+				/*position: fixed;*/
+			}
+		</style>
+		<title>
+			Import a GeoPackage
+		</title>
+	</head>
+	<body>
+		<div id="sqlQuery"></div>
+		<div id="mouse-position"></div>
+		<div id="hit-tolerance"></div>
+		<div id="map" class="map"></div>
+		<!--div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div-->
+		
+		<script src="./lib/sqlquery.js"></script>
+		<script src="./lib/map_show.js"></script>
+		<script>
+			let gpkg = 'london.gpkg';
+			let jsons = [
+				];
+		</script>
+		
+		<script src="./lib/jszip.min.js" type="text/javascript"></script>
+		<script src="./lib/filesaver.js" type="text/javascript"></script>
+		<script type="module" src="./lib/spl-view2.js"></script>
+	</body>
+</html>
