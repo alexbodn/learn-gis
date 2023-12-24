@@ -1,4 +1,6 @@
 
+'use strict';
+
 import SPL from '../dist/index.js';
 
 async function load_features(db, tableInfo, target_srs) {
@@ -243,7 +245,7 @@ function applySLD(vectorLayer, text) {
 	);
 }
 
-function init_sql() {
+function init_sql(projFile) {
 	let pragmas = `
 		PRAGMA foreign_keys = 1;
 		PRAGMA recursive_triggers = 1;`;
@@ -265,7 +267,7 @@ function init_sql() {
 			);`;
 	let init = `
 		SELECT initspatialmetadatafull(1);
-		SELECT PROJ_SetDatabasePath('/proj/proj.db'); -- set proj.db path
+		SELECT PROJ_SetDatabasePath('${projFile}'); -- set proj.db path
 		`;
 	return pragmas + gpkg + init;
 }
@@ -294,7 +296,7 @@ async function spl_db() {
 			{ name: 'proj.db', data: projdbArrayBuffer }
 		])
 		.db()
-			.read(init_sql(true));
+			.read(init_sql('/proj/proj.db'));
 	//console.log('db loaded', db);
 	
 	return db;
@@ -310,6 +312,26 @@ function fetchAll(urls, method='text', options={}) {
 	)
 }
 
+async function fetchMounts(urlsInfo) {
+	let promises = [];
+	let mounts = {};
+	for (let info of urlsInfo) {
+		let promise = fetch(info.url)
+			.then(response => {
+				let method = info.method || 'text';
+				return response[method]();
+			})
+			.then(data => {
+				mounts[info.point] = {data, name: info.filename};
+				return {data, ...info};
+			})
+			.catch(error => ({error, url, ...info}))
+			;
+		promises.push(promise);
+	}
+	return Promise.all(promises).then(() => mounts);
+}
+
 async function spl_loadgpkg(gpkgUrl, fileName) {
 	const spl = await SPL(
 		{
@@ -321,41 +343,33 @@ async function spl_loadgpkg(gpkgUrl, fileName) {
 		[],
 	);
 	//console.log('spl loaded');
-	
-	let gpkgArrayBuffer, projdbArrayBuffer;
-	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
 	console.time('fetching gpkgs');
-	let urls = [projdbUrl];
+	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
+	let mountUrls = [
+		{url: projdbUrl, point: 'proj', filename: 'proj.db', method: 'arrayBuffer'}
+	];
 	if (gpkgUrl && fileName) {
-		urls.push(gpkgUrl);
+		mountUrls.push({url: gpkgUrl, point: 'data', filename: fileName, method: 'arrayBuffer'});
 	}
-	await fetchAll(urls, 'arrayBuffer').then(responses => {
-		for (let response of responses) {
-			if (response.url == projdbUrl) {
-				projdbArrayBuffer = response.data;
-			}
-			if (response.url == gpkgUrl) {
-				gpkgArrayBuffer = response.data;
-			}
-		}
-	});
+	let mounts = await fetchMounts(mountUrls);
 	console.timeEnd('fetching gpkgs');
+	console.time('mounting gpkgs');
+	for (let [point, info] of Object.entries(mounts)) {
+		spl.mount(point, [info]);
+	}
+	let db;
 	
-	let db = spl
-		.mount('proj', [
-			{ name: 'proj.db', data: projdbArrayBuffer }
-		]);
-	if (gpkgUrl && fileName) {
-		/*
-		await db.mount('data', [
-			{ name: fileName, data: gpkgArrayBuffer }
-		]);
+	if (fileName) {
+		if (0) {
 		db = await spl.db()
 			.load(`file:data/${fileName}?immutable=1`)
-		*/
-		db = await spl.db(gpkgArrayBuffer);
+		}
+		else {
+		db = await spl.db(mounts['data'].data);
+		}
 	}
-	await db.read(init_sql());
+	console.timeEnd('mounting gpkgs');
+	await db.read(init_sql('/proj/proj.db'));
 	//console.log('db loaded', db);
 	
 	return db;

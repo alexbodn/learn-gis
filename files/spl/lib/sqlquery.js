@@ -1,6 +1,33 @@
 
 'use strict';
 
+//todo
+//save results as json array of objects
+//eventually zipped
+//remove layer from the map
+
+// hex conversion code adapted from
+// https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
+const isHex = (maybeHex) => {
+	return /^[xX]\'(([a-f0-9A-F]){2})+\'$/.test(maybeHex);
+}
+
+const fromHexString = (hexString) => {
+	hexString = hexString.slice(2, -1);
+	return Uint8Array
+		.from(hexString.match(/(([a-f0-9A-F]){2})/g)
+		.map((byte) => parseInt(byte, 16)));
+}
+
+const toHexString = (bytes) => {
+	return "x'" + bytes
+		.reduce((str, byte) => {
+			return str + byte
+				.toString(16)
+				.padStart(2, '0');
+		}, '') + "'";
+}
+
 class SQLQuery {
 	
 	fieldTypes = {
@@ -8,7 +35,7 @@ class SQLQuery {
 		INTEGER: ['^([+-]?[1-9]\\d*([Ee][+-]?[1-9]\\d*)?|0)$', '', parseInt, false, '123'],
 		REAL: ['^[+-]?(([1-9]\\d*(\\.\\d*)?([Ee][+-]?[1-9]\\d*)?|0)|Infinity)$', '', parseFloat, false, '123.45'],
 		TEXT: ['.*', '', x => x, false, 'abc'],
-		BLOB: ['.*', '', x => x, false, 'abc'],
+		BLOB: ["^[xX]\\'(([a-f0-9A-F]){2})+\\'$", '', x => isHex(x) ? fromHexString(x).buffer : undefined, false, "x'4C696665'"],
 		DATETIME: ['^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$', '', x => parseDate(x), false, '2009-09-28T09:15:15'],
 	};
 	
@@ -226,9 +253,15 @@ class SQLQuery {
 			.querySelector('.sqlParams');
 		params.insertAdjacentHTML('beforeend', row);
 		let newVar = params.querySelector('tr:last-child');
-		newVar.querySelector('input.variable').addEventListener('blur', e => {this.buildParams(e.currentTarget, false);});
+		newVar.querySelector('input.variable').addEventListener('blur', e => {
+			this.buildParams(e.currentTarget, false);
+			e.stopPropagation();
+		});
 		newVar.querySelector('select.type').addEventListener('change', e => {this.paramType(e.currentTarget);});
-		newVar.querySelector('input.value').addEventListener('blur', e => {this.buildParams(e.currentTarget);});
+		newVar.querySelector('input.value').addEventListener('blur', e => {
+			this.buildParams(e.currentTarget);
+			e.stopPropagation();
+		});
 		newVar.querySelector('button.del-param').addEventListener('click', e => {this.delParam(e.currentTarget);});
 		newVar.querySelector('input.variable').focus();
 	}
@@ -369,13 +402,14 @@ class SQLQuery {
 	
 	async runQuery(button, query, timeLabel) {
 		let params = this.buildParams(button);
-		let queryElem = this.queryTab(button)
-			.querySelector('.query');
-		let target = this.queryTab(button)
-			.querySelector('.sqlResults');
+		let queryTab = this.queryTab(button);
+		let queryElem = queryTab.querySelector('.query');
+		let tabLabel = queryTab.dataset.tabLabel;
+		let target = queryTab.querySelector('.sqlResults');
 		
 		let started = Date.now();
-		let [rows, cols] = await this.sql(query || queryElem.value, params, timeLabel);
+		let [rows, cols] = await this.sql(
+			query || queryElem.value, params, timeLabel || tabLabel);
 		this.showTable(target, rows, cols, Date.now() - started);
 	}
 	
@@ -392,7 +426,7 @@ class SQLQuery {
 	
 	hex(arrayBuffer) {
 		const buff = new Uint8Array(arrayBuffer);
-		return this.hexUint(buff);
+		return this.hexUint8(buff);
 	}
 	
 	hexUint8(buff) {
@@ -463,25 +497,20 @@ class SQLQuery {
 	
 	async mapQuery(button, query) {
 		let params = this.buildParams(button);
-		let queryElem = this.queryTab(button)
-			.querySelector('.query');
+		let queryTab = this.queryTab(button);
+		let queryElem = queryTab.querySelector('.query');
+		let tabId = queryTab.dataset.tabValue;
+		let tabLabel = queryTab.dataset.tabLabel;
 		
-		let [rows, cols] = await this.sql(query || queryElem.value, params);
+		let [rows, cols] = await this.sql(query || queryElem.value, params, tabLabel);
 		if (!cols.includes('feature')) {
 			alert('provide a geojson column named "feature"');
 			return;
 		}
-		this.showLayer(rows);
+		this.showLayer(tabId, tabLabel,rows);
 	}
 	
-	showLayer(rows) {
-		let title = prompt(
-			'the layer title please. required',
-			'query layer',
-		);
-		if (!title) {
-			return;
-		}
+	showLayer(tabId, tabLabel, rows) {
 		let vectorSource = new ol.source.Vector();
 		let dataProjection = 'EPSG:900913';
 		let featureProjection = 'EPSG:3857';
@@ -513,7 +542,8 @@ class SQLQuery {
 			origProjection: dataProjection,
 		});
 		const vectorLayer = new ol.layer.Vector({
-			title: title,
+			title: tabLabel,
+			tabId,
 			source: vectorSource,
 			style: (feature, resolution) => {
 				let style;
@@ -625,7 +655,7 @@ class SQLQuery {
 	}
 	
 	async sql(query, params={}, timeLabel) {
-		[params, query] = this.prepKeys(params, query);
+		[params, query] = this.prepKeys(params, query, timeLabel);
 		if (timeLabel) {
 			console.time(timeLabel);
 		}
@@ -640,6 +670,10 @@ class SQLQuery {
 	
 	buildForm() {
 		let html = `
+			<!--
+			the code for the tabbed ui comes from
+			https://www.geeksforgeeks.org/how-to-create-tabs-containing-different-content-in-html/amp/
+			-->
 			<style>
 				/*
 				* {
@@ -764,7 +798,7 @@ class SQLQuery {
 		let tabInfos = this.sqlQuery.querySelector('.tab-content');
 		tabInfos.insertAdjacentHTML(
 			'beforeend',
-			`<div class="tabs__tab ${_class}" data-tab-info="${_class}">
+			`<div class="tabs__tab ${_class}" data-tab-info="${_class}" data-tab-label="${label}">
 				${content}
 			</div>`
 		);
@@ -792,8 +826,10 @@ class SQLQuery {
 				<button class="run-query">run</button>
 				<button class="map-query">map</button>
 			</div>
-			<textarea class="query" style="width: 100%" placeholder="select 'hello';" rows="7"></textarea>
-			<table border="1"><tbody class="sqlResults"></tbody></table>
+			<textarea class="query" style="width: 100%; white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+			<div style="width: 100%; overflow: auto; border: solid;">
+				<table border="1"><tbody class="sqlResults"></tbody></table>
+			</div>
 			`;
 		let [tab, tabInfo] = this.createTab(label, html, true);
 		tabInfo.querySelector('.query').value = query;
