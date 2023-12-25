@@ -445,7 +445,7 @@ class SQLQuery {
 		if (results.length) {
 			//let colnames = Object.keys(results[0]);
 			let columns = colnames
-				.map(col => `<th style="position: sticky;">${col}</th>`)
+				.map(col => `<th style="position: sticky; top: 0; opacity: 1; background-color: white;">${col}</th>`)
 				.reduce((acc, curr) => acc + curr, '');
 			target.insertAdjacentHTML(
 				'beforeend',
@@ -826,8 +826,8 @@ class SQLQuery {
 				<button class="run-query">run</button>
 				<button class="map-query">map</button>
 			</div>
-			<textarea class="query" style="width: 100%; white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
-			<div style="width: 100%; overflow: auto; border: solid;">
+			<textarea class="query" style="width: 96vw; white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+			<div style="width: 96vw; height: 60vh; overflow: auto; border: solid;">
 				<table border="1"><tbody class="sqlResults"></tbody></table>
 			</div>
 			`;
