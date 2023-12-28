@@ -2,9 +2,10 @@
 'use strict';
 
 //todo
-//save results as json array of objects
+//copy results as json array of objects
 //eventually zipped
 //remove layer from the map
+//map geojson without sql
 
 // hex conversion code adapted from
 // https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
@@ -28,39 +29,73 @@ const toHexString = (bytes) => {
 		}, '') + "'";
 }
 
-class SQLQuery {
-	
-	fieldTypes = {
-		NULL: ['^$', '', x => null, true, 'null'],
-		INTEGER: ['^([+-]?[1-9]\\d*([Ee][+-]?[1-9]\\d*)?|0)$', '', parseInt, false, '123'],
-		REAL: ['^[+-]?(([1-9]\\d*(\\.\\d*)?([Ee][+-]?[1-9]\\d*)?|0)|Infinity)$', '', parseFloat, false, '123.45'],
-		TEXT: ['.*', '', x => x, false, 'abc'],
-		BLOB: ["^[xX]\\'(([a-f0-9A-F]){2})+\\'$", '', x => isHex(x) ? fromHexString(x).buffer : undefined, false, "x'4C696665'"],
-		DATETIME: ['^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$', '', x => parseDate(x), false, '2009-09-28T09:15:15'],
-	};
-	
-	snippets = {
-		allTables: `
+//code taken from
+//https://stackoverflow.com/a/10727155/4444742
+const randomVar = (length=32) => {
+	let chars = '0123456789abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	let result = '_';
+	for (let i = length - 1; i > 0; --i) {
+		result += chars[Math.floor(Math.random() * chars.length)];
+	}
+	return result in window ? randomVar(length) : result;
+}
+
+const snippets = {
+	allTables: {
+		query: `
 			SELECT name
 			FROM sqlite_schema
 			WHERE type ='table' AND 
 				name NOT LIKE 'sqlite_%';`,
-		tableFields: `
+		spatial: false,
+	},
+	tableFields: {
+		query: `
 			SELECT *
 			FROM pragma_table_info('table_name')`,
-		allDbs: `
+		spatial: false,
+	},
+	schema: {
+		query: `
+			WITH all_tables AS (
+				SELECT
+					name table_name,
+					type table_type
+				FROM sqlite_master
+				WHERE type = 'table'
+			) 
+			SELECT table_name, table_type, pti.*
+			FROM all_tables at
+			INNER JOIN pragma_table_info(table_name) pti
+			ORDER BY table_type, table_name, cid`,
+		spatial: false,
+	},
+	allDbs: {
+		query: `
 			select * 
 			from PRAGMA_database_list`,
-		compileOptions: `
+		spatial: false,
+	},
+	compileOptions: {
+		query: `
 			select * 
 			from PRAGMA_compile_options`,
-		attachMountedDb: `
+		spatial: false,
+	},
+	attachMountedDb: {
+		query: `
 			ATTACH DATABASE '/proj/proj.db' AS proj`,
-		generateSeries: `
+		spatial: false,
+	},
+	generateSeries: {
+		query: `
 			SELECT value
 			FROM generate_series --(5,100,5)
 			where start=5 and stop=50 and step=5`,
-		pentagonPoints: `
+		spatial: false,
+	},
+	pentagonPoints: {
+		query: `
 			with icons as $(pinpng)
 			SELECT
 				flatstyle, 
@@ -72,7 +107,10 @@ class SQLQuery {
 			FROM generate_series as ctr
 			inner join icons on 1
 			where ctr.start=0 and ctr.stop=5`,
-		pinpng: `
+		spatial: false,
+	},
+	pinpng: {
+		query: `
 			select
 				json_object(
 					--'text-value', '',
@@ -102,9 +140,11 @@ class SQLQuery {
 					7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
 					Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
 					' as pinpng
-				) on 1=1
-			`,
-		xyncolor: `
+				) on 1=1`,
+		spatial: false,
+	},
+	xyncolor: {
+		query: `
 			with t1(x,y,n,color) as
 			(VALUES
 				(100,100,3,'red'),
@@ -118,9 +158,11 @@ class SQLQuery {
 				(400,200,16,'blue'),
 				(500,200,20,'purple')
 			)
-			select * from t1
-			`,
-		polygonGeometries: `
+			select * from t1`,
+		spatial: false,
+	},
+	polygonGeometries: {
+		query: `
 			WITH t1 AS $(xyncolor)
 			SELECT
 				json_object(
@@ -140,9 +182,11 @@ class SQLQuery {
 					'text-value', cast (n as text)
 				) as flatstyle,
 				cast (n as text) as name
-			FROM t1
-			`,
-		polygonFeatures: `
+			FROM t1`,
+		spatial: false,
+	},
+	polygonFeatures: {
+		query: `
 			WITH t1 AS $(polygonGeometries)
 			SELECT
 				json_object(
@@ -154,9 +198,11 @@ class SQLQuery {
 						'flatstyle', json(flatstyle)
 					)
 				) as feature
-			FROM t1
-			`,
-		featuresCollection: `
+			FROM t1`,
+		spatial: false,
+	},
+	featuresCollection: {
+		query: `
 			WITH t1 AS $(polygonFeatures)
 			SELECT
 				json_object(
@@ -168,19 +214,22 @@ class SQLQuery {
 						json(feature)
 					)
 				) as feature
-			FROM t1
-			`,
-		builtPolygons: `
+			FROM t1`,
+		spatial: false,
+	},
+	builtPolygons: {
+		query: `
 			WITH t1 AS $(xyncolor)
 			SELECT
+				cast (n as text) as name,
+				json(asgeojson(makepolygon(makeline(point)))) as feature,
 				json_object(
 					'fill-color', color,
 					'fill-opacity', 0.05,
 					'stroke-color', color,
 					'stroke-width', 2,
 					'text-value', cast (n as text)
-				) as flatstyle,
-				makepolygon(makeline(point)) as feature
+				) as flatstyle
 			from (
 				select
 					makepoint(
@@ -194,21 +243,115 @@ class SQLQuery {
 				inner join generate_series
 					on generate_series.start=0 and generate_series.stop=t1.n and generate_series.step=1
 			)
-			group by n, color
-			`
+			group by n, color`,
+		spatial: true,
+	},
+	builtFeatures: {
+		query: `
+			WITH t1 AS $(builtPolygons)
+			SELECT
+				json_object(
+					'type', 'Feature',
+					'geometry', json(Feature),
+					'properties',
+					json_object(
+						'name', name,
+						'flatstyle', json(flatstyle)
+					)
+				) as feature
+			FROM t1`,
+		spatial: false,
+	},
+	builtCollection: {
+		query: `
+			WITH t1 AS $(builtFeatures)
+			SELECT
+				json_object(
+					'type', 'FeatureCollection',
+					'crs',
+					json('{ "type": "name", "properties": { "name": "EPSG:900913" } }'),
+					'features',
+					json_group_array(
+						json(feature)
+					)
+				) as feature
+			FROM t1`,
+		spatial: true,
+	},
+	spatiaLiteVersion: {
+		query: `
+			SELECT spatialite_version()`,
+		spatial: true,
+	},
+	projVersion: {
+		query: `
+			SELECT proj_version()`,
+		spatial: true,
+	},
+	gpkg_contents: {
+		query: `
+			SELECT * FROM gpkg_contents`,
+		spatial: false,
+	},
+	transform_point: {
+		query: `
+			with icons as $(pinpng)
+			select 
+			--aswkt (
+			st_transform(
+			st_transform(
+			MakePoint (-22562.401432422717, 6730934.887787993, 3857)
+			, 27700)
+			, 3857)
+			--)
+			as feature,
+			flatstyle
+			from icons`,
+		spatial: true,
+	},
+	gpkg_spatial_ref_sys: {
+		query: `
+			select *
+			from gpkg_spatial_ref_sys`,
+		spatial: false,
+	},
+};
+
+const isString = value => typeof value === 'string' || value instanceof String;
+
+class SQLQuery {
+	
+	fieldTypes = {
+		NULL: ['^$', '', x => null, true, 'null'],
+		INTEGER: ['^([+-]?[1-9]\\d*([Ee][+-]?[1-9]\\d*)?|0)$', '', parseInt, false, '123'],
+		REAL: ['^[+-]?(([1-9]\\d*(\\.\\d*)?([Ee][+-]?[1-9]\\d*)?|0)|Infinity)$', '', parseFloat, false, '123.45'],
+		TEXT: ['.*', '', x => x, false, 'abc'],
+		BLOB: ["^[xX]\\'(([a-f0-9A-F]){2})+\\'$", '', x => isHex(x) ? fromHexString(x).buffer : undefined, false, "x'4C696665'"],
+		DATETIME: ['^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$', '', x => parseDate(x), false, '2009-09-28T09:15:15'],
 	};
 	
-	constructor(selector, db, snippets, map) {
-		this.sqlQuery = document.querySelector(selector);
+	constructor(container, db, map, id) {
+		this.container = isString(container) ?
+			document.querySelector(container) : container;
+		this.sqlQuery = document.createElement("div");
+		this.rootId = id || randomVar();
+		this.sqlQuery.setAttribute('id', this.rootId);
+		this.container.appendChild(this.sqlQuery);
+		
 		this.db = db;
-		if (snippets) {
-			this.snippets = snippets;
-		}
-		if (map) {
-			this.map = map;
-		}
+		this.isSpatial = false;
 		this.tabCounter = 0;
-		this.buildForm();
+		this.map = map;
+
+		db.exec('SELECT spatialite_version();').get.first
+			.then(first => {
+				this.isSpatial = true;
+			})
+			.catch(error => {})
+			.finally(x => {
+				this.buildForm();
+				this.setSnippets(snippets);
+			});
 	}
 	
 	paramType(_this) {
@@ -302,8 +445,8 @@ class SQLQuery {
 	
 	makeParams(button) {
 		let params = this.buildParams(button, false);
-		let query = this.queryTab(button)
-			.querySelector('.query').value;
+		let queryTab = this.queryTab(button);
+		let query = this.getQuery(queryTab, true);
 		let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
 		let param;
 		while (param = paramRe.exec(query)) {
@@ -315,21 +458,28 @@ class SQLQuery {
 	}
 	
 	addSnippets = (snippets) => {
-		for (let [name, query] of Object.entries(snippets)) {
-			this.snippets[name] = query;
+		for (let [name, snippet] of Object.entries(snippets)) {
+			if (!snippet.spatial || this.isSpatial) {
+				this.snippets[name] = snippet.query;
+			}
 		}
 		this.buildSnippetsMenu();
 	}
 	
+	setSnippets = (snippets) => {
+		this.snippets = {};
+		this.addSnippets(snippets);
+	}
+	
 	buildSnippetsMenu = () => {
-		let snippets = Object.keys(this.snippets)
+		let snippets = Object.keys(this.snippets || {})
 			.map(
-				name => 
-				`<tr>
-				<td class="snippet-name">${name}</td>
-				<td><button class="snippet-cp">cp</button></td>
-				<td><button class="snippet-open">open</button></td>
-				</tr>`
+				name => `
+					<tr>
+						<td class="snippet-name">${name}</td>
+						<td><button class="snippet-cp">cp</button></td>
+						<td><button class="snippet-open">open</button></td>
+					</tr>`
 			)
 			.reduce((a, b) => a + b, '');
 		let target = this.sqlQuery
@@ -395,22 +545,32 @@ class SQLQuery {
 		let queryElem = this.queryTab(button)
 			.querySelector('.query');
 		let query = queryElem.value;
-		console.log('query0:', queryElem, query);
 		query = this.prepQuery(query);
-		console.log('query:', query);
 	}
 	
-	async runQuery(button, query, timeLabel) {
+	getQuery(queryTab, all=false) {
+		let queryElem = queryTab.querySelector('.query');
+		let startPos = queryElem.selectionStart;
+		let endPos = queryElem.selectionEnd;
+		let selectedText = queryElem.value;
+		if (!all && endPos > startPos) {
+			selectedText = selectedText
+				.substring(startPos, endPos);
+		}
+		return selectedText;
+	}
+	
+	async runQuery(button) {
 		let params = this.buildParams(button);
 		let queryTab = this.queryTab(button);
-		let queryElem = queryTab.querySelector('.query');
+		let query = this.getQuery(queryTab);
 		let tabLabel = queryTab.dataset.tabLabel;
 		let target = queryTab.querySelector('.sqlResults');
 		
 		let started = Date.now();
-		let [rows, cols] = await this.sql(
-			query || queryElem.value, params, timeLabel || tabLabel);
-		this.showTable(target, rows, cols, Date.now() - started);
+		let [rows, cols, error] = await this.performQuery(
+			query, params, tabLabel);
+		this.showTable(target, rows, cols, error, Date.now() - started);
 	}
 	
 	hexBytes() {
@@ -439,15 +599,20 @@ class SQLQuery {
 		return hexOctets.join('');
 	}
 	
-	showTable(target, results, colnames, duration=0) {
+	showTable(target, results, colnames, error, duration=0) {
 		let logRows=false;
-		target.textContent = '';
-		if (results.length) {
+		let thead = target.querySelector('thead');
+		let tbody = target.querySelector('tbody');
+		let tfoot = target.querySelector('tfoot');
+		thead.textContent = '';
+		tbody.textContent = '';
+		tfoot.textContent = '';
+		if (results.length || error) {
 			//let colnames = Object.keys(results[0]);
 			let columns = colnames
-				.map(col => `<th style="position: sticky; top: 0; opacity: 1; background-color: white;">${col}</th>`)
+				.map(col => `<td>${col}</td>`)
 				.reduce((acc, curr) => acc + curr, '');
-			target.insertAdjacentHTML(
+			thead.insertAdjacentHTML(
 				'beforeend',
 				`<tr>${columns}</tr>`
 			);
@@ -475,39 +640,79 @@ class SQLQuery {
 						return `<td>${col}</td>`;
 					})
 					.reduce((acc, curr) => acc + curr, '');
-				target.insertAdjacentHTML(
+				tbody.insertAdjacentHTML(
 					'beforeend',
 					`<tr>${row}</tr>`
 				);
 			}
-			target.insertAdjacentHTML(
+			let csvDisplay = (results.length && colnames.length) ? 'inline-block' : 'none';
+			tfoot.insertAdjacentHTML(
 				'beforeend',
 				`<tr><td colspan="${colnames.length || 1}">
-					<span style="background-color: 'green';">${duration} ms</span>
+					<span style="background-color: green;">${duration} ms</span>
+					<button class="csv-cp" style="display: ${csvDisplay}">csv cp</button>
+					<span style="background-color: red;">${error ? error.toString() : ''}</span>
 				</td></tr>`
 			);
+			tfoot.querySelector('button.csv-cp')
+				.addEventListener('click', e => {this.csvResults(e.currentTarget);});
 		}
 		else {
-			target.insertAdjacentHTML(
+			tbody.insertAdjacentHTML(
 				'beforeend',
 				`<tr><td><span style="background-color: 'green';">no results</span></td></tr>`
 			);
 		}
 	}
 	
-	async mapQuery(button, query) {
+	csvResults(button) {
+		let table = button.closest('table');
+		let csv = [];
+		let entities = [
+			table.querySelector('thead'),
+			table.querySelector('tbody'),
+		];
+		for (let entity of entities) {
+			if (!entity) {
+				continue;
+			}
+			for (let tr of entity.getElementsByTagName('tr')) {
+				let fields = [];
+				for (let td of tr.getElementsByTagName('td')) {
+					//todo tab string should be configurable
+					fields.push(td.textContent.replaceAll('\t', '&tab;'));
+				}
+				csv.push(fields.reduce((a, b) => a + '\t' + b));
+			}
+		}
+		navigator.clipboard.writeText(csv.join('\n')).then(
+			() => {
+				//alert('clipboard successfully set');
+			},
+			() => {
+				alert('clipboard write failed');
+			},
+		);
+	}
+	
+	async mapQuery(button) {
 		let params = this.buildParams(button);
 		let queryTab = this.queryTab(button);
-		let queryElem = queryTab.querySelector('.query');
+		let query = this.getQuery(queryTab);
 		let tabId = queryTab.dataset.tabValue;
 		let tabLabel = queryTab.dataset.tabLabel;
 		
-		let [rows, cols] = await this.sql(query || queryElem.value, params, tabLabel);
+		let [rows, cols, error] = await this.performQuery(
+			query, params, tabLabel);
+		if (error) {
+			alert(error);
+			return;
+		}
 		if (!cols.includes('feature')) {
 			alert('provide a geojson column named "feature"');
 			return;
 		}
-		this.showLayer(tabId, tabLabel,rows);
+		this.showLayer(tabId, tabLabel, rows);
 	}
 	
 	showLayer(tabId, tabLabel, rows) {
@@ -596,7 +801,6 @@ class SQLQuery {
 			.map(line => prefix + line)
 			.reduce((a, b) => a + '\n' + b)
 			;
-		console.log(nTabs, text);
 		//console.log(text);
 		return text;
 	}
@@ -654,18 +858,24 @@ class SQLQuery {
 		return [params, query];
 	}
 	
-	async sql(query, params={}, timeLabel) {
+	async performQuery(query, params={}, timeLabel) {
 		[params, query] = this.prepKeys(params, query, timeLabel);
 		if (timeLabel) {
 			console.time(timeLabel);
 		}
-		let rs = this.db.exec(query, params).get;
-		let cols = await rs.cols;
-		let rows = await rs.objs;
+		let rows = [], cols = [], error = '';
+		try {
+			let rs = this.db.exec(query, params).get;
+			cols = await rs.cols;
+			rows = await rs.objs;
+		}
+		catch (exception) {
+			error = exception;
+		}
 		if (timeLabel) {
 			console.timeEnd(timeLabel);
 		}
-		return [rows, cols];
+		return [rows, cols, error];
 	}
 	
 	buildForm() {
@@ -675,70 +885,71 @@ class SQLQuery {
 			https://www.geeksforgeeks.org/how-to-create-tabs-containing-different-content-in-html/amp/
 			-->
 			<style>
-				/*
-				* {
-					margin: 0;
-					padding: 0;
-				}
-				body {
-					background: white;
-				}
-				.container {
-					border: 1px solid grey;
-					margin: 1rem;
-				}
-				*/
-				[data-tab-info] {
+				#${this.rootId} [data-tab-info] {
 					display: none;
 				}
-				.active[data-tab-info] {
+				#${this.rootId} .active[data-tab-info] {
 					display: block;
 				}
-				.tab-content {
+				#${this.rootId} .tab-content {
 					margin-top: 1rem;
-					/*
-					padding-left: 1rem;
-					font-size: 20px;
-					font-family: sans-serif;
-					font-weight: bold;
-					color: rgb(0, 0, 0);
-					*/
 				}
-				.tabs {
+				#${this.rootId} .tabs {
 					border-bottom: 1px solid grey;
 					background-color: rgb(16, 153, 9);
-					/*
-					font-size: 25px;
-					*/
 					color: rgb(0, 0, 0);
-					/***
-					display: flex;
-					***/
 					margin: 0;
 				}
-				.tabs span {
+				#${this.rootId} .tabs span {
 					background: rgb(16, 153, 9);
 					padding: 10px;
-					border: 1px solid rgb(255, 255, 255);
+					border: 1px solid white;
 					
 					float: inline-start;
 				}
-				.tabs span:hover, .tabs span.active {
+				#${this.rootId} .tabs span:hover,
+				#${this.rootId} .tabs span.active {
 					background: rgb(55, 219, 46);
 					cursor: pointer;
 					color: black;
 				}
-				.tabs span.new-query {
+				#${this.rootId} .tabs span.new-query {
 					float: inline-end !important;
+					background: rgb(55, 219, 46);
 				}
-				.tabs span.tab-close {
+				#${this.rootId} .tabs span.tab-close {
 					padding: 0;
 					margin: 0;
 					border: 0;
+					background: red;
 					float: none;
 				}
-				.tab-content {
+				#${this.rootId} .tab-content {
 					clear: both;
+				}
+				
+				#${this.rootId} table.sqlResults thead,
+				#${this.rootId} table.sqlResults tfoot {
+					position: sticky;
+				}
+				#${this.rootId} table.sqlResults thead td,
+				#${this.rootId} table.sqlResults tfoot td {
+					opacity: 1;
+					background-color: white;
+				}
+				#${this.rootId} table.sqlResults thead {
+					inset-block-start: 0; /* "top" */
+				}
+				#${this.rootId} table.sqlResults tfoot {
+					inset-block-end: 0; /* "bottom" */
+				}
+				
+				#${this.rootId} .query-control {
+					float: inline-start;
+					margin: 0;
+				}
+				#${this.rootId} .map-query {
+					display: ${this.map ? 'inline-block' : 'none'};
 				}
 			</style>
 			<div class="tabs">
@@ -751,7 +962,9 @@ class SQLQuery {
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
 		this.createTab(
 			'snippets', `
-			<table border="1"><tbody class="snippetsMenu"></tbody></table>`
+			<div style="width: 98vw; height: 60vh; overflow: auto; border: solid;">
+				<table border="1"><tbody class="snippetsMenu"></tbody></table>
+			</div>`
 		);
 		this.sqlQuery.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
@@ -818,7 +1031,11 @@ class SQLQuery {
 	addQueryTab = (label, query='') => {
 		let html = `
 			<table border="0"><tbody class="sqlParams"></tbody></table>
-			<div>
+			<div style="width: 98vw;">
+			<div class="query-control" style="width: 70%;">
+				<textarea class="query" style="width: 100%; white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+			</div>
+			<div class="query-control" style="width: 28%;">
 				<button class="add-param">add param</button>
 				<button class="make-params">make params</button>
 				<button class="pp-query">pp</button>
@@ -826,9 +1043,13 @@ class SQLQuery {
 				<button class="run-query">run</button>
 				<button class="map-query">map</button>
 			</div>
-			<textarea class="query" style="width: 96vw; white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
-			<div style="width: 96vw; height: 60vh; overflow: auto; border: solid;">
-				<table border="1"><tbody class="sqlResults"></tbody></table>
+			</div>
+			<div style="width: 98vw; height: 60vh; overflow: auto; border: solid;">
+				<table border="1" class="sqlResults">
+					<thead></thead>
+					<tbody></tbody>
+					<tfoot></tfoot>
+				</table>
 			</div>
 			`;
 		let [tab, tabInfo] = this.createTab(label, html, true);

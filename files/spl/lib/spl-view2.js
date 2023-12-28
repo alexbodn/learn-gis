@@ -368,6 +368,9 @@ async function spl_loadgpkg(gpkgUrl, fileName) {
 		db = await spl.db(mounts['data'].data);
 		}
 	}
+	else {
+		db = await spl.db()
+	}
 	console.timeEnd('mounting gpkgs');
 	await db.read(init_sql('/proj/proj.db'));
 	//console.log('db loaded', db);
@@ -589,36 +592,11 @@ async function london_gpkg(map) {
 let map = build_map('map');
 map.addLayer(osm_layer());
 
-let db = await london_gpkg(map);
+//let db = await london_gpkg(map);
+let db = await spl_loadgpkg();
 //let db = await spl_db();
 
 
 show_map(map, displayProjection.srs_code, "#hit-tolerance");
 
-let sqlConsole = new SQLQuery('div#sqlQuery', db, undefined, map);
-sqlConsole.addSnippets({
-	spatiaLiteVersion: `
-		SELECT spatialite_version()`,
-	projVersion: `
-		SELECT proj_version()`,
-	gpkg_contents: `
-		SELECT *
-		FROM gpkg_contents`,
-	transform_point: `
-		with icons as $(pinpng)
-		select 
-		--aswkt (
-		st_transform(
-		st_transform(
-		MakePoint (-22562.401432422717, 6730934.887787993, 3857)
-		, 27700)
-		, 3857)
-		--)
-		as feature,
-		flatstyle
-		from icons
-		`,
-	gpkg_spatial_ref_sys: `
-		select *
-		from gpkg_spatial_ref_sys;`,
-});
+let sqlConsole = new SQLQuery('div#sqlQuery', db, map);
