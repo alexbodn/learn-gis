@@ -33,7 +33,63 @@ function onEachFeature(feature, layer) {
 	layer.on('click', onLayerClick);
 }
 
-function makeLayerJSON(layerInfo, name) {
+function makeLayerJSON(json, name, style) {
+	console.log(json, name, style);
+	function filter(feature, layer, name) {
+		return !feature.properties.hide_on_map;
+	}
+	function pointToLayer(feature, latlng) {
+		return L.marker(latlng)
+			.bindPopup(feature.properties.name);
+	}
+	if (false && style) {
+		let SLDStyler = new L.SLDStyler(style);
+		style = SLDStyler.getStyleFunction;
+	}
+	
+	let layer =
+	L.Proj.geoJson
+	//L.geoJSON
+		(json, {
+		filter,
+		onEachFeature,
+		pointToLayer,
+		style: style || json?.properties?.style,
+	});
+	let crsSection = json?.crs;
+	let crs;
+	if (crsSection?.type === 'name') {
+		crs = new L.Proj.CRS(
+			crsSection.properties.name);
+	}
+	else if (crsSection?.type) {
+		crs = new L.Proj.CRS(
+			crsSection.type + ':' + crsSection.properties.code);
+	}
+	if (crs !== undefined) {
+		layer.options.latLngToCoords = function(latlng) {
+			//console.log('conv', latlng);
+			return crs.projection.project(latlng);
+		};
+	}
+	else {
+		layer.options.latLngToCoords = function(latlng) {
+			let point = new L.point(latlng.lng, latlng.lat);
+			//console.log('no conv', latlng, point);
+			return point;
+		};
+	}
+	//console.log('build', crs, layer.options);
+	
+	layer.eachLayer(featureInstanceLayer => {
+		let style = featureInstanceLayer.feature?.properties?.style;
+		featureInstanceLayer.setStyle(style);
+	});
+	
+	return layer;
+}
+
+function makeLayerJSON0(json, name) {
 	
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
@@ -43,17 +99,17 @@ function makeLayerJSON(layerInfo, name) {
 			.bindPopup(feature.properties.name);
 	}
 	
-	//transform data from layerInfo.projection
+	//transform data from.projection
 	let layer =
 	L.Proj.geoJson
 	//L.geoJSON
-		(layerInfo.data, {
+		(json, {
 		filter,
 		onEachFeature,
 		pointToLayer,
-		style: layerInfo.data?.properties?.style,
+		style: json?.properties?.style,
 	});
-	let crsSection = layerInfo.data?.crs;
+	let crsSection = json?.crs;
 	let crs;
 	if (crsSection?.type === 'name') {
 		crs = new L.Proj.CRS(
@@ -107,25 +163,29 @@ function fetchAll(urls, method='text', options={}) {
 	);
 }
 
-async function jsons() {
-	let urlNames = {};
-	let jsonUrls = [
-		/*
-		'greece-regions-2100',
-		'greece-prefectures',
-		*/
-		'london_boroughs'
-	].map(name => {
-		let url = new URL(
-			`./test/files/dbs/${name}.geojson`,
-			window.location.href
-		).toString();
-		urlNames[url] = name;
-		return url;
-	});
-	return fetchAll(
-		jsonUrls, 'json', {urlNames}
-	).then(handleJson);
+function build_map(target='map') {
+	let mapdef = 
+	//'map'
+	document.querySelector('#map')
+	;
+	let map = L.map(mapdef, {
+		// https://leafletjs.com/reference.html#map-zoomsnap
+		zoomSnap: 0,
+	})
+	//.setView([51.505, -0.09], 13)
+	;
+	
+	const onMapClick = (e) => {
+		let coords = e.latlng;
+		//if (feature.options.latLngToCoords)
+		L.popup()
+			.setLatLng(e.latlng)
+			.setContent("You clicked the map at " + coords.toString())
+			.openOn(map);
+	};
+	map.on('click', onMapClick);
+
+	return map;
 }
 
 function show_map(map) {
@@ -148,7 +208,7 @@ function show_map(map) {
 }
 
 //main//
-
+/**
 let mapdef = 
 //'map'
 document.querySelector('.map')
@@ -157,10 +217,9 @@ let map = L.map(mapdef, {
 	// https://leafletjs.com/reference.html#map-zoomsnap
 	zoomSnap: 0,
 })
-//.setView([51.505, -0.09], 13)
+.setView([51.505, -0.09], 13)
 ;
 
-/**/
 const onMapClick = (e) => {
 	let coords = e.latlng;
 	//if (feature.options.latLngToCoords)
@@ -170,7 +229,6 @@ const onMapClick = (e) => {
 		.openOn(map);
 };
 map.on('click', onMapClick);
-/**/
 
 let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
@@ -214,4 +272,5 @@ jsons().then(layers => {
 	
 	show_map(map);
 });
+**/
 

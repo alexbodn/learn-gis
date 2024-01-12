@@ -4,8 +4,8 @@
 //todo
 //copy results as json array of objects
 //eventually zipped
+//if no map try creation of leaflet map
 //remove layer from the map
-//map geojson without sql
 
 // hex conversion code adapted from
 // https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
@@ -30,6 +30,60 @@ const toHexString = (bytes) => {
 }
 
 //code taken from
+//https://stackoverflow.com/a/41797377/4444742
+function hexToBase64(hexstring) {
+	return btoa(hexstring.match(/\w{2}/g).map(function(a) {
+		return String.fromCharCode(parseInt(a, 16));
+	}).join(""));
+}
+//hexToBase64("a6b580481008e60df9350de170b7e728");
+
+//code taken from
+//https://stackoverflow.com/a/62365404/4444742
+function bytesArrToBase64(arr) {
+	const abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; // base64 alphabet
+	const bin = n => n.toString(2).padStart(8,0); // convert num to 8-bit binary string
+	const l = arr.length
+	let result = '';
+
+	for(let i=0; i<=(l-1)/3; i++) {
+		let c1 = i*3+1>=l; // case when "=" is on end
+		let c2 = i*3+2>=l; // case when "=" is on end
+		let chunk = bin(arr[3*i]) + bin(c1? 0:arr[3*i+1]) + bin(c2? 0:arr[3*i+2]);
+		let r = chunk.match(/.{1,6}/g).map((x,j)=> j==3&&c2 ? '=' :(j==2&&c1 ? '=':abc[+('0b'+x)]));
+		result += r.join('');
+	}
+
+	return result;
+}
+
+function hexToBytes(hexString) {
+	return hexString.match(/.{1,2}/g).map(x=> +('0x'+x));
+}
+/*
+let hexString = "a6b580481008e60df9350de170b7e728";
+let bytes = hexToBytes(hexString);
+let base64 = bytesArrToBase64(bytes);
+*/
+
+function getMimeTypeFromHex(hexString) {
+	let prefixes = {
+		'89504E47': 'image/png',
+		'47494638': 'image/gif',
+		'25504446': 'application/pdf',
+		'FFD8FFDB': 'image/jpeg',
+		'FFD8FFE0': 'image/jpeg',
+		'504B0304': 'application/zip',
+	};
+	for (let [prefix, mime] of Object.entries(prefixes)) {
+		if (hexString.startsWith(prefix)) {
+			return mime;
+		}
+	}
+	return null;
+}
+
+//code taken from
 //https://stackoverflow.com/a/10727155/4444742
 const randomVar = (length=32) => {
 	let chars = '0123456789abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -40,13 +94,57 @@ const randomVar = (length=32) => {
 	return result in window ? randomVar(length) : result;
 }
 
+//code from
+//https://stackoverflow.com/a/36535220/4444742
+function walkDOM(node, func, filter) {
+	if (filter && !filter(node)) {
+		return;
+	}
+	func(node);
+	node = node.firstChild;
+	while(node) {
+		walkDOM(node, func, filter);
+		node = node.nextSibling;
+	}
+};
+
+//code provided at
+//https://stackoverflow.com/a/1388022/4444742
+function getStyleProperty(elem, property)
+{
+	if (window.getComputedStyle) {
+		return document.defaultView
+			.getComputedStyle(elem,null)
+			.getPropertyValue(property); 
+	}
+	else if (elem.currentStyle) {
+		return elem.currentStyle[property];
+	}
+}
+
+function isElement($obj) {
+	try {
+		return ($obj.constructor.__proto__.prototype.constructor.name === 'HTMLElement');
+	}catch(e){
+		return false;
+	}
+}
+
 const snippets = {
+	tileRows: {
+		query: `
+			select *
+			from tiles
+			limit 5
+			`,
+		spatial: false,
+	},
 	allTables: {
 		query: `
-			SELECT name
+			SELECT type, name
 			FROM sqlite_schema
-			WHERE type ='table' AND 
-				name NOT LIKE 'sqlite_%';`,
+			WHERE type IN ('table', 'view')
+				AND name NOT LIKE 'sqlite_%';`,
 		spatial: false,
 	},
 	tableFields: {
@@ -116,31 +214,28 @@ const snippets = {
 					--'text-value', '',
 					'icon-color', '#8959A8',
 					'icon-cross-origin', 'anonymous',
-					'icon-src', 'data:'||pinpng
+					'icon-src', 'data:'||
+						'image/png;base64,
+						iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
+						AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
+						VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
+						yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
+						yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
+						sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
+						1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
+						D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
+						jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
+						aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
+						Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
+						7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
+						Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
+						'
 					
 					--'circle-stroke-color', 'blue',
 					--'circle-stroke-width', 1,
 					--'circle-radius', 5
 				) as flatstyle
-			from (select 1)
-			inner join (
-				select 
-					'image/png;base64,
-					iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-					AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
-					VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
-					yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
-					yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
-					sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
-					1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
-					D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
-					jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
-					aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
-					Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
-					7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
-					Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
-					' as pinpng
-				) on 1=1`,
+				`,
 		spatial: false,
 	},
 	xyncolor: {
@@ -290,7 +385,8 @@ const snippets = {
 	},
 	gpkg_contents: {
 		query: `
-			SELECT * FROM gpkg_contents`,
+			SELECT *
+			FROM gpkg_contents`,
 		spatial: false,
 	},
 	transform_point: {
@@ -410,10 +506,13 @@ class SQLQuery {
 	}
 	
 	buildParams(button, testValues=true) {
-		let paramsDiv = this.queryTab(button)
-			.querySelector('.sqlParams');
-		let rows = paramsDiv.querySelectorAll('tr');
+		let queryTab = this.queryTab(button)
+		let paramsDiv = queryTab?.querySelector('.sqlParams') || [];
+		if (paramsDiv) {
+			return {};
+		}
 		let params = {};
+		let rows = paramsDiv.querySelectorAll('tr');
 		const nameRegex = /^[a-z_A-Z][a-z_A-Z0-9]*$/;
 		rows.forEach(curr => {
 			let varField = curr.querySelector('.variable');
@@ -610,7 +709,7 @@ class SQLQuery {
 		if (results.length || error) {
 			//let colnames = Object.keys(results[0]);
 			let columns = colnames
-				.map(col => `<td>${col}</td>`)
+				.map(col => `<td><div class="td">${col}</div></td>`)
 				.reduce((acc, curr) => acc + curr, '');
 			thead.insertAdjacentHTML(
 				'beforeend',
@@ -623,21 +722,39 @@ class SQLQuery {
 				row = colnames
 					.map(col => row[col])
 					.map(col => {
+						let dataPopup = false;
+						let dataMime, placeHolder = 'empty';
+						let minWidth = 0;
 						if (typeof col === 'object') {
 							if (col === null) {
-								col = '&lt;null&gt;'
+								//col = '&lt;null&gt;';
+								col = '';
+								placeHolder = 'null';
 							}
 							else if (col.constructor == Uint8Array) {
-								col = `x'${this.hexUint8(col)}'`;
+								let hex = this.hexUint8(col);
+								dataMime = getMimeTypeFromHex(hex);
+								col = `x'${hex}'`;
+								minWidth = '75vw; overflow-wrap: anywhere';
+								dataPopup = true;
 							}
 							else if (col.constructor == ArrayBuffer) {
-								col = `x'${this.hex(col)}'`;
+								let hex = this.hex(col);
+								dataMime = getMimeTypeFromHex(hex);
+								col = `x'${hex}'`;
+								minWidth = '75vw; overflow-wrap: anywhere';
+								dataPopup = true;
 							}
 							else {
-								col = JSON.stringify(col);
+								col = JSON.stringify(col)
+									.replaceAll('\\n', '\n')
+									.replaceAll('\\t', '\t');
 							}
 						}
-						return `<td>${col}</td>`;
+						dataPopup = `data-popup="${dataPopup}"`;
+						dataMime = dataMime ? `data-mime="${dataMime}"` : '';
+						placeHolder = `placeholder="${placeHolder}"`;
+						return `<td><div class="td data-field" ${dataPopup} ${dataMime} ${placeHolder} style="max-width: 75vw; min-width: ${minWidth}; overflow-y: auto; max-height: 12vh; overflow-y: scroll">${col}</div></td>`;
 					})
 					.reduce((acc, curr) => acc + curr, '');
 				tbody.insertAdjacentHTML(
@@ -645,6 +762,9 @@ class SQLQuery {
 					`<tr>${row}</tr>`
 				);
 			}
+			tbody.querySelectorAll('div.td[data-popup="true"]').forEach(td => {
+				td.addEventListener('click', e => {this.dataPopup(e.currentTarget);});
+			});
 			let csvDisplay = (results.length && colnames.length) ? 'inline-block' : 'none';
 			tfoot.insertAdjacentHTML(
 				'beforeend',
@@ -665,6 +785,55 @@ class SQLQuery {
 		}
 	}
 	
+	dataPopup(td) {
+		let hex = td.textContent.slice(2, -1);
+		let mime = td.dataset.mime;
+		if (!hex || !mime) {
+			return;
+		}
+		
+		let countZ = 0, maxZ = -Infinity;
+		walkDOM(document.body, function(node) {
+			let zIndex = getStyleProperty(node, 'z-index');
+			let value = parseFloat(zIndex);
+			if (!isNaN(value)) {
+				maxZ = Math.max(maxZ, value);
+			}
+			++countZ;
+		}, isElement);
+		maxZ = Math.max(maxZ, countZ);
+		
+		let overlay = this.sqlQuery.querySelector('.overlay');
+		let popup = this.sqlQuery.querySelector('.popup');
+		let popupcontent = popup.querySelector('.popupcontent');
+		console.log(popupcontent);
+		popupcontent.textContent = '';
+		popupcontent.insertAdjacentHTML(
+			'beforeend',
+			`<div>mimetype: ${mime}</div>`
+		);
+		if (mime.startsWith('image/')) {
+			let bytes = hexToBytes(hex);
+			let base64 = bytesArrToBase64(bytes);
+			let div = document.createElement('div');
+			let img = document.createElement('img');
+			img.setAttribute('src', `data:${mime};base64,${base64}`);
+			img.crossOrigin = "anonymous";
+			div.insertAdjacentElement(
+				'beforeend',
+				img,
+			);
+			popupcontent.insertAdjacentElement(
+				'beforeend',
+				div,
+			);
+		}
+		overlay.style['z-index'] = maxZ + 1;
+		popup.style['z-index'] = maxZ + 2;
+		overlay.style.display = 'block';
+		popup.style.display = 'block';
+	}
+	
 	csvResults(button) {
 		let table = button.closest('table');
 		let csv = [];
@@ -676,10 +845,9 @@ class SQLQuery {
 			if (!entity) {
 				continue;
 			}
-			for (let tr of entity.getElementsByTagName('tr')) {
+			for (let tr of entity.querySelectorAll('tr')) {
 				let fields = [];
-				for (let td of tr.getElementsByTagName('td')) {
-					//todo tab string should be configurable
+				for (let td of tr.querySelectorAll('div.td')) {
 					fields.push(td.textContent.replaceAll('\t', '&tab;'));
 				}
 				csv.push(fields.reduce((a, b) => a + '\t' + b));
@@ -722,19 +890,16 @@ class SQLQuery {
 		const formatJson = new ol.format.GeoJSON();
 		for (let row of rows) {
 			let {feature, ...properties} = row;
-			let features2style = [feature];
 			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
 				feature = {
 					type: 'Feature',
 					properties,
 					geometry: feature,
 				}
-				features2style = [feature];
 			}
-			else if (feature.type == 'FeatureCollection') {
+			else {
 				dataProjection = 
 					(feature?.crs?.properties?.name) || dataProjection;
-				features2style = feature.features;
 			}
 			let features = formatJson.readFeatures(feature, {
 				dataProjection: dataProjection,
@@ -880,11 +1045,11 @@ class SQLQuery {
 	
 	buildForm() {
 		let html = `
-			<!--
-			the code for the tabbed ui comes from
-			https://www.geeksforgeeks.org/how-to-create-tabs-containing-different-content-in-html/amp/
-			-->
 			<style>
+				/*
+				the code for the tabbed ui comes from
+				https://www.geeksforgeeks.org/how-to-create-tabs-containing-different-content-in-html/amp/
+				*/
 				#${this.rootId} [data-tab-info] {
 					display: none;
 				}
@@ -927,7 +1092,9 @@ class SQLQuery {
 				#${this.rootId} .tab-content {
 					clear: both;
 				}
+			</style>
 				
+			<style>
 				#${this.rootId} table.sqlResults thead,
 				#${this.rootId} table.sqlResults tfoot {
 					position: sticky;
@@ -944,6 +1111,12 @@ class SQLQuery {
 					inset-block-end: 0; /* "bottom" */
 				}
 				
+				#${this.rootId} .query {
+					width: 100%;
+					height: 100%;
+					box-sizing: border-box;
+					-moz-box-sizing: border-box;
+				}
 				#${this.rootId} .query-control {
 					float: inline-start;
 					margin: 0;
@@ -951,15 +1124,73 @@ class SQLQuery {
 				#${this.rootId} .map-query {
 					display: ${this.map ? 'inline-block' : 'none'};
 				}
+				#${this.rootId} .data-field:empty::before {
+					content: attr(placeholder);
+					color: gray;
+				}
+			</style>
+				
+			<style>
+				/*
+				the code for the popup comes from Zoie Carnegie
+				https://www.loginradius.com/blog/engineering/simple-popup-tutorial/
+				*/
+				#${this.rootId} .overlay {
+					display: none;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-color: gray;
+					opacity: 0.8;
+					z-index: auto;
+				}
+				
+				#${this.rootId} .popup {
+					display: none;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-color: green;
+					/*margin-left: -250px;*/ /*Half the value of width to center div*/
+					/*margin-top: -250px*/ /*Half the value of height to center div*/
+					z-index: auto; /*show over leaflet*/
+				}
+				
+				#${this.rootId} .popupcontrols {
+					float: right;
+					padding: 1px;
+					cursor: pointer;
+				}
+				
+				#${this.rootId} .popupcontent {
+					clear: both;
+					padding: 3px;
+				}
+				
 			</style>
 			<div class="tabs">
 				<span class="new-query">+</span>
 			</div>
 			<div class="tab-content">
 			</div>
+			<div class="overlay"></div>
+			<div class="popup">
+				<div class="popupcontrols">
+					<span class="popupclose">x</span>
+				</div>
+				<div class="popupcontent">
+					<h1>Some Popup Content</h1>
+				</div>
+			</div>
 		`;
 		this.sqlQuery.textContent = '';
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
+		this.sqlQuery.querySelector('.popupclose')
+			.addEventListener('click', e => {this.popupClose()});
 		this.createTab(
 			'snippets', `
 			<div style="width: 98vw; height: 60vh; overflow: auto; border: solid;">
@@ -970,6 +1201,15 @@ class SQLQuery {
 			.addEventListener('click', e => {this.addQueryTab()});
 		this.buildSnippetsMenu();
 		this.addQueryTab();
+	}
+	
+	popupClose() {
+		let popup = this.sqlQuery.querySelector('.popup');
+		popup.style.display = 'none';
+		popup.style['z-index'] = 'auto';
+		let overlay = this.sqlQuery.querySelector('.overlay');
+		overlay.style.display = 'none';
+		overlay.style['z-index'] = 'auto';
 	}
 	
 	tabClick = tab => {
@@ -1033,7 +1273,7 @@ class SQLQuery {
 			<table border="0"><tbody class="sqlParams"></tbody></table>
 			<div style="width: 98vw;">
 			<div class="query-control" style="width: 70%;">
-				<textarea class="query" style="width: 100%; white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+				<textarea class="query" style="white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
 			</div>
 			<div class="query-control" style="width: 28%;">
 				<button class="add-param">add param</button>
