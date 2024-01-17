@@ -20,7 +20,7 @@ L.Control.ZoomDisplay = L.Control.extend({
     },
 
     onMapZoomEnd: function (e) {
-        this.updateMapZoom(this._map.getZoom());
+        this.updateMapZoom(this._map.getZoom().toFixed(1));
     },
 
     updateMapZoom: function (zoom) {

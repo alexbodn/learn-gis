@@ -1,7 +1,12 @@
 
 'use strict';
 
-import SPL from '../dist/index.js';
+import SPL from '../dist/spl-web.js';
+
+let autogpkg = 0;
+let withgpkg = true;
+
+const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
 
 async function table_features(db, tableInfo, target_srs) {
 	let tableDataProjection = tableInfo.srs_code;
@@ -56,6 +61,15 @@ async function table_features(db, tableInfo, target_srs) {
 					)
 					as `;
 			}
+			else if (window.autoGeoJSON === false) {
+				prefix = `
+					asgeojson(
+					GeomFromGPB(
+						[${name}]
+					)
+					)
+					as `;
+			}
 			return prefix + `[${name}]`;
 		})
 		.join(', ');
@@ -100,16 +114,26 @@ async function table_features(db, tableInfo, target_srs) {
 	return collection;
 }
 
-async function read_gpkg(db, target_srs) {
-	// Extract all feature tables, SRS IDs and their geometry types
-	// Note the following fields are not extracted:
-	//	 gpkg_contents.identifier - title (QGIS: same as table_name)
-	//	 gpkg_contents.description - human readable (QGIS: blank)
-	//	 gpkg_geometry_columns.geometry_type_name
-	//	 - e.g. LINESTRING (but info also embedded in each feature)
-	let featureTable = await db.exec(`
+async function gpkg_read(db, target_srs) {
+	let featuresTable = [];
+	let tilesTable = [];
+	let attributesTable = [];
+	
+	let isGpkg = await db.exec(`
+		SELECT count(*)
+		FROM sqlite_schema
+		WHERE name LIKE 'gpkg_contents'
+	`).get.first;
+	
+	if (!isGpkg) {
+		return {featuresTable, tilesTable, attributesTable};
+	}
+	
+	featuresTable = await db.exec(`
 		SELECT
 			gpkg_contents.table_name,
+			gpkg_contents.identifier,
+			gpkg_contents.description,
 			CASE
 				WHEN organization IS NULL
 				THEN 'EPSG:'||cast(gpkg_contents.srs_id as text)
@@ -152,7 +176,7 @@ async function read_gpkg(db, target_srs) {
 			}, {});
 		});
 	
-	for (let tableInfo of featureTable) {
+	for (let tableInfo of featuresTable) {
 		if (tableInfo.table_name in featureColumns) {
 			tableInfo.geometry_columns =
 				featureColumns[tableInfo.table_name];
@@ -193,7 +217,7 @@ async function read_gpkg(db, target_srs) {
 	}
 	
 	// For each table, extract geometry and other properties
-	for (let tableInfo of featureTable) {
+	for (let tableInfo of featuresTable) {
 		let table_name = tableInfo.table_name;
 		tableInfo.features = await table_features(
 			db, tableInfo, target_srs);
@@ -202,7 +226,7 @@ async function read_gpkg(db, target_srs) {
 		}
 	}
 	
-	let tilesTable = await db.exec(`
+	tilesTable = await db.exec(`
 		SELECT
 			gpkg_contents.table_name,
 			min_zoom, max_zoom, srs_id
@@ -221,10 +245,10 @@ async function read_gpkg(db, target_srs) {
 		await raster_table(db, tableInfo);
 	}
 	
-	return {featureTable, tilesTable};
+	return {featuresTable, tilesTable, attributesTable};
 }
 
-function init_sql(projFile) {
+function init_sql(projFile='/proj/proj.db') {
 	let pragmas = `
 		PRAGMA foreign_keys = 1;
 		PRAGMA recursive_triggers = 1;`;
@@ -234,6 +258,9 @@ function init_sql(projFile) {
 		drop view if exists st_spatial_ref_sys;
 		drop view if exists geometry_columns;
 		drop view if exists st_geometry_columns;
+		
+		CREATE UNIQUE INDEX IF NOT EXISTS 
+		tiles_zxy ON tiles (zoom_level, tile_column, tile_row);
 		*/
 		
 		SELECT initspatialmetadatafull(1);
@@ -254,7 +281,11 @@ function init_sql(projFile) {
 			SELECT 1
 			FROM sqlite_schema
 			WHERE name LIKE 'gpkg_contents'
-		)`;
+		)
+		and ${autogpkg}=1`;
+	if (!withgpkg) {
+		gpkg = '';
+	}
 	return pragmas + init + gpkg;
 }
 
@@ -278,7 +309,7 @@ async function fetchMounts(urlsInfo) {
 				return response[method]();
 			})
 			.then(data => {
-				mounts[info.point] = {data, name: info.filename};
+				mounts[info.mountpoint] = {data, name: info.filename};
 				return {data, ...info};
 			})
 			.catch(error => ({error, url, ...info}))
@@ -289,37 +320,31 @@ async function fetchMounts(urlsInfo) {
 }
 
 async function spl_loadgpkg(gpkgUrl, fileName) {
+	const autoGeoJSON =
+		'autoGeoJSON' in window ? window.autoGeoJSON : {
+		precision: 15,
+		options: 4,
+	};
 	const spl = await SPL(
-		/*{
-			autoGeoJSON: 0 ? false : {
-				precision: 8,
-				//options: 0,
-			},
+		{
+			autoGeoJSON,
 		},
-		[
-			{
-				extends: 'db',
-					fns: {
-						'tables': db => db.exec('SELECT name FROM sqlite_master WHERE type=\'table\''),
-						'master': (db, type) => db.exec('SELECT name FROM sqlite_master WHERE type=?', [type]),
-					}
-				},
-		],*/
+		[],
 	);
-	console.log('spl loaded', spl.splOptions);
+	console.log('spl loaded');
 	console.time('fetching gpkgs');
 	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
 	let mountUrls = [
-		{url: projdbUrl, point: 'proj', filename: 'proj.db', method: 'arrayBuffer'}
+		{url: projdbUrl, mountpoint: 'proj', filename: 'proj.db', method: 'arrayBuffer'}
 	];
 	if (gpkgUrl && fileName) {
-		mountUrls.push({url: gpkgUrl, point: 'data', filename: fileName, method: 'arrayBuffer'});
+		mountUrls.push({url: gpkgUrl, mountpoint: 'data', filename: fileName, method: 'arrayBuffer'});
 	}
 	let mounts = await fetchMounts(mountUrls);
 	console.timeEnd('fetching gpkgs');
 	console.time('mounting gpkgs');
-	for (let [point, info] of Object.entries(mounts)) {
-		spl.mount(point, [info]);
+	for (let [mountpoint, info] of Object.entries(mounts)) {
+		spl.mount(mountpoint, [info]);
 	}
 	let db;
 	
@@ -336,15 +361,15 @@ async function spl_loadgpkg(gpkgUrl, fileName) {
 		db = await spl.db()
 	}
 	console.timeEnd('mounting gpkgs');
-	await db.read(init_sql('/proj/proj.db'));
+	await db.read(init_sql());
 	//console.log('db loaded', db);
 	
 	return db;
 }
 
-async function gpkg_vectorLayers(featureTable, target_srs, styles={}) {
+async function gpkg_vectorLayers(featuresTable, target_srs, styles={}) {
 	let layers = [];
-	for (let tableInfo of featureTable) {
+	for (let tableInfo of featuresTable) {
 		let table_name = tableInfo.table_name;
 		let label = `layer ${table_name}`;
 		console.time(label);
@@ -360,115 +385,6 @@ async function gpkg_vectorLayers(featureTable, target_srs, styles={}) {
 	}
 	
 	return layers;
-}
-
-function lines_features(data) {
-	let segments = data.features;
-	let index = segments.reduce((a, b) => {a[b.properties.id] = b; return a;}, {});
-	let features = {
-		inactive: {},
-		regular: {},
-		special: {},
-	};
-	var thisYear = (new Date()).getUTCFullYear()
-	//group features by line name
-	for (let segment of segments) {
-		for (let line of segment.properties.lines) {
-			let branch;
-			let inactive =
-				'opened' in line && line.opened > thisYear ||
-				'closed' in line && line.closed <= thisYear;
-			if (inactive) {
-				branch = features.inactive;
-			}
-			else if ('name' in line && 'start_sid' in line && 'end_sid' in line) {
-				branch = features.regular;
-			}
-			else {
-				branch = features.special;
-			}
-			if (!(line.name in branch)) {
-				branch[line.name] = [];
-			}
-			branch[line.name].push({...line, id: segment.properties.id});
-		}
-	}
-	let linesFeatures = {};
-	for (let [branch, contents] of Object.entries(features)) {
-		let features = [];
-		for (let [line, segments] of Object.entries(contents)) {
-			let coordinates = contents[line].map(
-				sgmnt => index[sgmnt.id].geometry.coordinates
-			);
-			features.push({
-				type: "Feature",
-				properties: {name: line,},
-				geometry: {
-					coordinates: coordinates,
-					type: 'MultiLineString',
-				},
-			});
-		}
-		linesFeatures[branch] = features;
-	}
-	return linesFeatures;
-}
-
-function handleLines({data, projection, map, displayProjection}) {
-	let linesFeatures = lines_features(data);
-	const formatJson = new ol.format.GeoJSON({
-		featureProjection: displayProjection,
-	});
-	let linesProjection = projection;
-	for (let [branch, features] of Object.entries(linesFeatures)) {
-		let layers = features.map(feature => {
-			const vectorSource = new ol.source.Vector({
-				features: formatJson.readFeatures(feature),
-			});
-			vectorSource.setProperties({origProjection: linesProjection});
-			const vectorLayer = new ol.layer.Vector({
-				title: feature.properties.name,
-				source: vectorSource,
-				//style: styleFunction,
-			});
-			return vectorLayer;
-		});
-		//todo port to leaflet
-		let layerGroup = new ol.layer.Group({
-			title: `tfl_lines ${branch}`,
-			fold: 'close',
-			combined: false,
-			layers,
-		});
-		map.addLayer(layerGroup);
-	}
-}
-
-function handleStations({data, projection, map, displayProjection}) {
-	const formatJson = new ol.format.GeoJSON({
-		featureProjection: displayProjection,
-	});
-	const vectorSource = new ol.source.Vector({
-		features: formatJson.readFeatures(data),
-	});
-	vectorSource.setProperties({origProjection: projection});
-	const vectorLayer = new ol.layer.Vector({
-		title: 'tfl_stations',
-		source: vectorSource,
-		//style: styleFunction,
-	});
-	map.addLayer(vectorLayer);
-}
-
-function handleJson(responses) {
-	let files = {};
-	for (let response of responses) {
-		let projection = 
-			(response.data?.crs?.properties?.name) || 'CRS:84';
-		files[response.data.name] = {...response, projection};
-	}
-	handleLines(files.tfl_lines);
-	handleStations(files.tfl_stations);
 }
 
 //code taken from
@@ -511,10 +427,10 @@ function getMimeTypeFromUint8Array(uint8arr) {
 			case 'FFD8FFE0':
 				return 'image/jpeg';
 			default:
-				return null
+				return null;
 		}
 	}
-	return null
+	return null;
 }
 
 // calculate the extent of the most
@@ -531,6 +447,8 @@ async function raster_table(db, tableInfo) {
 		return {lat, lng};
 	}
 	
+	const table_name = tableInfo.table_name;
+	
 	await db.exec(`
 		select *
 		from (
@@ -540,13 +458,12 @@ async function raster_table(db, tableInfo) {
 				min(tile_row) as last_row,
 				max(tile_column) + 1 as last_col,
 				count(*) as ntiles
-			from ${tableInfo.table_name}
+			from ${table_name}
 			group by zoom_level
 		) as group_tiles
-		WHERE zoom_level=14
 		order by ntiles desc
 		limit 1
-	`, [tableInfo.table_name]).get.objs
+	`, [table_name]).get.objs
 	.then(objs => {
 		if (!objs.length) {
 			return;
@@ -564,7 +481,7 @@ console.log('bounds', tableInfo.bounds, tableInfo.zoom_level);
 		select zoom_level, tile_width, tile_height
 		from gpkg_tile_matrix
 		where table_name=?
-	`, [tableInfo.table_name]).get.objs
+	`, [table_name]).get.objs
 	.then(objs => {
 		tableInfo.imgSizes = objs
 		.reduce((a, level) => {
@@ -575,9 +492,19 @@ console.log('bounds', tableInfo.bounds, tableInfo.zoom_level);
 			return a;
 		}, {});
 	});
+	tableInfo.fetchTile = (x, y, z) => {
+		return db.exec(`
+			select 
+			--casttoblob(
+				tile_data
+			--)
+			from ${table_name}
+			where zoom_level=${z} and tile_column=${x} and tile_row=${y}
+		`).get.first;
+	};
 }
 
-async function gpkg_rasterLayers(db, tilesTable, target_srs) {
+async function gpkg_rasterLayers(tilesTable, target_srs) {
 	let layers = [];
 	let emptyCache = {};
 	//code taken from
@@ -618,15 +545,14 @@ async function gpkg_rasterLayers(db, tilesTable, target_srs) {
 			layer.options.bounds = L.latLngBounds(...tableInfo.bounds);
 		}
 		layer.options.imgSizes = tableInfo.imgSizes;
+		layer.options.fetchTile = tableInfo.fetchTile;
 		
-		layer.createTile1 = function (coords, done) {
-			var tile = document.createElement('div');
+		function missingTile (coords, done) {
+			let tile = document.createElement('div');
+			tile.width = coords.x;
+			tile.height = coords.y;
 			tile.innerHTML = [coords.x, coords.y, coords.z].join(', ');
 			tile.style.outline = '1px solid green';
-			
-			setTimeout(function () {
-				done(null, tile);	// Syntax is 'done(error, tile)'
-			}, 500 + Math.random() * 1500);
 			
 			return tile;
 		}
@@ -638,17 +564,14 @@ async function gpkg_rasterLayers(db, tilesTable, target_srs) {
 			let img = createImage(layer.options.imgSizes[coords.z]);
 			let timeRetrieve = `tile_${coords.x},${coords.y},${coords.z} retrieve`;
 			console.time(timeRetrieve);
-			db.exec(`
-				select tile_data
-				from ${table_name}
-				where zoom_level=${coords.z} and tile_column=${coords.x} and tile_row=${coords.y}
-			`).get.first
+			layer.options.fetchTile(coords.x, coords.y, coords.z)
 			.then(tile => {
 			console.timeEnd(timeRetrieve);
 				if (tile) {
 					//const buff = new Uint8Array(tile);
 					//let mime = getMimeTypeFromUint8Array(buff);
-					let blob = new Blob([tile]/*, {type: mime}*/);
+					let blob = new Blob([tile], //{type: mime}
+						);
 					let url = URL.createObjectURL(blob);
 					img.src = url;
 					img.onload = () => {
@@ -698,12 +621,12 @@ layer.createTile = function (coords) {
 async function london_gpkg(map) {
 	let db = await spl_loadgpkg(url, 'london_boroughs.gpkg');
 	// For each table, extract geometry and other properties
-	let {featureTable, tilesTable} = await read_gpkg(
+	let {featuresTable, tilesTable} = await gpkg_read(
 		db, /*displayProjection.srs_code*/);
 	let maxBounds;
 	let tileLayer;
 	let baseLayers = await gpkg_rasterLayers(
-		db, tilesTable, /*target_srs*/);
+		tilesTable, /*target_srs*/);
 	for (let layer of baseLayers) {
 	//console.log(layer);
 		tileLayer = layer;
@@ -712,38 +635,12 @@ async function london_gpkg(map) {
 		//maxBounds = layer.options.bounds;
 	}
 	let overLayers = await gpkg_vectorLayers(
-		featureTable, displayProjection, styles);
+		featuresTable, displayProjection, styles);
 	for (let layer of overLayers) {
 	//console.log(layer);
 		map.addLayer(layer);
 	}
 	
-	let jsonFiles = [
-		'tfl_lines.json',
-		'tfl_stations.json',
-	];
-	/*let jsonMounts = jsonFiles
-		.map(fileName => ({
-			url: new URL(
-				`./test/files/dbs/${fileName}`,
-				window.location.href).toString(),
-			filename: fileName,
-			method: 'json'
-		}));
-	let mounts = await fetchMounts(jsonMounts);
-	console.log(mounts);
-	let jsonUrls = jsonFiles
-		.map(file => new URL(
-		`./test/files/dbs/${file}`,
-		window.location.href).toString());
-	await fetchAll(
-		jsonUrls,
-		'json',
-		{
-			map,
-			displayProjection: displayProjection.srs_code,
-		}
-	).then(handleJson);*/
 	maxBounds = tileLayer?.options?.bounds;
 	if (maxBounds) {
 		console.log('yyy', maxBounds, maxBounds.isValid());
@@ -756,39 +653,63 @@ async function london_gpkg(map) {
 	return db;
 }
 
-//todo prepare the map with base
-let map = build_map('map');
-/**/
-let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	maxZoom: 16,
-	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-});
-let bwStamen = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png', {
-	maxZoom: 16,
-	attribution: `
-		&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>
-		&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
-		&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>`
 
-});
-//map.addLayer(bwStamen);
-/**/
+// main function
 
-/*var transparentLayer = new L.geoJSON(null, {
-	style: {
-		"opacity": 0,
-		"fillOpacity": 0.5 // value between 0-1 or 0% - 100%
+if (typeof 'styles' === 'undefined') {
+	var styles = {};
+}
+
+if (typeof 'userData' === 'undefined') {
+	var userData = [];
+}
+if (1) {
+	const autoGeoJSON =
+		'autoGeoJSON' in window ? window.autoGeoJSON : {
+		precision: 15,
+		options: 4,
+	};
+	const spl = await SPL(
+		{
+			autoGeoJSON,
+		},
+		[],
+	);
+	let projData = {
+		url: projdbUrl,
+		mountpoint: 'proj', 
+		filename: 'proj.db', 
+		method: 'arrayBuffer',
+	};
+	
+	let fetched = await fetchMounts([projData, ...(userData || [])]);
+	for (let [mountpoint, info] of Object.entries(fetched)) {
+		spl.mount(mountpoint, [info]);
 	}
-});
-map.addLayer(transparentLayer);*/
-
-//todo prepare db and layers
-let db = await london_gpkg(map);
-//let db = await spl_loadgpkg();
-//let db = await spl_db();
-
-//todo show the map
-show_map(map, viewOptions);
-
-//todo show sql console
-let sqlConsole = new SQLQuery('div#sqlQuery', db, map);
+	
+	let db;
+	
+	if (dbMount in fetched) {
+		if (0) {
+		db = await spl.db()
+			.load(`file:${dbMount}/${fetched[dbMount].filename}?immutable=1`)
+		}
+		if (1) {
+		db = await spl.db(fetched[dbMount].data);
+		}
+	}
+	else {
+		db = await spl.db()
+	}
+	await db.read(init_sql());
+	
+	let {featuresTable, tilesTable} = await gpkg_read(
+		db, /*displayProjection.srs_code*/);
+	let baseLayers = await gpkg_rasterLayers(
+		tilesTable, /*target_srs*/);
+	let overLayers = await gpkg_vectorLayers(
+		featuresTable, displayProjection, styles);
+ 	if ('onMounted' in window) {
+		onMounted(db, fetched, {baseLayers, overLayers});
+	}
+}

@@ -76,6 +76,42 @@ function calcExtent(layers) {
 	return extent;
 }
 
+function makeLayerJSON(json, name, {sldStyle, style={}}={}) {
+	const formatJson = new ol.format.GeoJSON({
+		featureProjection: displayProjection.name,
+	});
+	const vectorSource = new ol.source.Vector({
+		features: formatJson.readFeatures(json),
+	});
+	let projection = 'CRS:84';
+	let crsSection = json?.crs;
+	if (crsSection?.type === 'name') {
+		projection = crsSection.properties.name;
+	}
+	else if (crsSection?.type) {
+		projection = crsSection.type + ':' + crsSection.properties.code;
+	}
+	vectorSource.setProperties({origProjection: projection});
+	const vectorLayer = new ol.layer.Vector({
+		title: name,
+		source: vectorSource,
+		style: style,
+	});
+}
+
+function makeLayerGroup(data, name) {
+	let layerGroup = new ol.layer.Group({
+		title: name,
+		fold: 'close',
+		combined: false,
+	});
+	for (let [name, json] of Object.entries(data)) {
+		let layer = makeLayerJSON(json, name);
+		layerGroup.addLayer(layer);
+	}
+	return layerGroup;
+}
+
 function colorStyle(mainColor='orange', opacity=0.05) {
 	const dimColor = ol.color.asString(
 		ol.color.asArray(mainColor).slice(0, 3).concat(opacity));

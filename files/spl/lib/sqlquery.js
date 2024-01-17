@@ -130,13 +130,100 @@ function isElement($obj) {
 	}
 }
 
+function gridTree(rows, row0=0, col0=0, last=null) {
+	
+	if (row0 >= rows.length || col0 >= rows[row0].length) {
+		return;
+	}
+	let summary = rows[row0][col0];
+	if (!summary) {
+		return;
+	}
+	let row = row0;
+	if (last === null) {
+		last = rows.length;
+	}
+	let result = [];
+	for(++row; row < last; ++row) {
+		if (summary != rows[row][col0]) {
+			let details = gridTree(rows, row0, col0 + 1, row);
+			result.push({summary, details});
+			row0 = row;
+			summary = rows[row0][col0];
+		}
+	}
+	if (row > row0) {
+		let details = gridTree(rows, row0, col0 + 1, row);
+		result.push({summary, details});
+	}
+	return result;
+}
+
+/*
+the code for the tree view originates
+is from https://iamkate.com/code/tree-views/
+*/
+function htmlTree(tree) {
+	const htmlNode = node => {
+		return node.details ? `
+			<li class="details"><details>
+				<summary>${node.summary}</summary>
+				${htmlTree(node.details)}
+			</details></li>` : `<li>${node.summary}</li>`;
+	}
+	return `<ul>${tree.map(htmlNode).join('\n')}</ul>`;
+}
+
 const snippets = {
-	tileRows: {
+	schemaTree: {
 		query: `
-			select *
-			from tiles
-			limit 5
-			`,
+SELECT
+'tables' as tables,
+tbl_name ||
+case
+when sqlite_schema.type='index'
+	then ' (table)'
+else ' (' || sqlite_schema.type || ')'
+end as entity,
+case
+when sqlite_schema.type='index'
+	then 'index ' || sqlite_schema.name
+when sqlite_schema.type='trigger'
+	then null
+else 'columns'
+end as [group],
+case
+when sqlite_schema.type='index'
+	then index_fields.name
+else table_fields.name || ' ' ||
+table_fields.type ||
+(case when [notnull]>0 then ' not null' else '' end) ||
+(case when dflt_value is not null then ' default(' || cast(dflt_value as TEXT) || ')' else '' end) ||
+(case when pk>0 then ' primary key' else '' end)
+end as field
+--, table_fields.*
+--, index_fields.*
+FROM sqlite_schema
+left outer JOIN pragma_table_info(sqlite_schema.name) table_fields
+left outer JOIN pragma_index_info(sqlite_schema.name) index_fields
+WHERE sqlite_schema.name NOT LIKE 'sqlite_%'
+and sqlite_schema.type<>'view'
+order by 
+tbl_name, 
+sqlite_schema.type desc,
+[group],
+coalesce(table_fields.cid, 0),
+coalesce(index_fields.seqno, 0)
+		`,
+		spatial: false,
+	},
+	gpkgSchema: {
+		query: `
+			SELECT 
+			'gpkg' as gpkg,
+			data_type,
+			table_name
+			FROM gpkg_contents`,
 		spatial: false,
 	},
 	allTables: {
@@ -196,12 +283,13 @@ const snippets = {
 		query: `
 			with icons as $(pinpng)
 			SELECT
-				flatstyle, 
-				makepoint(
+				flatstyle,
+				style,
+				asgeojson(makepoint(
 					100 + 40 * sin((value % 5) * radians(360) / 5),
 					100 + 40 * cos((value % 5) * radians(360) / 5),
 					3857
-				) as feature
+				)) as feature
 			FROM generate_series as ctr
 			inner join icons on 1
 			where ctr.start=0 and ctr.stop=5`,
@@ -234,7 +322,32 @@ const snippets = {
 					--'circle-stroke-color', 'blue',
 					--'circle-stroke-width', 1,
 					--'circle-radius', 5
-				) as flatstyle
+				) as flatstyle,
+				json_object(
+					--'text-value', '',
+					'icon-color', '#8959A8',
+					'icon-cross-origin', 'anonymous',
+					'iconUrl', 'data:'||
+						'image/png;base64,
+						iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
+						AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
+						VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
+						yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
+						yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
+						sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
+						1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
+						D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
+						jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
+						aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
+						Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
+						7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
+						Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
+						'
+					
+					--'circle-stroke-color', 'blue',
+					--'circle-stroke-width', 1,
+					--'circle-radius', 5
+				) as style
 				`,
 		spatial: false,
 	},
@@ -276,6 +389,13 @@ const snippets = {
 					'stroke-width', 2,
 					'text-value', cast (n as text)
 				) as flatstyle,
+				json_object(
+					'fillColor', color,
+					'fillOpacity', 0.05,
+					'color', color,
+					'opacity', 1,
+					'weight', 2
+				) as style,
 				cast (n as text) as name
 			FROM t1`,
 		spatial: false,
@@ -290,6 +410,7 @@ const snippets = {
 					'properties',
 					json_object(
 						'name', name,
+						'style', json(style),
 						'flatstyle', json(flatstyle)
 					)
 				) as feature
@@ -324,7 +445,14 @@ const snippets = {
 					'stroke-color', color,
 					'stroke-width', 2,
 					'text-value', cast (n as text)
-				) as flatstyle
+				) as flatstyle,
+				json_object(
+					'fillColor', color,
+					'fillOpacity', 0.05,
+					'color', color,
+					'opacity', 1,
+					'weight', 2
+				) as style
 			from (
 				select
 					makepoint(
@@ -351,6 +479,7 @@ const snippets = {
 					'properties',
 					json_object(
 						'name', name,
+						'style', json(style),
 						'flatstyle', json(flatstyle)
 					)
 				) as feature
@@ -884,6 +1013,42 @@ class SQLQuery {
 	}
 	
 	showLayer(tabId, tabLabel, rows) {
+		//let layer = L.Proj.geoJson(false);
+		let layer = makeLayerJSON(false, tabLabel);
+		layer.tabId = tabId;
+		layer.options.name = tabLabel;
+		//retrieve with layer.feature.properties
+		let dataProjection = 'EPSG:900913';
+		for (let row of rows) {
+			let {feature, crs, ...properties} = row;
+			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
+				feature = {
+					type: 'Feature',
+					properties,
+					crs,
+					geometry: feature,
+				}
+			}
+			if (!crs) {
+				feature.crs = {properties: {name: dataProjection}};
+			}
+			if (!feature.crs.type) {
+				feature.crs.type = 'name';
+			}
+			layer.addData(feature);
+		}
+		//interstimg the followimh works only after adding the features.
+		layer.eachLayer(featureInstanceLayer => {
+			let style = featureInstanceLayer.feature?.properties?.style;
+			if (style && featureInstanceLayer.setStyle) {
+				featureInstanceLayer?.setStyle(style);
+			}
+		});
+		this.map.addLayer(layer);
+		show_map(this.map);
+	}
+	
+	showLayer_ol(tabId, tabLabel, rows) {
 		let vectorSource = new ol.source.Vector();
 		let dataProjection = 'EPSG:900913';
 		let featureProjection = 'EPSG:3857';
@@ -1095,6 +1260,16 @@ class SQLQuery {
 			</style>
 				
 			<style>
+				#${this.rootId} div.query-container {
+					width: 98vw;
+					height: 60vh;
+					overflow: auto;
+					border: solid;
+					white-space:nowrap;
+				}
+				#${this.rootId} div.schema li.details {
+					display: block;
+				}
 				#${this.rootId} table.sqlResults thead,
 				#${this.rootId} table.sqlResults tfoot {
 					position: sticky;
@@ -1193,14 +1368,43 @@ class SQLQuery {
 			.addEventListener('click', e => {this.popupClose()});
 		this.createTab(
 			'snippets', `
-			<div style="width: 98vw; height: 60vh; overflow: auto; border: solid;">
+			<div class="query-container">
 				<table border="1"><tbody class="snippetsMenu"></tbody></table>
 			</div>`
 		);
 		this.sqlQuery.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
+		this.schemaTree();
 		this.buildSnippetsMenu();
 		this.addQueryTab();
+	}
+	
+	async schemaTree() {
+		let [tab, tabInfo] = this.createTab(
+			'schema', `
+			<div class="query-container schema">
+			</div>`,
+			false);
+		
+		let tables = await this.db.exec(snippets.schemaTree.query).get.rows;
+		let tree = gridTree(tables);
+		let isGpkg = await this.db.exec(`
+			SELECT count(*)
+			FROM sqlite_schema
+			WHERE name LIKE 'gpkg_contents'
+		`).get.first;
+		if (isGpkg) {
+			let gpkgTables = await this.db.exec(snippets.gpkgSchema.query).get.rows;
+			let gpkgTree = gridTree(gpkgTables);
+			tree.push(...gpkgTree);
+		}
+		
+		let container = tabInfo.querySelector('.query-container');
+		container.insertAdjacentHTML(
+			'beforeend',
+			htmlTree(tree)
+		);
+		//console.log(JSON.stringify(tree, null, 4));
 	}
 	
 	popupClose() {
@@ -1251,9 +1455,7 @@ class SQLQuery {
 		let tabInfos = this.sqlQuery.querySelector('.tab-content');
 		tabInfos.insertAdjacentHTML(
 			'beforeend',
-			`<div class="tabs__tab ${_class}" data-tab-info="${_class}" data-tab-label="${label}">
-				${content}
-			</div>`
+			`<div class="tabs__tab ${_class}" data-tab-info="${_class}" data-tab-label="${label}">${content || ''}</div>`
 		);
 		let tab = tabs.querySelector(`span[data-tab-value=".${_class}"]`);
 		if (withClose) {
@@ -1273,7 +1475,7 @@ class SQLQuery {
 			<table border="0"><tbody class="sqlParams"></tbody></table>
 			<div style="width: 98vw;">
 			<div class="query-control" style="width: 70%;">
-				<textarea class="query" style="white-space: nowrap; tab-size: 4;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+				<textarea class="query" style="white-space: nowrap; tab-size: 4; resize: none;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
 			</div>
 			<div class="query-control" style="width: 28%;">
 				<button class="add-param">add param</button>
@@ -1284,7 +1486,7 @@ class SQLQuery {
 				<button class="map-query">map</button>
 			</div>
 			</div>
-			<div style="width: 98vw; height: 60vh; overflow: auto; border: solid;">
+			<div class="query-container">
 				<table border="1" class="sqlResults">
 					<thead></thead>
 					<tbody></tbody>

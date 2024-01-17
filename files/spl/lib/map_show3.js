@@ -21,12 +21,12 @@ const onLayerClick = (e) => {
 };
 
 function onEachFeature(feature, layer) {
-	let label = feature?.properties?.name_greek;
+	let label = feature?.properties?.name;
 	if (label) {
-		//layer.bindPopup(label);
+		layer.setText(label, {below: true});
 	}
 	if (feature?.properties?.style) {
-		//
+		//console.log(feature);
 	}
 	layer.on('click', onLayerClick);
 }
@@ -36,7 +36,12 @@ function makeLayerJSON(json, name, {sldStyle, style}={}) {
 		return !feature.properties.hide_on_map;
 	}
 	function pointToLayer(feature, latlng) {
-		return L.marker(latlng, 'iconUrl' in (style || {}) ? {icon: L.icon(style)} : undefined)
+		let featureStyle = feature?.properties?.style || style;
+		let icon;
+		if ('iconUrl' in (featureStyle || {})) {
+			icon = {icon: L.icon(featureStyle)};
+		}
+		return L.marker(latlng, icon)
 		//return L.circleMarker(latlng)
 			.bindPopup(feature.properties.name);
 	}
@@ -55,7 +60,7 @@ function makeLayerJSON(json, name, {sldStyle, style}={}) {
 		pointToLayer,
 		style: style || styleFunction || json?.properties?.style,
 	});
-	console.log('style:', style || styleFunction || json?.properties?.style);
+//console.log('style:', style || styleFunction || json?.properties?.style);
 	layer.options.name = name;
 	let crsSection = json?.crs;
 	let crs;
@@ -82,13 +87,23 @@ function makeLayerJSON(json, name, {sldStyle, style}={}) {
 	
 	layer.eachLayer(featureInstanceLayer => {
 		let style = featureInstanceLayer.feature?.properties?.style;
-//console.log(featureInstanceLayer, featureInstanceLayer.setStyle, style);
+//console.log('123', featureInstanceLayer, featureInstanceLayer.setStyle, style);
 		if (style && featureInstanceLayer.setStyle) {
 			featureInstanceLayer?.setStyle(style);
 		}
 	});
 	
 	return layer;
+}
+
+function makeLayerGroup(data, name) {
+	let layerGroup = L.layerGroup();
+	layerGroup.options.name = name;
+	for (let [name, json] of Object.entries(data)) {
+		let layer = makeLayerJSON(json, name);
+		layerGroup.addLayer(layer);
+	}
+	return layerGroup;
 }
 
 function build_map(target='map') {
@@ -98,7 +113,7 @@ function build_map(target='map') {
 	;
 	let map = L.map(mapdef, {
 		// https://leafletjs.com/reference.html#map-zoomsnap
-		//zoomSnap: 2,
+		zoomSnap: 0,
 		worldCopyJump: true,
 	});
 	
@@ -111,7 +126,9 @@ function build_map(target='map') {
 			.openOn(map);
 	};
 	map.on('click', onMapClick);
-
+	
+	L.control.scale({metric: true}).addTo(map);
+	
 	return map;
 }
 
@@ -122,7 +139,7 @@ function build_map1(target='map') {
 	;
 	let map = L.map(mapdef, {
 		// https://leafletjs.com/reference.html#map-zoomsnap
-		zoomSnap: 0,
+		//zoomSnap: 0,
 	})
 	//.setView([51.505, -0.09], 13)
 	;
@@ -200,6 +217,14 @@ function build_map1(target='map') {
                     attribution: attrLink,
                     maxZoom: 18,
                 });
+                
+            var transparentLayer = new L.geoJSON(null, {
+				style: {
+					"opacity": 0,
+					"fillOpacity": 0.5 // value between 0-1 or 0% - 100%
+				}
+			});
+
 	
 	layerControl.addBaseLayer(openTopoMap, "OpenTopoMap");
 	//map.addLayer(osm);
@@ -209,8 +234,6 @@ function build_map1(target='map') {
 
 
 function show_map(map, viewOptions=[]) {
-	L.control.scale({metric: true}).addTo(map);
-	
 	//todo break viewOptions in center & zoom
 	if (viewOptions && viewOptions.length) {
 		map.setView(...viewOptions);
@@ -229,9 +252,12 @@ function show_map(map, viewOptions=[]) {
 				bounds.extend(layerBounds);
 			}
 		});
-	console.log('calc bounds', bounds?.isValid(), bounds.getCenter());
+	//console.log('calc bounds', bounds?.isValid(), bounds.getCenter());
 		if (bounds && bounds.isValid()) {
 			map.fitBounds(bounds);
+		}
+		else {
+			map.setView([0, 0], 1);
 		}
 	}
 	map.on("baselayerchange",
