@@ -97,21 +97,6 @@ async function load_features(db, tableInfo, target_srs) {
 		},
 		features: features,
 	};
-	if (0) {
-		let zip = new JSZip();
-		zip.file(
-			`${table_name}.geojson`,
-			JSON.stringify(collection, null, '\t'));
-		zip.generateAsync({
-			type: "blob",
-			compression: "DEFLATE"
-		})
-		.then((arc) => {
-			// see FileSaver.js
-			//saveAs(content, `${table_name}.zip`);
-			saveAs(arc, `${table_name}.zip`);
-		});
-	}
 	
 	return collection;
 }
@@ -186,6 +171,7 @@ async function read_gpkg(db, target_srs) {
 		WHERE srs_id>0 AND srs_id NOT IN (4326, 3857);
 	`).get.rows;
 	//todo run this with each loaded geojson
+	console.log(3333, projections);
 	proj4.defs(projections);
 	
 	// Extract SLD styles for each layer (if styles included in the gpkg)
@@ -217,32 +203,6 @@ async function read_gpkg(db, target_srs) {
 	}
 	
 	return featureTable;
-}
-
-/**
- * @param {object} vectorLayer
- * @param {string} text the xml text
- * apply sld
- */
-function applySLD(vectorLayer, text) {
-	const sldObject = SLDReader.Reader(text);
-	// for debugging
-	//	window.sldObject = sldObject;
-	const sldLayer = SLDReader.getLayer(sldObject);
-	const style = SLDReader.getStyle(sldLayer);
-	const featureTypeStyle = style.featuretypestyles[0];
-
-	vectorLayer.setStyle(
-		SLDReader.createOlStyleFunction(
-			featureTypeStyle, {
-				imageLoadedCallback: () => {
-					// Signal OpenLayers to redraw the layer when an image icon has loaded.
-					// On redraw, the updated symbolizer with the correct image scale will be used to draw the icon.
-					vectorLayer.changed();
-				},
-			}
-		)
-	);
 }
 
 function init_sql(projFile) {
@@ -393,47 +353,57 @@ function osm_layer() {
 	});
 }
 
-function build_map(target='map') {
-	// Create Map canvas and View
-	return new ol.Map({
-		target: target,
-		layers: [],
-	});
-}
-
 async function gpkg_layers(featureTable, target_srs) {
 	// (Note: becomes OpenLayers-specific from here)
 	// Make non-built-in projections defined in proj4 available in OpenLayers.
 	// (must be done before GeoPackages are loaded)
-	ol.proj.proj4.register(proj4);
 	let vectorLayers = [];
 	for (let tableInfo of featureTable) {
 		let tableDataProjection = tableInfo.srs_code;
-		const formatJson = new ol.format.GeoJSON({
-			dataProjection: (tableInfo.features?.crs?.properties?.name) || 'CRS:84',
-			featureProjection: target_srs.srs_code,
-		});
 		let table_name = tableInfo.table_name;
-		
-		let label = `layer ${table_name}`;
-		console.time(label);
-		
-		let features = formatJson.readFeatures(tableInfo.features);
+		/**
 		let vectorSource = new ol.source.Vector({
-			features: features,
+//			features: features,
 		});
-		// For information only, save details of original projection (SRS)
 		vectorSource.setProperties({origProjection: tableDataProjection});
 		
-		const vectorLayer = new ol.layer.Vector({
+		let vectorLayer = new ol.layer.Vector({
 			title: table_name,
 			source: vectorSource,
 			//style: colorStyle(),
 		});
+		**/
+		let dataProjection = (tableInfo.features?.crs?.properties?.name) || tableDataProjection;
+		let featureProjection = target_srs.srs_code;
+		const projections = {
+			dataProjection,
+			featureProjection,
+		};
+
+		let label = `layer ${table_name}`;
+		console.time(label);
+		
+		/**/
+		let vectorLayer = makeLayerJSON(
+			table_name, {
+				style: colorStyle('blue'),
+				sldStyle: tableInfo.style,
+			}
+		);
+		/**/
+		if (0) {
+		const formatJson = new ol.format.GeoJSON({featureProjection});
+		let features = formatJson.readFeatures(tableInfo.features);
+		vectorLayer.getSource().addFeatures(features, {featureProjection});
+		console.log(22222, dataProjection, featureProjection, tableInfo.features, features[0].getGeometry().getCoordinates());
+		}
+		else {
+		addJSON(vectorLayer, tableInfo.features);
+		}
 		console.timeEnd(label);
 		
 		if ('style' in tableInfo) {
-			applySLD(vectorLayer, tableInfo.style);
+			//applySLD(vectorLayer, tableInfo.style);
 		}
 		vectorLayers.push(vectorLayer);
 	}
@@ -592,8 +562,8 @@ async function london_gpkg(map) {
 let map = build_map('map');
 map.addLayer(osm_layer());
 
-//let db = await london_gpkg(map);
-let db = await spl_loadgpkg();
+let db = await london_gpkg(map);
+//let db = await spl_loadgpkg();
 //let db = await spl_db();
 
 

@@ -169,7 +169,8 @@ function htmlTree(tree) {
 			<li class="details"><details>
 				<summary>${node.summary}</summary>
 				${htmlTree(node.details)}
-			</details></li>` : `<li>${node.summary}</li>`;
+			</details></li>` :
+			`<li class="leaf">${node.summary}</li>`;
 	}
 	return `<ul>${tree.map(htmlNode).join('\n')}</ul>`;
 }
@@ -201,8 +202,6 @@ table_fields.type ||
 (case when dflt_value is not null then ' default(' || cast(dflt_value as TEXT) || ')' else '' end) ||
 (case when pk>0 then ' primary key' else '' end)
 end as field
---, table_fields.*
---, index_fields.*
 FROM sqlite_schema
 left outer JOIN pragma_table_info(sqlite_schema.name) table_fields
 left outer JOIN pragma_index_info(sqlite_schema.name) index_fields
@@ -219,12 +218,52 @@ coalesce(index_fields.seqno, 0)
 	},
 	gpkgSchema: {
 		query: `
-			SELECT 
-			'gpkg' as gpkg,
-			data_type,
-			table_name
-			FROM gpkg_contents`,
+SELECT 
+'gpkg' as gpkg,
+data_type,
+gpkg_contents.table_name,
+'column ' || column_name || ' ' || 
+geometry_type_name || ' ' ||
+'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
+'x y' ||
+case when z<>0 then ' z' else '' end ||
+case when m<>0 then ' m' else '' end
+as column
+FROM gpkg_contents
+left outer join gpkg_geometry_columns 
+on gpkg_contents.table_name=gpkg_geometry_columns.table_name
+			`,
 		spatial: false,
+	},
+	spatialiteSchema: {
+		query: `
+select 'geometries', 'tables',
+f_table_name as [table],
+f_geometry_column || ' ' ||
+cast (geometry_type as TEXT) as column
+from geometry_columns
+union all
+select 'geometries', 'views',
+view_name as [view],
+view_geometry as geometry
+from views_geometry_columns
+union all
+select 'geometries', 'virts',
+virt_name as virt,
+virt_geometry as geometry
+from virts_geometry_columns
+union all
+select 'networks',
+network_name,
+null, null
+from networks
+union all
+select 'topologies',
+topology_name,
+null, null
+from topologies
+		`,
+		spatial: true,
 	},
 	allTables: {
 		query: `
@@ -1014,11 +1053,11 @@ class SQLQuery {
 	
 	showLayer(tabId, tabLabel, rows) {
 		//let layer = L.Proj.geoJson(false);
-		let layer = makeLayerJSON(false, tabLabel);
+		let layer = makeLayerJSON(tabLabel);
 		layer.tabId = tabId;
-		layer.options.name = tabLabel;
 		//retrieve with layer.feature.properties
 		let dataProjection = 'EPSG:900913';
+		//may set layer projection afterwards 
 		for (let row of rows) {
 			let {feature, crs, ...properties} = row;
 			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
@@ -1030,29 +1069,49 @@ class SQLQuery {
 				}
 			}
 			if (!crs) {
-				feature.crs = {properties: {name: dataProjection}};
+				feature.crs = {
+					properties: {name: dataProjection},
+					type: 'name',
+				};
 			}
 			if (!feature.crs.type) {
 				feature.crs.type = 'name';
 			}
-			layer.addData(feature);
+			addJSON(layer, feature);
 		}
-		//interstimg the followimh works only after adding the features.
-		layer.eachLayer(featureInstanceLayer => {
-			let style = featureInstanceLayer.feature?.properties?.style;
-			if (style && featureInstanceLayer.setStyle) {
-				featureInstanceLayer?.setStyle(style);
-			}
-		});
 		this.map.addLayer(layer);
 		show_map(this.map);
 	}
 	
-	showLayer_ol(tabId, tabLabel, rows) {
-		let vectorSource = new ol.source.Vector();
+	showLayer_(tabId, tabLabel, rows) {
+		let vectorLayer = makeLayerJSON(
+			tabLabel);
 		let dataProjection = 'EPSG:900913';
 		let featureProjection = 'EPSG:3857';
 		const formatJson = new ol.format.GeoJSON();
+		/*
+		let vectorSource = new ol.source.Vector();
+		vectorSource.setProperties({
+			origProjection: dataProjection,
+		});
+		const vectorLayer = new ol.layer.Vector({
+			title: tabLabel,
+			tabId,
+			source: vectorSource,
+			style: (feature, resolution) => {
+				let style;
+				if (!feature.get('styled')) {
+					let flatstyle = feature.get('flatstyle') || {};
+					let parsingContext = ol.expr.expression.newParsingContext();
+					style = ol.render.canvas.style.buildStyle(flatstyle, parsingContext)();
+					feature.setStyle(style);
+					feature.set('styled', true);
+				}
+				style = feature.getStyle();
+				return style;
+			},
+		});
+		*/
 		for (let row of rows) {
 			let {feature, ...properties} = row;
 			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
@@ -1068,34 +1127,14 @@ class SQLQuery {
 			}
 			let features = formatJson.readFeatures(feature, {
 				dataProjection: dataProjection,
-				featureProjection: featureProjection,
+				featureProjection: 'EPSG:3857',
 			});
+			console.log('//////', dataProjection, feature);
 			features[0].setProperties(properties);
-			vectorSource.addFeatures(features);
+			vectorLayer.getSource().addFeatures(features);
+			//vectorLayer.getSource().refresh();
+			//vectorLayer.setSource(vectorLayer.getSource());
 		}
-		vectorSource.setProperties({
-			origProjection: dataProjection,
-		});
-		const vectorLayer = new ol.layer.Vector({
-			title: tabLabel,
-			tabId,
-			source: vectorSource,
-			style: (feature, resolution) => {
-				let style;
-				if (!feature.get('styled')) {
-					let flatstyle = feature.get('flatstyle') || {};
-					let parsingContext = ol.expr.expression.newParsingContext();
-					style = ol.render.canvas.style.buildStyle(flatstyle, parsingContext)();
-					//style = ol.render.canvas.style.flatStylesToStyleFunction(
-					//	[flatstyle], feature, resolution);
-					//console.log('Style', style);
-					feature.setStyle(style);
-					feature.set('styled', true);
-				}
-				style = feature.getStyle();
-				return style;
-			},
-		});
 		this.map.addLayer(vectorLayer);
 		show_map(this.map, featureProjection, '#hit-tolerance');
 	}
@@ -1295,6 +1334,7 @@ class SQLQuery {
 				#${this.rootId} .query-control {
 					float: inline-start;
 					margin: 0;
+					padding: 1px;
 				}
 				#${this.rootId} .map-query {
 					display: ${this.map ? 'inline-block' : 'none'};

@@ -34,6 +34,7 @@ async function build_source(db, tableInfo, displayProjection) {
 		let geomProp = properties[geometry_column_name];
 		delete properties[geometry_column_name];
 		if (geomProp.hasOwnProperty('coordinates')) {
+console.log(33333, tableDataProjection, displayProjection, geomProp, features)
 			features = formatJson.readFeatures(geomProp);
 		}
 		else {

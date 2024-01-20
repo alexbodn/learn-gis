@@ -51,6 +51,15 @@ class SelectHitTolerance {
 	}
 };
 
+function build_map(target='map') {
+//	ol.proj.proj4.register(proj4);
+	// Create Map canvas and View
+	return new ol.Map({
+		target: target,
+		layers: [],
+	});
+}
+
 function calcExtent(layers) {
 	let extent = ol.extent.createEmpty();
 	layers.forEach(layer => {
@@ -76,27 +85,77 @@ function calcExtent(layers) {
 	return extent;
 }
 
-function makeLayerJSON(json, name, {sldStyle, style={}}={}) {
-	const formatJson = new ol.format.GeoJSON({
-		featureProjection: displayProjection.name,
-	});
-	const vectorSource = new ol.source.Vector({
-		features: formatJson.readFeatures(json),
-	});
-	let projection = 'CRS:84';
-	let crsSection = json?.crs;
-	if (crsSection?.type === 'name') {
-		projection = crsSection.properties.name;
-	}
-	else if (crsSection?.type) {
-		projection = crsSection.type + ':' + crsSection.properties.code;
-	}
-	vectorSource.setProperties({origProjection: projection});
+/**
+ * @param {object} vectorLayer
+ * @param {string} text the xml text
+ * apply sld
+ */
+function applySLD(vectorLayer, text) {
+	const sldObject = SLDReader.Reader(text);
+	// for debugging
+	//	window.sldObject = sldObject;
+	const sldLayer = SLDReader.getLayer(sldObject);
+	const style = SLDReader.getStyle(sldLayer);
+	const featureTypeStyle = style.featuretypestyles[0];
+
+	vectorLayer.setStyle(
+		SLDReader.createOlStyleFunction(
+			featureTypeStyle, {
+				imageLoadedCallback: () => {
+					// Signal OpenLayers to redraw the layer when an image icon has loaded.
+					// On redraw, the updated symbolizer with the correct image scale will be used to draw the icon.
+					vectorLayer.changed();
+				},
+			}
+		)
+	);
+}
+
+function makeLayerJSON(name, {sldStyle, style}={}) {
+	ol.proj.proj4.register(proj4);
+	const vectorSource = new ol.source.Vector();
 	const vectorLayer = new ol.layer.Vector({
 		title: name,
 		source: vectorSource,
-		style: style,
+		style,
 	});
+	if (sldStyle) {
+		applySLD(vectorLayer, sldStyle);
+	}
+	return vectorLayer;
+}
+
+function addJSON(layer, json, dataProjection='CRS:84', featureProjection='EPSG:3857') {
+	let crsSection = json?.crs;
+	if (crsSection?.type === 'name' || crsSection?.properties?.name && !crsSection.type) {
+		dataProjection = crsSection.properties.name;
+	}
+	else if (crsSection?.type) {
+		dataProjection = crsSection.type + ':' + crsSection.properties.code;
+	}
+	const formatJson = new ol.format.GeoJSON();
+	let features = formatJson.readFeatures(json, {
+		dataProjection, featureProjection
+	});
+	for (let feature of features) {
+		let flatstyle = feature.get('flatstyle');
+		if (flatstyle) {
+			let fillColor = flatstyle['fill-color'];
+			let fillOpacity = flatstyle['fill-opacity'];
+			if (fillColor && fillOpacity) {
+				flatstyle['fill-color'] = ol.color.asString(
+					ol.color.asArray(fillColor)
+					.slice(0, 3).concat(fillOpacity));
+			}
+			let parsingContext = ol.expr.expression.newParsingContext();
+			let style = ol.render.canvas.style.buildStyle(flatstyle, parsingContext)();
+			feature.setStyle(style);
+		}
+	}
+	//todo do i need copy properties explicitly?
+	//features[0].setProperties(features.properties);
+	layer.getSource().setProperties({origProjection: dataProjection});
+	layer.getSource().addFeatures(features);
 }
 
 function makeLayerGroup(data, name) {

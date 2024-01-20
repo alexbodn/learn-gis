@@ -40,10 +40,14 @@
 		<style>
 			body {
 				/*margin: 0px;*/
+				margin-left: 0;
+				margin-right: 0;
 			}
 			.map {
 				width: 98vw;
-				height: 60vh;
+				height: 59vh;
+				margin-top: 1vh;
+				margin-left: 1vw;
 				border: solid 1px gray;
 				/*position: fixed;*/
 			}
@@ -92,8 +96,8 @@ const userData = [
 ];
 */
 
-async function onMounted(db, fetched, {baseLayers, overLayers}) {
-
+function onMounted(db, fetched, {baseLayers, overLayers}) {
+	
 	let map = build_map('map');
 	/**/
 	if (!baseLayers.length) {
@@ -129,6 +133,14 @@ async function onMounted(db, fetched, {baseLayers, overLayers}) {
 		map.addLayer(layer);
 	}
 	
+	for (let [mount, info] of Object.entries(fetched)) {
+		if ('layers' in info) {
+			for (let layer of info.layers) {
+				map.addLayer(layer);
+			}
+		}
+	}
+	
 	if (typeof 'viewOptions' === 'undefined') {
 		var viewOptions = null;
 	}
@@ -141,6 +153,23 @@ async function onMounted(db, fetched, {baseLayers, overLayers}) {
 		
 		<script src="./lib/jszip.min.js" type="text/javascript"></script>
 		<script src="./lib/filesaver.js" type="text/javascript"></script>
+		<script>
+		function saveJSON(fileName, data) {
+				let zip = new JSZip();
+				zip.file(
+					`${fileName}.geojson`,
+					JSON.stringify(data, null, '\t'));
+				zip.generateAsync({
+					type: "blob",
+					compression: "DEFLATE"
+				})
+				.then((arc) => {
+					// see FileSaver.js
+					//saveAs(content, `${table_name}.zip`);
+					saveAs(arc, `${fileName}.zip`);
+				});
+			}
+		</script>
 		<!--script src="./lib/eruda.js" type="text/javascript"></script-->
 		<script type="module" src="./lib/spl-view3.js"></script>
 		<script>

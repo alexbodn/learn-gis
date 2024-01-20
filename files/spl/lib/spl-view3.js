@@ -309,7 +309,11 @@ async function fetchMounts(urlsInfo) {
 				return response[method]();
 			})
 			.then(data => {
-				mounts[info.mountpoint] = {data, name: info.filename};
+				let mount = {data, name: info.filename};
+				mounts[info.mountpoint] = mount;
+				if ('onFetch' in info) {
+					info.onFetch(mount);
+				}
 				return {data, ...info};
 			})
 			.catch(error => ({error, url, ...info}))
@@ -374,12 +378,12 @@ async function gpkg_vectorLayers(featuresTable, target_srs, styles={}) {
 		let label = `layer ${table_name}`;
 		console.time(label);
 		let layer = makeLayerJSON(
-			tableInfo.features,
 			table_name,
 			{
 				sldStyle: tableInfo.style,
 				style: styles[table_name]
 			});
+		addJSON(layer, tableInfo.features);
 		console.timeEnd(label);
 		layers.push(layer);
 	}
@@ -656,13 +660,9 @@ async function london_gpkg(map) {
 
 // main function
 
-if (typeof 'styles' === 'undefined') {
-	var styles = {};
-}
+var styles = window.styles;
+var userData = window.userData || [];
 
-if (typeof 'userData' === 'undefined') {
-	var userData = [];
-}
 if (1) {
 	const autoGeoJSON =
 		'autoGeoJSON' in window ? window.autoGeoJSON : {
@@ -682,9 +682,11 @@ if (1) {
 		method: 'arrayBuffer',
 	};
 	
-	let fetched = await fetchMounts([projData, ...(userData || [])]);
+	let fetched = await fetchMounts([projData, ...userData]);
 	for (let [mountpoint, info] of Object.entries(fetched)) {
-		spl.mount(mountpoint, [info]);
+		if (info.filename) {
+			spl.mount(mountpoint, [info]);
+		}
 	}
 	
 	let db;

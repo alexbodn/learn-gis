@@ -12,7 +12,7 @@ const onLayerClick = (e) => {
 		}
 	}
 	L.DomEvent.stopPropagation(e);
-	let label = feature?.properties?.name_greek || 'the map';
+	let label = feature?.properties?.name || 'the map';
 	L.popup()
 		.setLatLng(e.latlng)
 		.setContent(`You clicked ${label} at ${coords.toString()}`)
@@ -22,46 +22,58 @@ const onLayerClick = (e) => {
 
 function onEachFeature(feature, layer) {
 	let label = feature?.properties?.name;
-	if (label) {
-		layer.setText(label, {below: true});
+	if (false && label) {
+		//layer.setText(label, {below: true});
+		layer.bindTooltip(label, {
+			permanent: true,
+			className: 'myClass',
+			direction: 'center',
+		}).openTooltip();
 	}
-	if (feature?.properties?.style) {
-		//console.log(feature);
+	let style = feature?.properties?.style;
+	if (style) {
+		//console.log(feature, layer);
+		layer.setStyle(style);
 	}
 	layer.on('click', onLayerClick);
 }
 
-function makeLayerJSON(json, name, {sldStyle, style}={}) {
+function makeLayerJSON(json, name, {sldStyle, style, dataProjection}={}) {
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
 	}
 	function pointToLayer(feature, latlng) {
-		let featureStyle = feature?.properties?.style || style;
-		let icon;
-		if ('iconUrl' in (featureStyle || {})) {
-			icon = {icon: L.icon(featureStyle)};
+		let defaultPoint = {radius: 5, weight: 0.5, opacity: 0.5, fillOpacity: 0};
+		let featureStyle = feature?.properties?.style || style || defaultPoint;
+		let marker;
+		if ('iconMarker' in featureStyle) {
+			let icon;
+			if ('iconUrl' in (featureStyle || {})) {
+				icon = {icon: L.icon(featureStyle)};
+			}
+			marker = L.marker(latlng, icon);
 		}
-		return L.marker(latlng, icon)
-		//return L.circleMarker(latlng)
+		else {
+			marker = L.circleMarker(latlng, featureStyle);
+		}
+		return marker
 			.bindPopup(feature.properties.name);
 	}
-	let styleFunction;
-	if (sldStyle) {
-		let SLDStyler = new L.SLDStyler(sldStyle);
-		styleFunction = SLDStyler.getStyleFunction;
-	}
-	
 	let layer =
 	L.Proj.geoJson (
 	//L.geoJSON (
-		json, {
+		false, {
 		filter,
 		onEachFeature,
 		pointToLayer,
-		style: style || styleFunction || json?.properties?.style,
+		style,
 	});
-//console.log('style:', style || styleFunction || json?.properties?.style);
 	layer.options.name = name;
+	if (sldStyle) {
+		let SLDStyler = new L.SLDStyler(sldStyle);
+		layer.setStyle(SLDStyler.getStyleFunction);
+	}
+	/*
 	let crsSection = json?.crs;
 	let crs;
 	if (crsSection?.type === 'name') {
@@ -72,8 +84,11 @@ function makeLayerJSON(json, name, {sldStyle, style}={}) {
 		crs = new L.Proj.CRS(
 			crsSection.type + ':' + crsSection.properties.code);
 	}
-	if (crs !== undefined) {
+	*/
+	if (dataProjection) {
+		let crs = new L.Proj.CRS(dataProjection);
 		layer.options.latLngToCoords = function(latlng) {
+			console.log('11111', latlng)
 			return crs.projection.project(latlng);
 		};
 	}
@@ -85,33 +100,34 @@ function makeLayerJSON(json, name, {sldStyle, style}={}) {
 	}
 	//console.log('build', crs, layer.options);
 	
-	layer.eachLayer(featureInstanceLayer => {
+	/*layer.eachLayer(featureInstanceLayer => {
 		let style = featureInstanceLayer.feature?.properties?.style;
 //console.log('123', featureInstanceLayer, featureInstanceLayer.setStyle, style);
 		if (style && featureInstanceLayer.setStyle) {
 			featureInstanceLayer?.setStyle(style);
 		}
-	});
+	});*/
 	
 	return layer;
+}
+
+async function addJSON(layer, json, dataProjection='CRS:84', featureProjection='EPSG:3857') {
+	layer.addData(json);
 }
 
 function makeLayerGroup(data, name) {
 	let layerGroup = L.layerGroup();
 	layerGroup.options.name = name;
 	for (let [name, json] of Object.entries(data)) {
-		let layer = makeLayerJSON(json, name);
+		let layer = makeLayerJSON(name);
 		layerGroup.addLayer(layer);
+		addJSON(layer, json);
 	}
 	return layerGroup;
 }
 
-function build_map(target='map') {
-	let mapdef = 
-	//'map'
-	document.querySelector('#map')
-	;
-	let map = L.map(mapdef, {
+function build_map(target) {
+	let map = L.map(target, {
 		// https://leafletjs.com/reference.html#map-zoomsnap
 		zoomSnap: 0,
 		worldCopyJump: true,
