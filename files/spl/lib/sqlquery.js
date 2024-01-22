@@ -594,7 +594,7 @@ class SQLQuery {
 		DATETIME: ['^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$', '', x => parseDate(x), false, '2009-09-28T09:15:15'],
 	};
 	
-	constructor(container, db, map, id) {
+	constructor(container, db, id) {
 		this.container = isString(container) ?
 			document.querySelector(container) : container;
 		this.sqlQuery = document.createElement("div");
@@ -603,18 +603,22 @@ class SQLQuery {
 		this.container.appendChild(this.sqlQuery);
 		
 		this.db = db;
+		
 		this.isSpatial = false;
+		this.isGpkg = undefined;
+		this.withMap = ('build_map' in window);
 		this.tabCounter = 0;
-		this.map = map;
+		
+		this.buildForm();
 
-		db.exec('SELECT spatialite_version();').get.first
+		db.exec(`SELECT spatialite_version();`).get.first
 			.then(first => {
 				this.isSpatial = true;
 			})
 			.catch(error => {})
 			.finally(x => {
-				this.buildForm();
 				this.setSnippets(snippets);
+				this.setSchema();
 			});
 	}
 	
@@ -1080,7 +1084,15 @@ class SQLQuery {
 			addJSON(layer, feature);
 		}
 		this.map.addLayer(layer);
-		show_map(this.map);
+		this.showMap();
+	}
+	
+	showMap() {
+		let map_tab = this.tabFetch(this.map_tab);
+		if (map_tab) {
+			this.tabClick(map_tab);
+			show_map(this.map);
+		}
 	}
 	
 	showLayer_(tabId, tabLabel, rows) {
@@ -1197,6 +1209,7 @@ class SQLQuery {
 			}
 			return replaced;
 		};
+		query = query.replace('&tab;', '\t');
 		return query.replace(snippetRe, replacer);
 	}
 	
@@ -1296,15 +1309,29 @@ class SQLQuery {
 				#${this.rootId} .tab-content {
 					clear: both;
 				}
+				
+				#${this.rootId} .map {
+					top: 0;
+					left: 0;
+					width: 98vw;
+					height: 80vh;
+					margin-top: 1vh;
+					margin-left: 1vw;
+					border: solid 1px gray;
+					/*position: fixed;*/
+				}
+				
 			</style>
 				
 			<style>
 				#${this.rootId} div.query-container {
 					width: 98vw;
 					height: 60vh;
-					overflow: auto;
 					border: solid;
-					white-space:nowrap;
+					overflow: auto;
+					white-space: nowrap;
+				}
+				#${this.rootId} .query-container .map {
 				}
 				#${this.rootId} div.schema li.details {
 					display: block;
@@ -1337,7 +1364,7 @@ class SQLQuery {
 					padding: 1px;
 				}
 				#${this.rootId} .map-query {
-					display: ${this.map ? 'inline-block' : 'none'};
+					display: ${this.withMap ? 'inline-block' : 'none'};
 				}
 				#${this.rootId} .data-field:empty::before {
 					content: attr(placeholder);
@@ -1406,45 +1433,71 @@ class SQLQuery {
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
 		this.sqlQuery.querySelector('.popupclose')
 			.addEventListener('click', e => {this.popupClose()});
+		this.createMapTab();
 		this.createTab(
 			'snippets', `
 			<div class="query-container">
 				<table border="1"><tbody class="snippetsMenu"></tbody></table>
 			</div>`
 		);
+		this.buildSnippetsMenu();
 		this.sqlQuery.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
 		this.schemaTree();
-		this.buildSnippetsMenu();
 		this.addQueryTab();
 	}
 	
-	async schemaTree() {
-		let [tab, tabInfo] = this.createTab(
+	schemaTree() {
+		this.createTab(
 			'schema', `
 			<div class="query-container schema">
 			</div>`,
 			false);
-		
+	}
+	
+	async setSchema() {
 		let tables = await this.db.exec(snippets.schemaTree.query).get.rows;
 		let tree = gridTree(tables);
-		let isGpkg = await this.db.exec(`
+		this.isGpkg = await this.db.exec(`
 			SELECT count(*)
 			FROM sqlite_schema
 			WHERE name LIKE 'gpkg_contents'
 		`).get.first;
-		if (isGpkg) {
+		if (this.isGpkg) {
 			let gpkgTables = await this.db.exec(snippets.gpkgSchema.query).get.rows;
 			let gpkgTree = gridTree(gpkgTables);
 			tree.push(...gpkgTree);
 		}
+		let html = htmlTree(tree);
 		
-		let container = tabInfo.querySelector('.query-container');
+		let container = this.sqlQuery.querySelector('.query-container.schema');
 		container.insertAdjacentHTML(
-			'beforeend',
-			htmlTree(tree)
+			'beforeend', html);
+	}
+	
+	createMapTab() {
+		if (!this.withMap) {
+			return;
+		}
+		let [tab, tabInfo] = this.createTab(
+			'map', `
+			<div class="query-container">
+				<div class="map-container" style="position: relative;">
+					<div class="map" style="position: relative;">
+					</div>
+				</div>
+			</div>`
 		);
-		//console.log(JSON.stringify(tree, null, 4));
+		if (window.build_map) {
+			let map = this.sqlQuery.querySelector(
+				'.query-container .map-container .map');
+			this.map = build_map(map);
+			this.map_tab = tab.dataset.tabValue;
+		}
+	}
+	
+	getMap() {
+		return this.map;
 	}
 	
 	popupClose() {
@@ -1505,7 +1558,9 @@ class SQLQuery {
 					e.stopPropagation();
 				});
 		}
-		let tabInfo = tabInfos.querySelector(`div[data-tab-info="${_class}"]`);
+		let tabInfo = tabInfos.querySelector(
+			`div[data-tab-info="${_class}"]`
+		);
 		this.tabOnClick(tab);
 		return [tab, tabInfo];
 	}
@@ -1557,13 +1612,17 @@ class SQLQuery {
 			.querySelector(tab.dataset.tabValue);
 		let tab_1;
 		if (Object.values(target.classList).includes('active')) {
-			tab_1 = this.sqlQuery.querySelector('span[data-tab-value=".tab_1"]');
+			tab_1 = this.tabFetch('.tab_1');
 		}
 		tab.remove();
 		target.remove();
 		if (tab_1) {
 			this.tabClick(tab_1);
 		}
+	}
+	
+	tabFetch(tabValue) {
+		return this.sqlQuery.querySelector(`span[data-tab-value="${tabValue}"]`);
 	}
 };
 

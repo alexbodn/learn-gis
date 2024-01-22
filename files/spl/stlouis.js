@@ -108,11 +108,11 @@ let stlouis_styles = {
 
 let url = stlouis_local;
 //url = rivers_local;
-let viewOptions
+//window.viewOptions
 //= stlouis_view;
 //= [{lat: 38.63400357606173, lng: -90.252685546875}, 14];
-let styles = stlouis_styles;
+//window.styles = stlouis_styles;
 
-const userData = [
+window.userData = [
 	{mountpoint: 'data', filename: 'StLouis.gpkg', url, method: 'arrayBuffer'},
 ];

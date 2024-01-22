@@ -32,13 +32,13 @@ function onEachFeature(feature, layer) {
 	}
 	let style = feature?.properties?.style;
 	if (style) {
-		//console.log(feature, layer);
+		//console.log(feature, layer.options.name);
 		layer.setStyle(style);
 	}
 	layer.on('click', onLayerClick);
 }
 
-function makeLayerJSON(json, name, {sldStyle, style, dataProjection}={}) {
+function makeLayerJSON(name, {sldStyle, style, dataProjection}={}) {
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
 	}
@@ -88,7 +88,7 @@ function makeLayerJSON(json, name, {sldStyle, style, dataProjection}={}) {
 	if (dataProjection) {
 		let crs = new L.Proj.CRS(dataProjection);
 		layer.options.latLngToCoords = function(latlng) {
-			console.log('11111', latlng)
+			///console.log('11111', latlng)
 			return crs.projection.project(latlng);
 		};
 	}
@@ -124,6 +124,32 @@ function makeLayerGroup(data, name) {
 		addJSON(layer, json);
 	}
 	return layerGroup;
+}
+
+function tile_layer(url, options) {
+	let layer = L.tileLayer(url, options);
+	return layer;
+}
+
+function osm_layer() {
+	let osm = tile_layer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	return osm;
+}
+
+function bw_layer() {
+	return tile_layer(
+		'bw osm',
+		'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png', {
+		maxZoom: 16,
+		attribution: `
+			&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>
+			&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
+			&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>
+		`
+	});
 }
 
 function build_map(target) {
@@ -260,7 +286,7 @@ function show_map(map, viewOptions=[]) {
 	//console.log('/////', layer.options);
 			let layerBounds = layer.getBounds ?
 				layer.getBounds() : null//layer.options.bounds;
-	//console.log('xxx', layer.options.name, layerBounds, layerBounds?.isValid());
+//console.log('xxx', layer.options.name, layerBounds, layerBounds?.isValid());
 			if (!bounds || !bounds.isValid()) {
 				bounds = layerBounds;
 			}
@@ -268,7 +294,7 @@ function show_map(map, viewOptions=[]) {
 				bounds.extend(layerBounds);
 			}
 		});
-	//console.log('calc bounds', bounds?.isValid(), bounds.getCenter());
+//	console.log('calc bounds', bounds?.isValid(), bounds.getCenter());
 		if (bounds && bounds.isValid()) {
 			map.fitBounds(bounds);
 		}
@@ -288,5 +314,83 @@ function show_map(map, viewOptions=[]) {
 			console.log("base map changed to " + e.name);
 		}
 	);
+}
+
+function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
+	
+	let layer = new L.GridLayer({
+		noWrap: true,
+		//pane: 'overlayPane',
+		minZoom: min_zoom,
+		maxZoom: max_zoom,
+	});
+	layer.options.name = name;
+	if (bounds) {
+		layer.options.bounds = L.latLngBounds(...bounds);
+	}
+	layer.options.imgSizes = imgSizes;
+	layer.options.fetchTile = fetchTile;
+	layer.options.emptyCache = {};
+	
+	//code taken from
+	//https://stackoverflow.com/a/70465895/4444742
+	const createImage = ({width, height}) => {
+		let key = `empty-${width}x${height}`;
+		if (!(key in layer.options.emptyCache)) {
+			const canvas = document.createElement('canvas');
+			canvas.width = width;
+			canvas.height = height;
+			
+			const ctx = canvas.getContext('2d');
+			ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+			ctx.fillRect(0, 0, width, height);
+			layer.options.emptyCache[key] = canvas.toDataURL('image/png');
+		}
+		
+		let img = new Image(width, height);
+		img.src = layer.options.emptyCache[key];
+		img.crossOrigin = "anonymous";
+		img.style.outline = '1px solid red';
+		
+		return img;
+	}
+	
+	layer.createTile = (coords, done) => {
+		let timeLabel = `tile_${coords.x},${coords.y},${coords.z}`;
+		console.time(timeLabel);
+		let error = null;
+		let img = createImage(layer.options.imgSizes[coords.z]);
+		let timeRetrieve = `tile_${coords.x},${coords.y},${coords.z} retrieve`;
+		console.time(timeRetrieve);
+		layer.options.fetchTile(coords.x, coords.y, coords.z)
+		.then(tile => {
+		console.timeEnd(timeRetrieve);
+			if (tile) {
+				//const buff = new Uint8Array(tile);
+				//let mime = getMimeTypeFromUint8Array(buff);
+				let blob = new Blob([tile], //{type: mime}
+					);
+				let url = URL.createObjectURL(blob);
+				img.src = url;
+				img.addEventListener('load', function() {
+					//return;
+					//console.log('loaded', timeLabel);
+					URL.revokeObjectURL(url);
+				});
+				img.style.outline = '1px solid green';
+			}
+		})
+		.catch(err => {
+			error = err;
+			console.error(error);
+		})
+		.finally(() => {
+			console.timeEnd(timeLabel);
+			done(error, img);
+		});
+		return img;
+	}
+	
+	return layer;
 }
 

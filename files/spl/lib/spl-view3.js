@@ -316,7 +316,11 @@ async function fetchMounts(urlsInfo) {
 				}
 				return {data, ...info};
 			})
-			.catch(error => ({error, url, ...info}))
+			.catch(error => {
+				let mount = {error, url, ...info};
+				console.warn(error);
+				return mount;
+			})
 			;
 		promises.push(promise);
 	}
@@ -510,92 +514,13 @@ console.log('bounds', tableInfo.bounds, tableInfo.zoom_level);
 
 async function gpkg_rasterLayers(tilesTable, target_srs) {
 	let layers = [];
-	let emptyCache = {};
-	//code taken from
-	//https://stackoverflow.com/a/70465895/4444742
-	const createImage = ({width, height}) => {
-		let key = `empty-${width}x${height}`;
-		if (!(key in emptyCache)) {
-			const canvas = document.createElement('canvas');
-			canvas.width = width;
-			canvas.height = height;
-			
-			const ctx = canvas.getContext('2d');
-			ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-			ctx.fillRect(0, 0, width, height);
-			emptyCache[key] = canvas.toDataURL('image/png');
-		}
-		
-		let img = new Image(width, height);
-		img.src = emptyCache[key];
-		img.crossOrigin = "anonymous";
-		img.style.outline = '1px solid red';
-		
-		return img;
-	}
-	
 	for (let tableInfo of tilesTable) {
 		let table_name = tableInfo.table_name;
 		let label = `layer ${table_name}`;
 		console.time(label);
-		let layer = new L.GridLayer({
-			noWrap: true,
-			//pane: 'overlayPane',
-			minZoom: tableInfo.min_zoom,
-			maxZoom: tableInfo.max_zoom,
-		});
-		layer.options.name = table_name;
-		if (tableInfo.bounds) {
-			layer.options.bounds = L.latLngBounds(...tableInfo.bounds);
-		}
-		layer.options.imgSizes = tableInfo.imgSizes;
-		layer.options.fetchTile = tableInfo.fetchTile;
 		
-		function missingTile (coords, done) {
-			let tile = document.createElement('div');
-			tile.width = coords.x;
-			tile.height = coords.y;
-			tile.innerHTML = [coords.x, coords.y, coords.z].join(', ');
-			tile.style.outline = '1px solid green';
-			
-			return tile;
-		}
-		
-		layer.createTile = (coords, done) => {
-			let timeLabel = `tile_${coords.x},${coords.y},${coords.z}`;
-			console.time(timeLabel);
-			let error = null;
-			let img = createImage(layer.options.imgSizes[coords.z]);
-			let timeRetrieve = `tile_${coords.x},${coords.y},${coords.z} retrieve`;
-			console.time(timeRetrieve);
-			layer.options.fetchTile(coords.x, coords.y, coords.z)
-			.then(tile => {
-			console.timeEnd(timeRetrieve);
-				if (tile) {
-					//const buff = new Uint8Array(tile);
-					//let mime = getMimeTypeFromUint8Array(buff);
-					let blob = new Blob([tile], //{type: mime}
-						);
-					let url = URL.createObjectURL(blob);
-					img.src = url;
-					img.onload = () => {
-						//return;
-						//console.log('loaded', timeLabel);
-						URL.revokeObjectURL(url);
-					};
-					img.style.outline = '1px solid green';
-				}
-			})
-			.catch(err => {
-				error = err;
-				console.error(error);
-			})
-			.finally(() => {
-				console.timeEnd(timeLabel);
-				done(error, img);
-			});
-			return img;
-		}
+		let layer = makeTiledLayer(
+			tableInfo.table_name, tableInfo);
 		console.timeEnd(label);
 		layers.push(layer);
 		/*
@@ -660,12 +585,11 @@ async function london_gpkg(map) {
 
 // main function
 
-var styles = window.styles;
-var userData = window.userData || [];
-
 if (1) {
-	const autoGeoJSON =
-		'autoGeoJSON' in window ? window.autoGeoJSON : {
+	var styles = window.styles;
+	var userData = window.userData || [];
+
+	const autoGeoJSON = window.autoGeoJSON || {
 		precision: 15,
 		options: 4,
 	};

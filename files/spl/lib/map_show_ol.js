@@ -171,6 +171,51 @@ function makeLayerGroup(data, name) {
 	return layerGroup;
 }
 
+function tile_layer(title, url, options) {
+	let {attribution, ...rest} = options;
+	let source = new ol.source.XYZ({
+		url,
+		attributions: attribution,
+		...rest,
+	});
+	source.set({
+		origProjection: source.projection.code,
+	});
+	return new ol.layer.Tile({
+		title,
+		source,
+	});
+	return layer;
+}
+
+function bw_layer() {
+	return tile_layer(
+		'bw osm',
+		'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png', {
+		maxZoom: 16,
+		attribution: `
+			&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>
+			&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
+			&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>
+		`
+	});
+}
+
+function osm_layer() {
+	let sourceOSM = new ol.source.OSM({
+		tileLoadFunction: function(imageTile, src) {
+			imageTile.getImage().src = src;
+		}
+	});
+	sourceOSM.set({
+		origProjection: sourceOSM.projection.code,
+	});
+	return new ol.layer.Tile({
+		title: 'base layer (OSM)',
+		source: sourceOSM,
+	});
+}
+
 function colorStyle(mainColor='orange', opacity=0.05) {
 	const dimColor = ol.color.asString(
 		ol.color.asArray(mainColor).slice(0, 3).concat(opacity));
@@ -249,7 +294,9 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 		return style;
 	}
 	
-	let selectHitTolerance = new SelectHitTolerance(hitToleranceSelector);
+	if (hitToleranceSelector) {
+		let selectHitTolerance = new SelectHitTolerance(hitToleranceSelector);
+	}
 	
 	map.on('singleclick', (evt) => {
 		var coordinates = map.getEventCoordinate(evt.originalEvent);
@@ -284,9 +331,11 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 					console.log(feature.get('style'));
 				}
 			},
-			{
-				hitTolerance: selectHitTolerance.hitTolerance,
-			}
+			(
+				selectHitTolerance ? {
+					hitTolerance: selectHitTolerance.hitTolerance,
+				} : undefined
+			)
 		);
 	});
 	
@@ -296,3 +345,104 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 	}
 }
 
+function data_tile() {
+var tileSource = new ol.source.XYZ({
+    tileUrlFunction: function(tileCoord, pixelRatio, projection){
+        // tileCoord is representing the location of a tile in a tile grid (z, x, y)
+        var z = tileCoord[0].toString();
+        var x = tileCoord[1].toString();
+        var y = tileCoord[2].toString();
+
+        // add the part /1/1-0.jpg, --> {z}/{x}-{y}.jpg
+        path += '/' + z + '/' + x + '-' + y + '.jpg';
+        return path;
+    },
+tileLoadFunction: async function (tile, src) {
+  const coordinates = tile.getTileCoord();
+  let row = await db.tiles.get({
+    zoom: coordinates[0],
+    column: coordinates[1],
+    tile: coordinates[2]
+  })
+
+  const image = tile.getImage();
+  if (row) {
+    // if tile image exists in database, return its URL
+    const result = URL.createObjectURL(row.blob);
+    image.addEventListener('load', function() {
+       URL.revokeObjectURL(result);
+    });
+    image.src = result;
+  } else {
+    image.src = src;
+  }
+}
+});
+    return new TileLayer({
+      source: new DataTile({
+        loader: function (z, x, y) {
+          const half = size / 2;
+          context.clearRect(0, 0, size, size);
+          context.fillStyle = 'rgba(100, 100, 100, 0.5)';
+          context.fillRect(0, 0, size, size);
+          context.fillStyle = 'black';
+          context.fillText(`z: ${z}`, half, half - lineHeight);
+          context.fillText(`x: ${x}`, half, half);
+          context.fillText(`y: ${y}`, half, half + lineHeight);
+          context.strokeRect(0, 0, size, size);
+          const data = context.getImageData(0, 0, size, size).data;
+          // converting to Uint8Array for increased browser compatibility
+          return new Uint8Array(data.buffer);
+        },
+        // disable opacity transition to avoid overlapping labels during tile loading
+        transition: 0,
+      }),
+    });
+}
+
+function makeTiledLayer(name, {min_zoom, max_zoom, fetchTile}) {
+	let tileSource = new ol.source.XYZ({
+		tileUrlFunction: function(tileCoord) {
+			// create a simplified url for use in the tileLoadFunction
+			return tileCoord.toString();
+		},
+		tileLoadFunction: async function (tile, src) {
+			const coordinates = tile.getTileCoord();
+			let timeLabel = `tile_${[1,2,0].map(c => coordinates[c]).join(',')}`;
+			console.time(timeLabel);
+			fetchTile(
+				coordinates[1],
+				coordinates[2],
+				coordinates[0],
+			)
+			.then(tile_data => {
+				const image = tile.getImage();
+				if (tile) {
+					// if tile image exists in database, return its URL
+					let blob = new Blob([tile]);
+					let url = URL.createObjectURL(blob);
+console.log('makeTiledLayer', url);
+					image.addEventListener('load', function() {
+					   URL.revokeObjectURL(url);
+					});
+					image.src = url;
+				}
+				else {
+					image.src = src;
+				}
+			})
+			.catch(err => {
+				console.error(err);
+			})
+			.finally(() => {
+				console.timeEnd(timeLabel);
+			});
+		}
+	});
+	return new ol.layer.Tile({
+		title: name,
+		source: tileSource,
+		maxZoom: max_zoom,
+		minZoom: min_zoom,
+	});
+ }
