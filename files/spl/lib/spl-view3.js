@@ -3,7 +3,7 @@
 
 import SPL from '../dist/spl-web.js';
 
-let autogpkg = 0;
+let autogpkg = 1;
 let withgpkg = true;
 
 const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
@@ -309,7 +309,10 @@ async function fetchMounts(urlsInfo) {
 				return response[method]();
 			})
 			.then(data => {
-				let mount = {data, name: info.filename};
+				let mount = {
+					data,
+					filename: info.filename,
+				};
 				mounts[info.mountpoint] = mount;
 				if ('onFetch' in info) {
 					info.onFetch(mount);
@@ -591,7 +594,7 @@ if (1) {
 
 	const autoGeoJSON = window.autoGeoJSON || {
 		precision: 15,
-		options: 4,
+		options: 0*4,
 	};
 	const spl = await SPL(
 		{
@@ -607,11 +610,21 @@ if (1) {
 	};
 	
 	let fetched = await fetchMounts([projData, ...userData]);
+	let mountPromises = [];
 	for (let [mountpoint, info] of Object.entries(fetched)) {
 		if (info.filename) {
-			spl.mount(mountpoint, [info]);
+			let mountData = {
+				data: info.data,
+				name: info.filename,
+			};
+			let mount = spl.mount(mountpoint, [mountData]);
+			mountPromises.push(mount);
 		}
 	}
+	await Promise.all(mountPromises)
+		.then(() => {
+			console.log('all mounts up');
+		});
 	
 	let db;
 	

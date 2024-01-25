@@ -67,7 +67,12 @@ function calcExtent(layers) {
 			let layerExtent;
 			if ('getSource' in layer) {
 				let source = layer.getSource();
-				layerExtent = source.getExtent();
+				try {
+					layerExtent = source.getExtent();
+				}
+				catch(err) {
+					layerExtent = source.get('extent');
+				}
 				//console.log('layer extent', layerExtent, source.getProperties());
 			}
 			else if ('getLayers' in layer) {
@@ -294,8 +299,9 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 		return style;
 	}
 	
+	let selectHitTolerance;
 	if (hitToleranceSelector) {
-		let selectHitTolerance = new SelectHitTolerance(hitToleranceSelector);
+		selectHitTolerance = new SelectHitTolerance(hitToleranceSelector);
 	}
 	
 	map.on('singleclick', (evt) => {
@@ -400,35 +406,42 @@ tileLoadFunction: async function (tile, src) {
     });
 }
 
-function makeTiledLayer(name, {min_zoom, max_zoom, fetchTile}) {
+function makeTiledLayer(name, {min_zoom, max_zoom, bounds, fetchTile}) {
+	
+	let extentw = [
+		bounds[0].lng,
+		bounds[0].lat,
+		bounds[1].lng,
+		bounds[1].lat,
+	];
+	let extent = ol.proj.transformExtent(
+		extentw, 'EPSG:4326', 'EPSG:3857');
+	
 	let tileSource = new ol.source.XYZ({
 		tileUrlFunction: function(tileCoord) {
 			// create a simplified url for use in the tileLoadFunction
-			return tileCoord.toString();
+			return '';
 		},
 		tileLoadFunction: async function (tile, src) {
-			const coordinates = tile.getTileCoord();
-			let timeLabel = `tile_${[1,2,0].map(c => coordinates[c]).join(',')}`;
+			const coords = tile.getTileCoord();
+			let image = tile.getImage();
+			image.src = src;
+			let timeLabel = `tile_${[1,2,0].map(c => coords[c]).join(',')}`;
 			console.time(timeLabel);
 			fetchTile(
-				coordinates[1],
-				coordinates[2],
-				coordinates[0],
+				coords[1], coords[2], coords[0],
 			)
 			.then(tile_data => {
-				const image = tile.getImage();
-				if (tile) {
-					// if tile image exists in database, return its URL
-					let blob = new Blob([tile]);
+				if (tile_data) {
+					let blob = new Blob([tile_data]);
 					let url = URL.createObjectURL(blob);
 console.log('makeTiledLayer', url);
 					image.addEventListener('load', function() {
-					   URL.revokeObjectURL(url);
+//						URL.revokeObjectURL(url);
 					});
 					image.src = url;
-				}
-				else {
-					image.src = src;
+					image.crossOrigin = "anonymous";
+					image.style.outline = '1px solid green';
 				}
 			})
 			.catch(err => {
@@ -439,10 +452,13 @@ console.log('makeTiledLayer', url);
 			});
 		}
 	});
-	return new ol.layer.Tile({
+	tileSource.setProperties({extent});
+	let layer = new ol.layer.Tile({
 		title: name,
+//		extent,
 		source: tileSource,
 		maxZoom: max_zoom,
 		minZoom: min_zoom,
 	});
+	return layer;
  }

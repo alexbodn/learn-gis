@@ -3,13 +3,13 @@
 	<head>
 		<meta charset="utf-8" />
 		<!--
+		-->
 		<link href="./lib/leaflet.css" rel="stylesheet" />
 		<link href="./lib/leaflet.zoomdisplay.css" rel="stylesheet" />
-		-->
 		
+		<!--
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css" />
 		<link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css" />
-		<!--
 		-->
 		
 		<style>
@@ -27,6 +27,15 @@
 				
 				/*position: fixed;*/
 			}
+			div#sqlQuery {
+				width: 98vw;
+				height: 59vh;
+				margin-top: 1vh;
+				margin-left: 1vw;
+				border: solid 1px gray;
+				
+				/*position: fixed;*/
+			}
 		</style>
 		<title>
 			Import a GeoPackage
@@ -36,28 +45,28 @@
 		<script src="./lib/proj4.js"></script>
 		
 		<!--
+		-->
 		<script src="./lib/leaflet-src.js"></script>
 		<script src="./lib/leaflet.sld.js"></script>
 		<script src="./lib/proj4leaflet.js"></script>
 		<script src="./lib/leaflet.zoomdisplay-src.js"></script>
 		<script src="./lib/map_show_leaflet.js"></script>
-		-->
 		<!--script src="./lib/leaflet.textpath.js"></script-->
 		
+		<!--
 		<script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
 		<script src="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js"></script>
 		<script src="./sld/sldreader.js"></script>
 		<script src="./lib/map_show_ol.js"></script>
-		<!--
 		-->
 		
 		
 		<script src="./lib/sqlquery.js"></script>
 
-<script src="./stlouis.js"></script>
 <!--
-<script src="./london_boroughs.js"></script>
+<script src="./stlouis.js"></script>
 -->
+<script src="./london_boroughs.js"></script>
 
 		<script>
 
@@ -112,17 +121,6 @@ function onMounted(db, fetched, {baseLayers, overLayers}) {
 	}
 	else {
 		map.addLayer(bw_layer());
-		/*
-		let bwStamen = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png', {
-			maxZoom: 16,
-			attribution: `
-				&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>
-				&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
-				&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>
-			`
-		});
-		map.addLayer(bwStamen);
-		*/
 	}
 	/**/
 	let maxBounds;
@@ -157,7 +155,18 @@ function onMounted(db, fetched, {baseLayers, overLayers}) {
 }
 
 		</script>
-		
+		<script>
+			function cssLoad(src) {
+				return new Promise((resolve, reject) => {
+					let s = document.createElement('link');
+					s.rel = 'stylesheet';
+					s.href = src;
+					s.onload = resolve;
+					s.onerror = reject;
+					document.head.append(s);
+				});
+			}
+		</script>
 		<script src="./lib/jszip.min.js" type="text/javascript"></script>
 		<script src="./lib/filesaver.js" type="text/javascript"></script>
 		<script>

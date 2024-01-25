@@ -175,6 +175,22 @@ function htmlTree(tree) {
 	return `<ul>${tree.map(htmlNode).join('\n')}</ul>`;
 }
 
+const pinBase64 = `
+	iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
+	AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
+	VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
+	yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
+	yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
+	sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
+	1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
+	D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
+	jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
+	aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
+	Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
+	7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
+	Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
+	`;
+
 const snippets = {
 	schemaTree: {
 		query: `
@@ -341,22 +357,7 @@ from topologies
 					--'text-value', '',
 					'icon-color', '#8959A8',
 					'icon-cross-origin', 'anonymous',
-					'icon-src', 'data:'||
-						'image/png;base64,
-						iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-						AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
-						VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
-						yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
-						yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
-						sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
-						1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
-						D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
-						jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
-						aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
-						Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
-						7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
-						Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
-						'
+					'icon-src', 'data:'||'image/png;base64,${pinBase64}'
 					
 					--'circle-stroke-color', 'blue',
 					--'circle-stroke-width', 1,
@@ -366,22 +367,7 @@ from topologies
 					--'text-value', '',
 					'icon-color', '#8959A8',
 					'icon-cross-origin', 'anonymous',
-					'iconUrl', 'data:'||
-						'image/png;base64,
-						iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-						AAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJISURB
-						VDiNjZHNS5RRGMXPc1/nvmOlZjPkQJqRGlIL01IcIjDMhYHJZEiBhIugPyBbBm6CCFrUTg2yDwhE
-						yKBds1CyMvyoxMFCTFvIYCk2hTrz3vfep0UOTDOjdHbPPb97OPc+hDQ1cHfO8u/iTgJ3MnAcAAj4
-						yMDD2byCflC7TuUpdTj2fWCPsjaHADrJbHpYiFEAsJhPM3AN4PdeJULTgSvryTsiNSCuTZ927FKV
-						sKpoc9d9jtsBjtsB3si95ziySjvewxuQPVkblC4OVgshJgRTnWuZfGFoiIEf9JfxM1GrYLPOoDEI
-						1CwUX/j0TwPW3hat5MR8aWiSE3afduWjxZJQxUJJqNx15GPjePq+Hmwb10pOmbjdkvEE49jFxrHn
-						D8yGfcaxyzju6QURg4hZ2b3Gscu3vDmtZElmgLKjRsmipcrGNaNkTKvc+qSnlQxqJX8uVTauGUcG
-						jCOjGX+wf3ysCcQvDTyHLLjtDL7DwBNBRMzcwUAXwzMooL4R49xybTCcsUb/26lxEH9ZCZ7o8I19
-						aCXmywDARM9W66tf+N9NPgXoyEqwpg7Z5BueqS0cibh7RyLn073C4Uhz4ciM3jc8Hcy6xqTyw3N3
-						Ab5ksXV0raksBgD+0c95TlxECDQQO1vRlcqL9IBfm7tvGsfeUK7nVvIsHvPe1o6tpVXQnc5nNAAA
-						7/NoAwmEmfkMWZYLY14biOZEa9Gr/woAAHtw9QGAU1vjm8RF39VsXM52AQlD13NcGQFgueze2I7b
-						Wf2JNvQn2nZC/gBcKQLqzHjHRAAAAABJRU5ErkJggg==
-						'
+					'iconUrl', 'data:'||'image/png;base64,${pinBase64}'
 					
 					--'circle-stroke-color', 'blue',
 					--'circle-stroke-width', 1,
@@ -600,6 +586,8 @@ class SQLQuery {
 		this.sqlQuery = document.createElement("div");
 		this.rootId = id || randomVar();
 		this.sqlQuery.setAttribute('id', this.rootId);
+		this.sqlQuery.style.height = '100%';
+		this.sqlQuery.style.width = '100%';
 		this.container.appendChild(this.sqlQuery);
 		
 		this.db = db;
@@ -679,8 +667,8 @@ class SQLQuery {
 	
 	buildParams(button, testValues=true) {
 		let queryTab = this.queryTab(button)
-		let paramsDiv = queryTab?.querySelector('.sqlParams') || [];
-		if (paramsDiv) {
+		let paramsDiv = queryTab?.querySelector('.sqlParams');
+		if (!paramsDiv) {
 			return {};
 		}
 		let params = {};
@@ -836,12 +824,11 @@ class SQLQuery {
 		let queryTab = this.queryTab(button);
 		let query = this.getQuery(queryTab);
 		let tabLabel = queryTab.dataset.tabLabel;
-		let target = queryTab.querySelector('.sqlResults');
 		
 		let started = Date.now();
 		let [rows, cols, error] = await this.performQuery(
 			query, params, tabLabel);
-		this.showTable(target, rows, cols, error, Date.now() - started);
+		this.showTable(queryTab, rows, cols, error, Date.now() - started);
 	}
 	
 	hexBytes() {
@@ -870,16 +857,28 @@ class SQLQuery {
 		return hexOctets.join('');
 	}
 	
-	showTable(target, results, colnames, error, duration=0) {
+	showTable(queryTab, rows, colnames, error, duration=0) {
 		let logRows=false;
+		
+		let tabRect = queryTab
+			.getBoundingClientRect();
+		let resultsDiv = queryTab
+			.querySelector('.results-container');
+		resultsDiv.style.height = (
+			tabRect.height +
+			tabRect.y -
+			resultsDiv.getBoundingClientRect().y
+		).toString() + 'px';
+		
+		let target = queryTab.querySelector('.sqlResults');
 		let thead = target.querySelector('thead');
 		let tbody = target.querySelector('tbody');
 		let tfoot = target.querySelector('tfoot');
 		thead.textContent = '';
 		tbody.textContent = '';
 		tfoot.textContent = '';
-		if (results.length || error) {
-			//let colnames = Object.keys(results[0]);
+		if (rows.length || error) {
+			//let colnames = Object.keys(rows[0]);
 			let columns = colnames
 				.map(col => `<td><div class="td">${col}</div></td>`)
 				.reduce((acc, curr) => acc + curr, '');
@@ -887,7 +886,7 @@ class SQLQuery {
 				'beforeend',
 				`<tr>${columns}</tr>`
 			);
-			for(let row of results) {
+			for(let row of rows) {
 				if (logRows) {
 					console.log(row);
 				}
@@ -937,7 +936,7 @@ class SQLQuery {
 			tbody.querySelectorAll('div.td[data-popup="true"]').forEach(td => {
 				td.addEventListener('click', e => {this.dataPopup(e.currentTarget);});
 			});
-			let csvDisplay = (results.length && colnames.length) ? 'inline-block' : 'none';
+			let csvDisplay = (rows.length && colnames.length) ? 'inline-block' : 'none';
 			tfoot.insertAdjacentHTML(
 				'beforeend',
 				`<tr><td colspan="${colnames.length || 1}">
@@ -978,7 +977,6 @@ class SQLQuery {
 		let overlay = this.sqlQuery.querySelector('.overlay');
 		let popup = this.sqlQuery.querySelector('.popup');
 		let popupcontent = popup.querySelector('.popupcontent');
-		console.log(popupcontent);
 		popupcontent.textContent = '';
 		popupcontent.insertAdjacentHTML(
 			'beforeend',
@@ -1056,10 +1054,8 @@ class SQLQuery {
 	}
 	
 	showLayer(tabId, tabLabel, rows) {
-		//let layer = L.Proj.geoJson(false);
 		let layer = makeLayerJSON(tabLabel);
 		layer.tabId = tabId;
-		//retrieve with layer.feature.properties
 		let dataProjection = 'EPSG:900913';
 		//may set layer projection afterwards 
 		for (let row of rows) {
@@ -1093,62 +1089,6 @@ class SQLQuery {
 			this.tabClick(map_tab);
 			show_map(this.map);
 		}
-	}
-	
-	showLayer_(tabId, tabLabel, rows) {
-		let vectorLayer = makeLayerJSON(
-			tabLabel);
-		let dataProjection = 'EPSG:900913';
-		let featureProjection = 'EPSG:3857';
-		const formatJson = new ol.format.GeoJSON();
-		/*
-		let vectorSource = new ol.source.Vector();
-		vectorSource.setProperties({
-			origProjection: dataProjection,
-		});
-		const vectorLayer = new ol.layer.Vector({
-			title: tabLabel,
-			tabId,
-			source: vectorSource,
-			style: (feature, resolution) => {
-				let style;
-				if (!feature.get('styled')) {
-					let flatstyle = feature.get('flatstyle') || {};
-					let parsingContext = ol.expr.expression.newParsingContext();
-					style = ol.render.canvas.style.buildStyle(flatstyle, parsingContext)();
-					feature.setStyle(style);
-					feature.set('styled', true);
-				}
-				style = feature.getStyle();
-				return style;
-			},
-		});
-		*/
-		for (let row of rows) {
-			let {feature, ...properties} = row;
-			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
-				feature = {
-					type: 'Feature',
-					properties,
-					geometry: feature,
-				}
-			}
-			else {
-				dataProjection = 
-					(feature?.crs?.properties?.name) || dataProjection;
-			}
-			let features = formatJson.readFeatures(feature, {
-				dataProjection: dataProjection,
-				featureProjection: 'EPSG:3857',
-			});
-			console.log('//////', dataProjection, feature);
-			features[0].setProperties(properties);
-			vectorLayer.getSource().addFeatures(features);
-			//vectorLayer.getSource().refresh();
-			//vectorLayer.setSource(vectorLayer.getSource());
-		}
-		this.map.addLayer(vectorLayer);
-		show_map(this.map, featureProjection, '#hit-tolerance');
 	}
 	
 	delParam(_this) {
@@ -1215,13 +1155,13 @@ class SQLQuery {
 	
 	prepKeys(obj, query, label) {
 		let params = obj;
-		if (false) warn(label);
-		if (!query) {
-			throw new Error('the query is empty');
-		}
+		let error;
 		query = this.prepQuery(query, true);
-		if (Array.isArray(obj)) {
-			return [params, query];
+		if (!query) {
+			error = 'the query is empty';
+		}
+		if (error || Array.isArray(obj)) {
+			return [params, query, error];
 		}
 		const paramRe = /:[a-z_A-Z][a-z_A-Z0-9]*/g;
 		if (typeof(obj) == 'object') {
@@ -1231,31 +1171,33 @@ class SQLQuery {
 			while (param = paramRe.exec(query)) {
 				let val = obj[param[1]];
 				if (typeof(val) == 'undefined') {
-					throw new Error(
-						`parameter ${param[1]} not defined for ${label}.`);
+					error = `parameter ${param[1]} not defined for ${label}.`;
+					break;
 				}
 				params[param[0]] = val;
 			}
 		}
-		return [params, query];
+		return [params, query, error];
 	}
 	
 	async performQuery(query, params={}, timeLabel) {
-		[params, query] = this.prepKeys(params, query, timeLabel);
-		if (timeLabel) {
-			console.time(timeLabel);
-		}
 		let rows = [], cols = [], error = '';
-		try {
-			let rs = this.db.exec(query, params).get;
-			cols = await rs.cols;
-			rows = await rs.objs;
-		}
-		catch (exception) {
-			error = exception;
-		}
-		if (timeLabel) {
-			console.timeEnd(timeLabel);
+		if (!error) {
+			[params, query, error] = this.prepKeys(params, query, timeLabel);
+			if (timeLabel) {
+				console.time(timeLabel);
+			}
+			try {
+				let rs = this.db.exec(query, params).get;
+				cols = await rs.cols;
+				rows = await rs.objs;
+			}
+			catch (exception) {
+				error = exception;
+			}
+			if (timeLabel) {
+				console.timeEnd(timeLabel);
+			}
 		}
 		return [rows, cols, error];
 	}
@@ -1263,18 +1205,28 @@ class SQLQuery {
 	buildForm() {
 		let html = `
 			<style>
+				#${this.rootId} {
+					width: 100%;
+					height: 100%;
+				}
+			</style>
+			<style>
 				/*
 				the code for the tabbed ui comes from
 				https://www.geeksforgeeks.org/how-to-create-tabs-containing-different-content-in-html/amp/
 				*/
 				#${this.rootId} [data-tab-info] {
 					display: none;
+					width: 100%;
+					height: 100%;
 				}
 				#${this.rootId} .active[data-tab-info] {
 					display: block;
 				}
 				#${this.rootId} .tab-content {
 					margin-top: 1rem;
+					width: 100%;
+					height: 100%;
 				}
 				#${this.rootId} .tabs {
 					border-bottom: 1px solid grey;
@@ -1306,35 +1258,41 @@ class SQLQuery {
 					background: red;
 					float: none;
 				}
-				#${this.rootId} .tab-content {
-					clear: both;
-				}
 				
-				#${this.rootId} .map {
+				#${this.rootId} .query-container .map-container {
 					top: 0;
 					left: 0;
-					width: 98vw;
-					height: 80vh;
-					margin-top: 1vh;
-					margin-left: 1vw;
+					width: 100%;
+					height: 100%;
+					position: relative;
 					border: solid 1px gray;
-					/*position: fixed;*/
 				}
-				
 			</style>
 				
 			<style>
 				#${this.rootId} div.query-container {
-					width: 98vw;
-					height: 60vh;
-					border: solid;
+					width: 100%;
+					height: 100%;
+					border: solid 1px red;
 					overflow: auto;
 					white-space: nowrap;
 				}
-				#${this.rootId} .query-container .map {
+				#${this.rootId} .clear {
+					clear: both;
 				}
+				#${this.rootId} div.results-container {
+					width: 100%;
+					border: solid 1px red;
+					overflow: auto;
+					position: relative;
+				}
+				
 				#${this.rootId} div.schema li.details {
 					display: block;
+				}
+				#${this.rootId} table.sqlResults {
+					height: 100%;
+					width: 100%;
 				}
 				#${this.rootId} table.sqlResults thead,
 				#${this.rootId} table.sqlResults tfoot {
@@ -1412,12 +1370,12 @@ class SQLQuery {
 					clear: both;
 					padding: 3px;
 				}
-				
 			</style>
+			
 			<div class="tabs">
 				<span class="new-query">+</span>
 			</div>
-			<div class="tab-content">
+			<div class="tab-content clear">
 			</div>
 			<div class="overlay"></div>
 			<div class="popup">
@@ -1452,7 +1410,7 @@ class SQLQuery {
 			'schema', `
 			<div class="query-container schema">
 			</div>`,
-			false);
+		);
 	}
 	
 	async setSchema() {
@@ -1482,18 +1440,17 @@ class SQLQuery {
 		let [tab, tabInfo] = this.createTab(
 			'map', `
 			<div class="query-container">
-				<div class="map-container" style="position: relative;">
-					<div class="map" style="position: relative;">
-					</div>
+				<div class="map-container">
 				</div>
-			</div>`
+			</div>`,
 		);
-		if (window.build_map) {
-			let map = this.sqlQuery.querySelector(
-				'.query-container .map-container .map');
-			this.map = build_map(map);
-			this.map_tab = tab.dataset.tabValue;
-		}
+		this.tabClick(tab);
+		let map_container = tabInfo.querySelector(
+			'.query-container .map-container'
+		);
+		
+		this.map = build_map(map_container);
+		this.map_tab = tab.dataset.tabValue;
 	}
 	
 	getMap() {
@@ -1532,7 +1489,7 @@ class SQLQuery {
 		tab.addEventListener('click', e => {this.tabClick(tab)});
 	}
 	
-	createTab(label, content, withClose=false) {
+	createTab(label, content, {withClose=false}={}) {
 		let _class = `tab_${++this.tabCounter}`;
 		if (!label) {
 			label = `query ${this.tabCounter}`;
@@ -1546,6 +1503,7 @@ class SQLQuery {
 			</span>`
 		);
 		let tabInfos = this.sqlQuery.querySelector('.tab-content');
+		this.tabsSyncHeight();
 		tabInfos.insertAdjacentHTML(
 			'beforeend',
 			`<div class="tabs__tab ${_class}" data-tab-info="${_class}" data-tab-label="${label}">${content || ''}</div>`
@@ -1567,21 +1525,24 @@ class SQLQuery {
 	
 	addQueryTab = (label, query='') => {
 		let html = `
-			<table border="0"><tbody class="sqlParams"></tbody></table>
-			<div style="width: 98vw;">
-			<div class="query-control" style="width: 70%;">
-				<textarea class="query" style="white-space: nowrap; tab-size: 4; resize: none;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+			<div class="query-with-controls" style="width: 100%;">
+				<table border="0"><tbody class="sqlParams"></tbody></table>
+				<div class="query-controls" style="width: 100%;">
+					<div class="query-control" style="width: 70%;">
+						<textarea class="query" style="white-space: nowrap; tab-size: 4; resize: none;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+					</div>
+					<div class="query-control" style="width: 28%;">
+						<button class="add-param">add param</button>
+						<button class="make-params">make params</button>
+						<button class="pp-query">pp</button>
+						<button class="log-query">log</button>
+						<button class="run-query">run</button>
+						<button class="map-query">map</button>
+					</div>
+					<div class="clear" />
+				</div>
 			</div>
-			<div class="query-control" style="width: 28%;">
-				<button class="add-param">add param</button>
-				<button class="make-params">make params</button>
-				<button class="pp-query">pp</button>
-				<button class="log-query">log</button>
-				<button class="run-query">run</button>
-				<button class="map-query">map</button>
-			</div>
-			</div>
-			<div class="query-container">
+			<div class="results-container">
 				<table border="1" class="sqlResults">
 					<thead></thead>
 					<tbody></tbody>
@@ -1589,7 +1550,7 @@ class SQLQuery {
 				</table>
 			</div>
 			`;
-		let [tab, tabInfo] = this.createTab(label, html, true);
+		let [tab, tabInfo] = this.createTab(label, html, {withClose: true});
 		tabInfo.querySelector('.query').value = query;
 		tabInfo.querySelector('button.add-param')
 			.addEventListener('click', e => {this.addParam(e.currentTarget);});
@@ -1616,9 +1577,17 @@ class SQLQuery {
 		}
 		tab.remove();
 		target.remove();
+		this.tabsSyncHeight();
 		if (tab_1) {
 			this.tabClick(tab_1);
 		}
+	}
+	
+	tabsSyncHeight() {
+		let tabs = this.sqlQuery.querySelector('.tabs');
+		let tabInfos = this.sqlQuery.querySelector('.tab-content');
+		let sqlQueryRect = this.sqlQuery.getBoundingClientRect();
+		tabInfos.style.height = (sqlQueryRect.height + sqlQueryRect.y - tabInfos.getBoundingClientRect().y).toString() + 'px';
 	}
 	
 	tabFetch(tabValue) {

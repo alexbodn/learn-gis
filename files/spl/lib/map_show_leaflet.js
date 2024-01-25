@@ -373,8 +373,6 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile})
 				let url = URL.createObjectURL(blob);
 				img.src = url;
 				img.addEventListener('load', function() {
-					//return;
-					//console.log('loaded', timeLabel);
 					URL.revokeObjectURL(url);
 				});
 				img.style.outline = '1px solid green';
