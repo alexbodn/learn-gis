@@ -126,13 +126,15 @@ function makeLayerGroup(data, name) {
 	return layerGroup;
 }
 
-function tile_layer(url, options) {
+function tile_layer(title, url, options) {
 	let layer = L.tileLayer(url, options);
 	return layer;
 }
 
 function osm_layer() {
-	let osm = tile_layer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	let osm = tile_layer(
+		'base layer (OSM)',
+		'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 19,
 		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 	});
@@ -363,14 +365,9 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile})
 		let timeRetrieve = `tile_${coords.x},${coords.y},${coords.z} retrieve`;
 		console.time(timeRetrieve);
 		layer.options.fetchTile(coords.x, coords.y, coords.z)
-		.then(tile => {
+		.then(url => {
 		console.timeEnd(timeRetrieve);
-			if (tile) {
-				//const buff = new Uint8Array(tile);
-				//let mime = getMimeTypeFromUint8Array(buff);
-				let blob = new Blob([tile], //{type: mime}
-					);
-				let url = URL.createObjectURL(blob);
+			if (url) {
 				img.src = url;
 				img.addEventListener('load', function() {
 					URL.revokeObjectURL(url);

@@ -418,6 +418,8 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, fetchTile}) {
 		extentw, 'EPSG:4326', 'EPSG:3857');
 	
 	let tileSource = new ol.source.XYZ({
+		
+		attributions: '&copy;',
 		tileUrlFunction: function(tileCoord) {
 			// create a simplified url for use in the tileLoadFunction
 			return '';
@@ -425,21 +427,17 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, fetchTile}) {
 		tileLoadFunction: async function (tile, src) {
 			const coords = tile.getTileCoord();
 			let image = tile.getImage();
-			image.src = src;
 			let timeLabel = `tile_${[1,2,0].map(c => coords[c]).join(',')}`;
 			console.time(timeLabel);
 			fetchTile(
 				coords[1], coords[2], coords[0],
 			)
-			.then(tile_data => {
-				if (tile_data) {
-					let blob = new Blob([tile_data]);
-					let url = URL.createObjectURL(blob);
-console.log('makeTiledLayer', url);
+			.then(url => {
+				if (url) {
 					image.addEventListener('load', function() {
-//						URL.revokeObjectURL(url);
+						URL.revokeObjectURL(url);
 					});
-					image.src = url;
+					src = url;
 					image.crossOrigin = "anonymous";
 					image.style.outline = '1px solid green';
 				}
@@ -448,6 +446,7 @@ console.log('makeTiledLayer', url);
 				console.error(err);
 			})
 			.finally(() => {
+				image.src = src;
 				console.timeEnd(timeLabel);
 			});
 		}

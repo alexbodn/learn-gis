@@ -511,7 +511,13 @@ console.log('bounds', tableInfo.bounds, tableInfo.zoom_level);
 			--)
 			from ${table_name}
 			where zoom_level=${z} and tile_column=${x} and tile_row=${y}
-		`).get.first;
+		`).get.first
+		.then(tile_data => {
+			const buff = new Uint8Array(tile_data);
+			let mime = getMimeTypeFromUint8Array(buff);
+			let blob = new Blob([tile_data], {type: mime});
+			return URL.createObjectURL(blob);
+		});
 	};
 }
 
