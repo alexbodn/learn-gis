@@ -114,5 +114,11 @@ let url = stlouis_local;
 //window.styles = stlouis_styles;
 
 window.userData = [
-	{mountpoint: 'data', filename: 'StLouis.gpkg', url, method: 'arrayBuffer'},
+	{
+		mountpoint: 'data',
+		filename: 'StLouis.gpkg',
+		isdb: true,
+		url,
+		method: 'arrayBuffer',
+	},
 ];

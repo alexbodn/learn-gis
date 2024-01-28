@@ -212,7 +212,7 @@ async function gpkg_read(db, target_srs) {
 			FROM layer_styles
 		`).get.objs;
 		for (let row of layer_styles) {
-			//sldsFromGpkg[row.f_table_name] = row.styleSLD;
+			sldsFromGpkg[row.f_table_name] = row.styleSLD;
 		}
 	}
 	
@@ -258,12 +258,15 @@ function init_sql(projFile='/proj/proj.db') {
 		drop view if exists st_spatial_ref_sys;
 		drop view if exists geometry_columns;
 		drop view if exists st_geometry_columns;
-		
-		CREATE UNIQUE INDEX IF NOT EXISTS 
-		tiles_zxy ON tiles (zoom_level, tile_column, tile_row);
 		*/
 		
-		SELECT initspatialmetadatafull(1);
+		SELECT initspatialmetadatafull(1)
+		where not exists (
+			SELECT 1
+			FROM sqlite_schema
+			WHERE name LIKE 'geometry_columns'
+		)
+		;
 		SELECT PROJ_SetDatabasePath('${projFile}'); -- set proj.db path
 		`;
 	let gpkg = `
@@ -282,7 +285,8 @@ function init_sql(projFile='/proj/proj.db') {
 			FROM sqlite_schema
 			WHERE name LIKE 'gpkg_contents'
 		)
-		and ${autogpkg}=1`;
+		and ${autogpkg}=1
+		`;
 	if (!withgpkg) {
 		gpkg = '';
 	}
@@ -301,8 +305,12 @@ function fetchAll(urls, method='text', options={}) {
 
 async function fetchMounts(urlsInfo) {
 	let promises = [];
-	let mounts = {};
+	let fetched = {};
 	for (let info of urlsInfo) {
+		let key = '/' + info.mountpoint;
+		if (info.filename) {
+			key += ('/' + info.filename);
+		}
 		let promise = fetch(info.url)
 			.then(response => {
 				let method = info.method || 'text';
@@ -310,14 +318,11 @@ async function fetchMounts(urlsInfo) {
 			})
 			.then(data => {
 				let mount = {
-					data,
-					filename: info.filename,
+					data, ...info,
 				};
-				mounts[info.mountpoint] = mount;
-				if ('onFetch' in info) {
-					info.onFetch(mount);
-				}
-				return {data, ...info};
+				fetched[key] = mount;
+				//console.log(key, mount);
+				return mount;
 			})
 			.catch(error => {
 				let mount = {error, url, ...info};
@@ -327,55 +332,7 @@ async function fetchMounts(urlsInfo) {
 			;
 		promises.push(promise);
 	}
-	return Promise.all(promises).then(() => mounts);
-}
-
-async function spl_loadgpkg(gpkgUrl, fileName) {
-	const autoGeoJSON =
-		'autoGeoJSON' in window ? window.autoGeoJSON : {
-		precision: 15,
-		options: 4,
-	};
-	const spl = await SPL(
-		{
-			autoGeoJSON,
-		},
-		[],
-	);
-	console.log('spl loaded');
-	console.time('fetching gpkgs');
-	const projdbUrl = new URL('./dist/proj/proj.db', window.location.href).toString();
-	let mountUrls = [
-		{url: projdbUrl, mountpoint: 'proj', filename: 'proj.db', method: 'arrayBuffer'}
-	];
-	if (gpkgUrl && fileName) {
-		mountUrls.push({url: gpkgUrl, mountpoint: 'data', filename: fileName, method: 'arrayBuffer'});
-	}
-	let mounts = await fetchMounts(mountUrls);
-	console.timeEnd('fetching gpkgs');
-	console.time('mounting gpkgs');
-	for (let [mountpoint, info] of Object.entries(mounts)) {
-		spl.mount(mountpoint, [info]);
-	}
-	let db;
-	
-	if (fileName) {
-		if (0) {
-		db = await spl.db()
-			.load(`file:data/${fileName}?immutable=1`)
-		}
-		if (1) {
-		db = await spl.db(mounts['data'].data);
-		}
-	}
-	else {
-		db = await spl.db()
-	}
-	console.timeEnd('mounting gpkgs');
-	await db.read(init_sql());
-	//console.log('db loaded', db);
-	
-	return db;
+	return Promise.all(promises).then(() => fetched);
 }
 
 async function gpkg_vectorLayers(featuresTable, target_srs, styles={}) {
@@ -461,6 +418,40 @@ async function raster_table(db, tableInfo) {
 	const table_name = tableInfo.table_name;
 	
 	await db.exec(`
+		with
+			index_fields as (
+				select
+				sqlite_schema.name as index_name,
+				index_fields.name as column
+				from 
+				sqlite_schema
+				inner JOIN pragma_index_info(sqlite_schema.name) index_fields
+				WHERE
+				sqlite_schema.type='index' and
+				sqlite_schema.tbl_name='${table_name}'
+				order by index_name, column
+			)
+		select
+			index_name,
+			json_group_array(column) as columns
+		from index_fields
+		group by index_name
+	`).get.objs
+	.then(indexes => {
+		indexes = indexes
+			.map(index => index.columns
+				.slice(0, 3)
+				.join(',')
+			);
+		if (!indexes.includes('tile_column,tile_row,zoom_level')) {
+			db.exec(`
+				CREATE UNIQUE INDEX IF NOT EXISTS 
+				${table_name}_zxy ON ${table_name} (zoom_level, tile_column, tile_row);
+			`);
+		}
+	});
+	
+	await db.exec(`
 		select *
 		from (
 			select zoom_level,
@@ -485,7 +476,6 @@ async function raster_table(db, tableInfo) {
 			get_lat_lng_for_number(rec.last_col, rec.last_row, rec.zoom_level),
 		];
 		tableInfo.zoom_level = rec.zoom_level;
-console.log('bounds', tableInfo.bounds, tableInfo.zoom_level);
 	});
 	
 	await db.exec(`
@@ -556,53 +546,15 @@ layer.createTile = function (coords) {
 	return layers;
 }
 
-async function london_gpkg(map) {
-	let db = await spl_loadgpkg(url, 'london_boroughs.gpkg');
-	// For each table, extract geometry and other properties
-	let {featuresTable, tilesTable} = await gpkg_read(
-		db, /*displayProjection.srs_code*/);
-	let maxBounds;
-	let tileLayer;
-	let baseLayers = await gpkg_rasterLayers(
-		tilesTable, /*target_srs*/);
-	for (let layer of baseLayers) {
-	//console.log(layer);
-		tileLayer = layer;
-		map.addLayer(layer);
-		layer.bringToFront();
-		//maxBounds = layer.options.bounds;
-	}
-	let overLayers = await gpkg_vectorLayers(
-		featuresTable, displayProjection, styles);
-	for (let layer of overLayers) {
-	//console.log(layer);
-		map.addLayer(layer);
-	}
-	
-	maxBounds = tileLayer?.options?.bounds;
-	if (maxBounds) {
-		console.log('yyy', maxBounds, maxBounds.isValid());
-	//console.log('///', map.getCenter(), maxBounds.getCenter());
-		//map.setMaxBounds(maxBounds);
-		//map.fitBounds(maxBounds);
-	//console.log('***', map.getCenter(), maxBounds.getCenter());
-	}
-	
-	return db;
-}
-
-
-// main function
-
-if (1) {
+function main() {
 	var styles = window.styles;
 	var userData = window.userData || [];
 
 	const autoGeoJSON = window.autoGeoJSON || {
 		precision: 15,
-		options: 0*4,
+		options: 4,
 	};
-	const spl = await SPL(
+	let spl = SPL(
 		{
 			autoGeoJSON,
 		},
@@ -610,51 +562,109 @@ if (1) {
 	);
 	let projData = {
 		url: projdbUrl,
-		mountpoint: 'proj', 
-		filename: 'proj.db', 
+		mountpoint: 'proj',
+		filename: 'proj.db',
 		method: 'arrayBuffer',
 	};
 	
-	let fetched = await fetchMounts([projData, ...userData]);
-	let mountPromises = [];
-	for (let [mountpoint, info] of Object.entries(fetched)) {
-		if (info.filename) {
-			let mountData = {
-				data: info.data,
-				name: info.filename,
-			};
-			let mount = spl.mount(mountpoint, [mountData]);
-			mountPromises.push(mount);
+	let fetched = fetchMounts([
+		projData, ...userData
+	]);
+	Promise.all([
+		spl,
+		fetched,
+		...(window.userPromises || []),
+	])
+	.then((spl_fetched) => {
+		[spl, fetched] = spl_fetched;
+		let mountPromises = [];
+		for (let [key, info] of Object.entries(fetched)) {
+			if (info.filename) {
+				let mountData = {
+					data: info.data,
+					name: info.filename,
+				};
+				let prom = spl.mount(
+					info.mountpoint, [mountData]);
+				mountPromises.push(prom);
+			}
 		}
-	}
-	await Promise.all(mountPromises)
-		.then(() => {
-			console.log('all mounts up');
-		});
-	
-	let db;
-	
-	if (dbMount in fetched) {
-		if (0) {
-		db = await spl.db()
-			.load(`file:${dbMount}/${fetched[dbMount].filename}?immutable=1`)
+		return Promise.all(mountPromises);
+	})
+	.then(() => {
+		let dbPromises = [];
+		for (let [key, info] of Object.entries(fetched)) {
+			const dbLoad = (mountfile) => {
+				let db;
+				if (mountfile) {
+					db = spl.db()
+						.load(`file:${mountfile}?immutable=1`);
+				}
+				else {
+					db = spl
+						.db(info.data)
+						.read(init_sql());
+				}
+				info.db = db;
+				dbPromises.push(db);
+			}
+			if (info.isdb) {
+				let mountfile;
+				if (false && info.filename) {
+					mountfile = info.mountpoint + '/' + info.filename;
+				}
+				dbLoad(mountfile);
+			}
 		}
-		if (1) {
-		db = await spl.db(fetched[dbMount].data);
+		return Promise.all(dbPromises);
+	})
+	.then((dbs) => {
+		if (!dbs.length) {
+			return;
 		}
-	}
-	else {
-		db = await spl.db()
-	}
-	await db.read(init_sql());
-	
-	let {featuresTable, tilesTable} = await gpkg_read(
-		db, /*displayProjection.srs_code*/);
-	let baseLayers = await gpkg_rasterLayers(
-		tilesTable, /*target_srs*/);
-	let overLayers = await gpkg_vectorLayers(
-		featuresTable, displayProjection, styles);
- 	if ('onMounted' in window) {
-		onMounted(db, fetched, {baseLayers, overLayers});
-	}
+		return Promise.all([
+			gpkg_read(
+				dbs[0], /*displayProjection.srs_code*/),
+			Promise.resolve(dbs[0]),
+		]);
+	})
+	.catch(error => {
+		console.log('db loading error', error);
+	})
+	.then((gpkg_data) => {
+		let db, baseLayers, overLayers;
+		if (gpkg_data) {
+			let [data, database] = gpkg_data;
+			db = database;
+			let {featuresTable, tilesTable, attributesTable} = data;
+			baseLayers = gpkg_rasterLayers(
+				tilesTable, //target_srs
+				);
+			overLayers = gpkg_vectorLayers(
+				featuresTable, displayProjection, styles);
+		}
+		else {
+			baseLayers = Promise.resolve([]);
+			overLayers = Promise.resolve([]);
+		}
+		db = Promise.resolve(db);
+		return Promise.all([
+			db, baseLayers, overLayers,
+		]);
+	})
+	.then(db_layers => {
+		let [db, baseLayers, overLayers] = db_layers;
+		for (let [key, info] of Object.entries(fetched)) {
+			if ('onFetch' in info) {
+				info.onFetch(info);
+			}
+		}
+		if ('onMounted' in window) {
+			onMounted(db, fetched, {baseLayers, overLayers});
+		}
+	})
+	;
 }
+
+main();
+

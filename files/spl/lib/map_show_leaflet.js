@@ -1,7 +1,6 @@
 
 'use strict';
 
-
 const onLayerClick = (e) => {
 	let feature = e.target.feature;
 	let coords = e.latlng;
@@ -377,7 +376,7 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile})
 		})
 		.catch(err => {
 			error = err;
-			console.error(error);
+			//console.warn(error);
 		})
 		.finally(() => {
 			console.timeEnd(timeLabel);

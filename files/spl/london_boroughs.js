@@ -89,7 +89,13 @@ function makeStationsLayer(mount) {
 //let styles = {};
 
 window.userData = [
-	{mountpoint: 'data', filename: 'london_boroughs.gpkg', url, method: 'arrayBuffer'},
+	{
+		mountpoint: 'data',
+		filename: 'london_boroughs.gpkg',
+		isdb: true,
+		url,
+		method: 'arrayBuffer',
+	},
 	{
 		mountpoint: 'tfl_lines',
 		//filename: 'tfl_lines.json',

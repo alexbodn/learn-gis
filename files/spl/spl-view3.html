@@ -65,7 +65,9 @@
 		</title>
 	</head>
 	<body>
+		<!--
 		<script src="./lib/proj4.js"></script>
+		-->
 		
 		<!--
 		<script src="./lib/leaflet-src.js"></script>
@@ -86,8 +88,8 @@
 		
 		<script src="./lib/sqlquery.js"></script>
 
-<script src="./stlouis.js"></script>
 <!--
+<script src="./stlouis.js"></script>
 <script src="./london_boroughs.js"></script>
 -->
 
@@ -99,7 +101,8 @@ const dctour_remote = 'https://github.com/ngageoint/geopackage-js/raw/master/doc
 const dctour_local = new URL('./test/files/dbs/dctour.gpkg', window.location.href).toString();
 const rivers_remote = 'https://www.geopackage.org/data/rivers.gpkg';
 const rivers_local = new URL('./test/files/dbs/rivers.gpkg', window.location.href).toString();
-
+const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.href).toString();
+ 
 //autoGeoJSON = false;
 
 const dbMount = 'data';
@@ -112,11 +115,18 @@ let displayProjection = {
 
 // mountpoint has to be unique.
 // but the array is used, to fetch files without mounting
-/*
-const userData = [
-	{mountpoint: dbMount, filename: 'StLouis.gpkg', url, method: 'arrayBuffer'},
+/**/
+let url = db_small;
+window.userData = [
+	{
+		mountpoint: dbMount,
+		filename: 'db_small.sqlite',
+		isdb: true,
+		url,
+		method: 'arrayBuffer',
+	},
 ];
-*/
+/**/
 
 let Leaflet = {
 	name: 'Leaflet',
@@ -125,6 +135,7 @@ let Leaflet = {
 		"./lib/leaflet.zoomdisplay.css",
 	],
 	js: [
+		"./lib/proj4.js",
 		"./lib/leaflet-src.js",
 		"./lib/leaflet.sld.js",
 		"./lib/proj4leaflet.js",
@@ -141,6 +152,7 @@ const OpenLayers = {
 		"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css",
 	],
 	js: [
+		"./lib/proj4.js",
 		"https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js",
 		"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js",
 		"./lib/sldreader.js",
@@ -150,18 +162,27 @@ const OpenLayers = {
 
 let driver = Leaflet;
 
+let program;
+//program = "./stlouis.js";
+//program = "./london_boroughs.js";
+
 let jsAll = Promise.resolve();
-for (let js of driver.js) {
+let scripts = [
+	program,
+	...driver.js,
+];
+for (let js of scripts) {
+	if (!js) {
+		continue;
+	}
 	jsAll = jsAll.then(() => jsLoad(js));
 }
 let cssAll = Promise.resolve();
 for (let css of driver.css) {
 	cssAll = cssAll.then(() => cssLoad(css));
 }
-Promise.all([jsAll, cssAll])
-.then(() => {
-	console.log(`${driver.name} resources loaded`);
-});
+
+window.userPromises = [jsAll, cssAll];
 
 function onMounted(db, fetched, {baseLayers, overLayers}) {
 //console.log(db, fetched, {baseLayers, overLayers});
@@ -226,7 +247,7 @@ function onMounted(db, fetched, {baseLayers, overLayers}) {
 		<script src="./lib/jszip.min.js" type="text/javascript"></script>
 		<script src="./lib/filesaver.js" type="text/javascript"></script>
 		<script>
-		function saveFile(fileName, data) {
+			function saveFile(fileName, data) {
 				let zip = new JSZip();
 				zip.file(
 					fileName,

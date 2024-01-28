@@ -85,16 +85,17 @@
 				var transparentLayer = new L.tileLayer('', {
 					style: {
 						"opacity": 0,
-						"fillOpacity": 0.5 // value between 0-1 or 0% - 100%
+						"fillOpacity": 0.05 // value between 0-1 or 0% - 100%
 					}
 				});
-				map.addLayer(transparentLayer);
+				//map.addLayer(transparentLayer);
 				//layerControl.addOverlay(transparentLayer);
 				
 				for (let [name, layerInfo] of Object.entries(layers)) {
 					let layer = makeLayerJSON(layerInfo.data, name, {
-						"opacity": 0,
-						//"fillOpacity": 0.5 // value between 0-1 or 0% - 100%
+						"opacity": 1,
+						width: 0.2,
+						"fillOpacity": 0.05 // value between 0-1 or 0% - 100%
 					});
 					map.addLayer(layer);
 					layerControl.addOverlay(layer, name);

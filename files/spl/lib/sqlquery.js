@@ -166,10 +166,12 @@ is from https://iamkate.com/code/tree-views/
 function htmlTree(tree) {
 	const htmlNode = node => {
 		return node.details ? `
-			<li class="details"><details>
+			<li class="details">
+			<details>
 				<summary>${node.summary}</summary>
 				${htmlTree(node.details)}
-			</details></li>` :
+			</details>
+			</li>` :
 			`<li class="leaf">${node.summary}</li>`;
 	}
 	return `<ul>${tree.map(htmlNode).join('\n')}</ul>`;
@@ -278,7 +280,27 @@ select 'topologies',
 topology_name,
 null, null
 from topologies
-		`,
+union all
+select 'raster_coverages',
+coverage_name,
+null, null
+from raster_coverages
+union all
+select 'vector_coverages',
+coverage_name,
+null, null
+from vector_coverages
+union all
+select 'stored_procedures',
+name,
+null, null
+from stored_procedures
+union all
+select 'stored_variables',
+name,
+null, null
+from stored_variables
+			`,
 		spatial: true,
 	},
 	allTables: {
@@ -596,6 +618,7 @@ class SQLQuery {
 		this.isGpkg = undefined;
 		this.withMap = ('build_map' in window);
 		this.tabCounter = 0;
+		this.tabEvents = {};
 		
 		this.buildForm();
 
@@ -606,7 +629,7 @@ class SQLQuery {
 			.catch(error => {})
 			.finally(x => {
 				this.setSnippets(snippets);
-				this.setSchema();
+				//this.setSchema();
 			});
 	}
 	
@@ -933,8 +956,8 @@ class SQLQuery {
 					`<tr>${row}</tr>`
 				);
 			}
-			tbody.querySelectorAll('div.td[data-popup="true"]').forEach(td => {
-				td.addEventListener('click', e => {this.dataPopup(e.currentTarget);});
+			tbody.querySelectorAll('div.td[data-popup="true"]').forEach(tdDiv => {
+				tdDiv.addEventListener('click', e => {this.dataPopup(e.currentTarget.parentNode);});
 			});
 			let csvDisplay = (rows.length && colnames.length) ? 'inline-block' : 'none';
 			tfoot.insertAdjacentHTML(
@@ -957,8 +980,9 @@ class SQLQuery {
 	}
 	
 	dataPopup(td) {
-		let hex = td.textContent.slice(2, -1);
-		let mime = td.dataset.mime;
+		let tdDiv = td.querySelector('div.td');
+		let hex = tdDiv.textContent.slice(2, -1);
+		let mime = tdDiv.dataset.mime;
 		if (!hex || !mime) {
 			return;
 		}
@@ -1386,7 +1410,7 @@ class SQLQuery {
 					<h1>Some Popup Content</h1>
 				</div>
 			</div>
-		`;
+			`;
 		this.sqlQuery.textContent = '';
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
 		this.sqlQuery.querySelector('.popupclose')
@@ -1405,15 +1429,20 @@ class SQLQuery {
 		this.addQueryTab();
 	}
 	
-	schemaTree() {
+	schemaTree = () => {
 		this.createTab(
 			'schema', `
 			<div class="query-container schema">
 			</div>`,
+			{
+				events: {
+					click: this.setSchema
+				}
+			}
 		);
 	}
 	
-	async setSchema() {
+	async setSchema(tab) {
 		let tables = await this.db.exec(snippets.schemaTree.query).get.rows;
 		let tree = gridTree(tables);
 		this.isGpkg = await this.db.exec(`
@@ -1422,14 +1451,30 @@ class SQLQuery {
 			WHERE name LIKE 'gpkg_contents'
 		`).get.first;
 		if (this.isGpkg) {
-			let gpkgTables = await this.db.exec(snippets.gpkgSchema.query).get.rows;
+			let gpkgTables = await this.db.exec(
+				snippets.gpkgSchema.query).get.rows;
 			let gpkgTree = gridTree(gpkgTables);
 			tree.push(...gpkgTree);
 		}
+		if (this.isSpatial) {
+			let spatialTables = await this.db.exec(
+				snippets.spatialiteSchema.query).get.rows;
+			let spatialTree = gridTree(spatialTables);
+			spatialTree = [{
+				summary: 'spatialite',
+				details: spatialTree,
+			}];
+			//console.log(spatialTables, spatialTree);
+			tree.push(...spatialTree);
+		}
 		let html = htmlTree(tree);
 		
-		let container = this.sqlQuery.querySelector('.query-container.schema');
-		container.insertAdjacentHTML(
+		if (!tab) {
+			tab = this.sqlQuery;
+		}
+		let target = tab.querySelector('.query-container.schema');
+		target.textContent = '';
+		target.insertAdjacentHTML(
 			'beforeend', html);
 	}
 	
@@ -1472,16 +1517,20 @@ class SQLQuery {
 		tabs.forEach(tab => {
 			tab.classList.remove('active')
 		});
-		const target = this.sqlQuery
+		const tabInfo = this.sqlQuery
 			.querySelector(tab.dataset.tabValue);
 		const tabInfos = this.sqlQuery
 			.querySelectorAll('[data-tab-info]');
 		tabInfos.forEach(tabInfo => {
 			tabInfo.classList.remove('active')
 		});
-		if (tab && target) {
+		if (tab && tabInfo) {
 			tab.classList.add('active');
-			target.classList.add('active');
+			tabInfo.classList.add('active');
+		}
+		let _class = tabInfo.dataset.tabInfo;
+		if ('click' in this.tabEvents[_class]) {
+			this.tabEvents[_class].click.call(this, tabInfo);
 		}
 	}
 	
@@ -1489,8 +1538,12 @@ class SQLQuery {
 		tab.addEventListener('click', e => {this.tabClick(tab)});
 	}
 	
-	createTab(label, content, {withClose=false}={}) {
+	createTab(label, content, {
+		withClose=false,
+		events={},
+	}={}) {
 		let _class = `tab_${++this.tabCounter}`;
+		this.tabEvents[_class] = events;
 		if (!label) {
 			label = `query ${this.tabCounter}`;
 		}
