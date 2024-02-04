@@ -4,8 +4,7 @@
 //todo
 //copy results as json array of objects
 //eventually zipped
-//if no map try creation of leaflet map
-//remove layer from the map
+//map show wkt and geojson from query textarea
 
 // hex conversion code adapted from
 // https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
@@ -165,14 +164,22 @@ is from https://iamkate.com/code/tree-views/
 */
 function htmlTree(tree) {
 	const htmlNode = node => {
+		let summary = node.summary
+		.replace(
+			/\[\s*(.*?)\s*\]/gm,
+			(match, match1) => {
+				let [tag, title, ...action] = match1.split('\t');
+				return `<${tag} data-action="${action.join('\t')}">${title}</${tag}>`;
+			}
+		);
 		return node.details ? `
 			<li class="details">
 			<details>
-				<summary>${node.summary}</summary>
+				<summary>${summary}</summary>
 				${htmlTree(node.details)}
 			</details>
 			</li>` :
-			`<li class="leaf">${node.summary}</li>`;
+			`<li class="leaf">${summary}</li>`;
 	}
 	return `<ul>${tree.map(htmlNode).join('\n')}</ul>`;
 }
@@ -234,74 +241,32 @@ coalesce(index_fields.seqno, 0)
 		`,
 		spatial: false,
 	},
-	gpkgSchema: {
+	geometryTypes: {
 		query: `
-SELECT 
-'gpkg' as gpkg,
-data_type,
-gpkg_contents.table_name,
-'column ' || column_name || ' ' || 
-geometry_type_name || ' ' ||
-'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
-'x y' ||
-case when z<>0 then ' z' else '' end ||
-case when m<>0 then ' m' else '' end
-as column
-FROM gpkg_contents
-left outer join gpkg_geometry_columns 
-on gpkg_contents.table_name=gpkg_geometry_columns.table_name
-			`,
+			with geometry_types(name, number) as
+			(VALUES
+				('GEOMETRY', 0),
+				('POINT', 1),
+				('LINESTRING', 2),
+				('POLYGON', 3),
+				('MULTIPOINT', 4),
+				('MULTILINESTRING', 5),
+				('MULTIPOLYGON', 6),
+				('GEOMETRYCOLLECTION', 7),
+				('CIRCULARSTRING', 8),
+				('COMPOUNDCURVE', 9),
+				('CURVEPOLYGON', 10),
+				('MULTICURVE', 11),
+				('MULTISURFACE',  12),
+				('CURVE', 13),
+				('SURFACE', 14),
+				('POLYHEDRALSURFACE', 15),
+				('TIN', 16),
+				('TRIANGLE', 17)
+			)
+			select *
+			from geometry_types`,
 		spatial: false,
-	},
-	spatialiteSchema: {
-		query: `
-select 'geometries', 'tables',
-f_table_name as [table],
-f_geometry_column || ' ' ||
-cast (geometry_type as TEXT) as column
-from geometry_columns
-union all
-select 'geometries', 'views',
-view_name as [view],
-view_geometry as geometry
-from views_geometry_columns
-union all
-select 'geometries', 'virts',
-virt_name as virt,
-virt_geometry as geometry
-from virts_geometry_columns
-union all
-select 'networks',
-network_name,
-null, null
-from networks
-union all
-select 'topologies',
-topology_name,
-null, null
-from topologies
-union all
-select 'raster_coverages',
-coverage_name,
-null, null
-from raster_coverages
-union all
-select 'vector_coverages',
-coverage_name,
-null, null
-from vector_coverages
-union all
-select 'stored_procedures',
-name,
-null, null
-from stored_procedures
-union all
-select 'stored_variables',
-name,
-null, null
-from stored_variables
-			`,
-		spatial: true,
 	},
 	allTables: {
 		query: `
@@ -589,6 +554,97 @@ from stored_variables
 	},
 };
 
+let conditionalSchema = {
+	gpkg_contents: `
+SELECT 
+'gpkg' as gpkg,
+data_type,
+gpkg_contents.table_name ||
+case
+	when data_type='attributes'
+	then ''
+	else ' [button\tmap\tmapTable\t' ||
+	data_type || '\t' ||
+	gpkg_contents.table_name ||
+	case
+		when data_type='tiles'
+		then ''
+		else '\t' || column_name
+	end || ']'
+end,
+'column ' || column_name || ' ' || 
+geometry_type_name || ' ' ||
+'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
+'x y' ||
+case when z<>0 then ' z' else '' end ||
+case when m<>0 then ' m' else '' end
+as column
+FROM gpkg_contents
+left outer join gpkg_geometry_columns 
+on gpkg_contents.table_name=gpkg_geometry_columns.table_name
+order by data_type, gpkg_contents.table_name, column`,
+	geometry_columns: `
+with
+	geometry_types as (
+		${snippets.geometryTypes.query}
+	)
+select 'spatialite', 'geometries', 'tables',
+f_table_name ||
+	' [button\tmap\tmapTable\tfeatures\t' ||
+	f_table_name || '\t' ||
+	f_geometry_column || ']'
+	as [table],
+f_geometry_column || ' ' ||
+coalesce(
+	geometry_types.name,
+	cast (geometry_type as TEXT)
+) as column
+from geometry_columns
+left outer join geometry_types
+	on geometry_types.number=geometry_type
+`,
+	views_geometry_columns: `
+select 'spatialite', 'geometries', 'views',
+view_name as [view],
+view_geometry as geometry
+from views_geometry_columns`,
+	virts_geometry_columns: `
+select 'spatialite', 'geometries', 'virts',
+virt_name as virt,
+virt_geometry as geometry
+from virts_geometry_columns`,
+	networks: `
+select 'spatialite', 'networks',
+network_name,
+null, null
+from networks`,
+	topologies: `
+select 'spatialite', 'topologies',
+topology_name,
+null, null
+from topologies`,
+	raster_coverages: `
+select 'spatialite', 'raster_coverages',
+coverage_name,
+null, null
+from raster_coverages`,
+	vector_coverages: `
+select 'spatialite', 'vector_coverages',
+coverage_name,
+null, null
+from vector_coverages`,
+	stored_procedures: `
+select 'spatialite', 'stored_procedures',
+name,
+null, null
+from stored_procedures`,
+	stored_variables: `
+select 'spatialite', 'stored_variables',
+name,
+null, null
+from stored_variables`,
+};
+
 const isString = value => typeof value === 'string' || value instanceof String;
 
 class SQLQuery {
@@ -602,7 +658,7 @@ class SQLQuery {
 		DATETIME: ['^[1-9]\\d{3}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$', '', x => parseDate(x), false, '2009-09-28T09:15:15'],
 	};
 	
-	constructor(container, db, id) {
+	constructor(container, db, {id, build_map}={}) {
 		this.container = isString(container) ?
 			document.querySelector(container) : container;
 		this.sqlQuery = document.createElement("div");
@@ -616,12 +672,52 @@ class SQLQuery {
 		
 		this.isSpatial = false;
 		this.isGpkg = undefined;
-		this.withMap = ('build_map' in window);
+		this.db.exec(`
+			SELECT count(*) as isGpkg
+			FROM sqlite_schema
+			WHERE name LIKE 'gpkg_contents'
+		`).get.first
+		.then(isGpkg => {
+			this.isGpkg = isGpkg;
+			if (isGpkg && window.proj4) {
+				this.db.exec(`
+					SELECT
+						organization||':'||cast(organization_coordsys_id as text) as srs,
+						definition
+					FROM gpkg_spatial_ref_sys
+					WHERE
+						srs_id>0
+						--AND srs_id NOT IN (4326, 3857)
+					;
+				`).get.rows
+				.then(projections => {
+					//todo run this with each loaded geojson
+					proj4.defs(projections);
+				})
+				.catch(error => {
+					console.log('error loading projections', error);
+				});
+			}
+		});
+		this.has_layer_styles = undefined;
+		this.db.exec(`
+			SELECT count(*)
+			FROM sqlite_schema
+			WHERE name like 'layer_styles'
+		`).get.first
+		.then(has_layer_styles => {
+			this.has_layer_styles = has_layer_styles;
+		});
+		this.withMap = !!build_map;
+		this.layersOnMap = {};
+		
 		this.tabCounter = 0;
 		this.tabEvents = {};
 		
+		this.waitingSnippets = {};
+		
 		this.buildForm();
-
+		
 		db.exec(`SELECT spatialite_version();`).get.first
 			.then(first => {
 				this.isSpatial = true;
@@ -629,6 +725,7 @@ class SQLQuery {
 			.catch(error => {})
 			.finally(x => {
 				this.setSnippets(snippets);
+				this.addSnippets(this.waitingSnippets, true);
 				//this.setSchema();
 			});
 	}
@@ -739,13 +836,23 @@ class SQLQuery {
 		}
 	}
 	
-	addSnippets = (snippets) => {
-		for (let [name, snippet] of Object.entries(snippets)) {
-			if (!snippet.spatial || this.isSpatial) {
-				this.snippets[name] = snippet.query;
+	addSnippets = (snippets, deleting=false) => {
+		if ('snippets' in this) {
+			for (let [name, snippet] of Object.entries(snippets)) {
+				if (!snippet.spatial || this.isSpatial) {
+					this.snippets[name] = snippet.query;
+					if (deleting) {
+						delete snippets[name];
+					}
+				}
+			}
+			this.buildSnippetsMenu();
+		}
+		else {
+			for (let [name, snippet] of Object.entries(snippets)) {
+				this.waitingSnippets[name] = snippet;
 			}
 		}
-		this.buildSnippetsMenu();
 	}
 	
 	setSnippets = (snippets) => {
@@ -962,7 +1069,8 @@ class SQLQuery {
 			let csvDisplay = (rows.length && colnames.length) ? 'inline-block' : 'none';
 			tfoot.insertAdjacentHTML(
 				'beforeend',
-				`<tr><td colspan="${colnames.length || 1}">
+				`<tr><td colspan="${colnames.length}">
+					<span style="background-color: blue;">${rows?.length || 0} rows</span>
 					<span style="background-color: green;">${duration} ms</span>
 					<button class="csv-cp" style="display: ${csvDisplay}">csv cp</button>
 					<span style="background-color: red;">${error ? error.toString() : ''}</span>
@@ -1061,11 +1169,102 @@ class SQLQuery {
 		let params = this.buildParams(button);
 		let queryTab = this.queryTab(button);
 		let query = this.getQuery(queryTab);
-		let tabId = queryTab.dataset.tabValue;
+		let tabId = queryTab.dataset.tabInfo;
 		let tabLabel = queryTab.dataset.tabLabel;
+		if (tabId in this.layersOnMap) {
+			this.removeLayer(tabId);
+		}
+		else {
+			await this.featuresLayer(
+				tabLabel, tabId, undefined, query, params);
+		}
+	}
+	
+	async tilesLayer(layerLabel, layerId, table_name) {
 		
+		function get_lat_lng_for_number(xtile, ytile, zoom) {
+			let n = Math.pow(2.0, Math.round(zoom));
+			let lng = xtile / n * 360.0 - 180.0;
+			let lat_rad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * ytile / n)));
+			let lat = 180.0 * lat_rad / Math.PI;
+			return {lat, lng};
+		}
+		
+		let tableInfo = {};
+		await this.db.exec(`
+			select *
+			from (
+				select zoom_level,
+					min(tile_column) as first_col,
+					max(tile_row) + 1 as first_row,
+					min(tile_row) as last_row,
+					max(tile_column) + 1 as last_col,
+					count(*) as ntiles
+				from ${table_name}
+				group by zoom_level
+			) as group_tiles
+			order by ntiles desc
+			limit 1
+		`, [table_name]).get.objs
+		.then(objs => {
+			if (!objs.length) {
+				return;
+			}
+			let rec = objs[0];
+			tableInfo.bounds = [
+				get_lat_lng_for_number(rec.first_col, rec.first_row, rec.zoom_level),
+				get_lat_lng_for_number(rec.last_col, rec.last_row, rec.zoom_level),
+			];
+			tableInfo.zoom_level = rec.zoom_level;
+		});
+		
+		tableInfo.fetchTile = (x, y, z) => {
+			return this.db.exec(`
+				select 
+				--casttoblob(
+					tile_data
+				--)
+				from ${table_name}
+				where zoom_level=${z} and tile_column=${x} and tile_row=${y}
+			`).get.first
+			.then(tile_data => {
+				//const buff = new Uint8Array(tile_data);
+				//let mime = getMimeTypeFromUint8Array(buff);
+				let blob = new Blob(
+					[tile_data],
+					//{type: mime},
+				);
+				return URL.createObjectURL(blob);
+			});
+		};
+		
+		await this.db.exec(`
+			select zoom_level, tile_width, tile_height
+			from gpkg_tile_matrix
+			where table_name=?
+		`, [table_name]).get.objs
+		.then(objs => {
+			tableInfo.imgSizes = objs
+			.reduce((acc, level) => {
+				acc[level.zoom_level] = {
+					width: level.tile_width,
+					height: level.tile_height,
+				};
+				return acc;
+			}, {});
+		});
+		
+		let layer = makeTiledLayer(
+			layerLabel, layerId, tableInfo);
+		addLayer(this.map, layer);
+		this.layersOnMap[layerId] = layerLabel;
+		
+		this.showMap();
+	}
+	
+	async featuresLayer(layerLabel, layerId, sldStyle, query, params={}) {
 		let [rows, cols, error] = await this.performQuery(
-			query, params, tabLabel);
+			query, params, layerLabel);
 		if (error) {
 			alert(error);
 			return;
@@ -1074,43 +1273,100 @@ class SQLQuery {
 			alert('provide a geojson column named "feature"');
 			return;
 		}
-		this.showLayer(tabId, tabLabel, rows);
+		let extent;
+		if (rows.length) {
+			let geometry;
+			for (let row of rows) {
+				if (row.feature) {
+					if (row.feature.coordinates) {
+						geometry = 'feature';
+					}
+					else if (row.feature.geometry?.coordinates) {
+						geometry = "json_extract(feature, '$.geometry')";
+					}
+					break;
+				}
+			}
+			if (geometry) {
+				let [rowsExtent, cols1, errorExtent] = await this.performQuery(`
+					SELECT extent(geomfromgeojson(${geometry})) as extent
+					FROM (
+						${query}
+					)
+					WHERE feature is not null
+				`, params);
+				if (errorExtent) {
+					error += ' ' + errorExtent;
+				}
+				else {
+					extent = rowsExtent[0].extent;
+				}
+			}
+		}
+		
+		if (extent) {
+			extent = extent.coordinates[0];
+		}
+		this.showLayer(
+			layerId, layerLabel, rows, extent, {sldStyle});
 	}
 	
-	showLayer(tabId, tabLabel, rows) {
-		let layer = makeLayerJSON(tabLabel);
-		layer.tabId = tabId;
+	showLayer(tabId, tabLabel, rows, extent, {sldStyle}={}) {
+		let layer = makeLayerJSON(
+			tabLabel, tabId, {extent, sldStyle});
 		let dataProjection = 'EPSG:900913';
 		//may set layer projection afterwards 
 		for (let row of rows) {
-			let {feature, crs, ...properties} = row;
-			if (!['Feature', 'FeatureCollection'].includes(feature.type)) {
+			let {feature, ...properties} = row;
+			if (!feature) {
+				continue;
+			}
+			let {crs, ...rest} = feature
+			feature = rest;
+			if (!['Feature', 'FeatureCollection'].includes(feature.type || '')) {
 				feature = {
 					type: 'Feature',
 					properties,
-					crs,
 					geometry: feature,
 				}
 			}
 			if (!crs) {
-				feature.crs = {
+				crs = {
 					properties: {name: dataProjection},
 					type: 'name',
 				};
 			}
-			if (!feature.crs.type) {
-				feature.crs.type = 'name';
+			else {
+				let code = crs.properties[crs.type || 'name'] || '';
+				if (code.endsWith('EPSG:4326')) {
+					crs = null;
+				}
+			}
+			if (crs) {
+				if (!crs.type) {
+					crs.type = 'name';
+				}
+				feature.crs = crs;
 			}
 			addJSON(layer, feature);
 		}
-		this.map.addLayer(layer);
+		addLayer(this.map, layer);
+		this.layersOnMap[tabId] = tabLabel;
 		this.showMap();
+	}
+	
+	removeLayer(layerId) {
+		if (layerId in this.layersOnMap) {
+			remove_layer(this.map, layerId);
+			delete this.layersOnMap[layerId];
+			this.showMap();
+		}
 	}
 	
 	showMap() {
 		let map_tab = this.tabFetch(this.map_tab);
 		if (map_tab) {
-			this.tabClick(map_tab);
+			this.tabActivate(map_tab);
 			show_map(this.map);
 		}
 	}
@@ -1427,6 +1683,9 @@ class SQLQuery {
 			.addEventListener('click', e => {this.addQueryTab()});
 		this.schemaTree();
 		this.addQueryTab();
+		
+		//lastly
+		this.showMap();
 	}
 	
 	schemaTree = () => {
@@ -1442,40 +1701,103 @@ class SQLQuery {
 		);
 	}
 	
-	async setSchema(tab) {
-		let tables = await this.db.exec(snippets.schemaTree.query).get.rows;
-		let tree = gridTree(tables);
-		this.isGpkg = await this.db.exec(`
-			SELECT count(*)
+	async buildConditionalSchema() {
+		return this.db.exec(`
+			SELECT json_group_object(name, type)
 			FROM sqlite_schema
-			WHERE name LIKE 'gpkg_contents'
-		`).get.first;
-		if (this.isGpkg) {
-			let gpkgTables = await this.db.exec(
-				snippets.gpkgSchema.query).get.rows;
-			let gpkgTree = gridTree(gpkgTables);
-			tree.push(...gpkgTree);
+			WHERE type IN ('table', 'view')
+		`).get.first
+		.then(entities => {
+			let available = Object.entries(conditionalSchema)
+				.filter(entry => {
+					let [entity, query] = entry;
+					return entity in entities;
+				})
+				.map(entry => {
+					let [entity, query] = entry;
+					return this.db.exec(query).get.rows;
+				});
+			return Promise.allSettled(available);
+		});
+	}
+	
+	async mapTable(data_type, table_name, column_name) {
+		if (table_name in this.layersOnMap) {
+			this.removeLayer(table_name);
 		}
-		if (this.isSpatial) {
-			let spatialTables = await this.db.exec(
-				snippets.spatialiteSchema.query).get.rows;
-			let spatialTree = gridTree(spatialTables);
-			spatialTree = [{
-				summary: 'spatialite',
-				details: spatialTree,
-			}];
-			//console.log(spatialTables, spatialTree);
-			tree.push(...spatialTree);
+		else {
+			if (data_type == 'features') {
+				let columns = await this.db.exec(`
+					SELECT name
+					FROM pragma_table_info('${table_name}')
+					WHERE name not in ('${column_name}')
+				`).get.flat;
+				columns.push(`asgeojson(
+					GeomFromGPB([${column_name}]), 15, 2) as feature`);
+				let query = `
+					select ${columns.join(', ')}
+					from [${table_name}]`;
+				let sldStyle;
+				if (this.has_layer_styles) {
+					sldStyle = await this.db.exec(`
+						SELECT styleSLD as sldStyle
+						FROM layer_styles
+						where f_table_name='${table_name}'
+					`).get.first;
+				}
+				await this.featuresLayer(table_name, table_name, sldStyle, query);
+			}
+			else {
+				await this.tilesLayer(table_name, table_name, table_name);
+			}
 		}
-		let html = htmlTree(tree);
-		
-		if (!tab) {
-			tab = this.sqlQuery;
-		}
-		let target = tab.querySelector('.query-container.schema');
-		target.textContent = '';
-		target.insertAdjacentHTML(
-			'beforeend', html);
+	}
+	
+	async setSchema(tab) {
+		let tables = this.db.exec(
+			snippets.schemaTree.query
+		).get.rows;
+		Promise.all([
+			Promise.allSettled([tables]),
+			this.buildConditionalSchema()
+		])
+		.then(groups => {
+			let tree = [];
+			for (let group of groups) {
+				for (let table of group) {
+					if (table.status == "fulfilled") {
+						let subTree = gridTree(table.value);
+						if (subTree) {
+							tree.push(...subTree);
+						}
+					}
+					else {
+						console.log(table);
+					}
+				}
+			}
+			let html = htmlTree(tree);
+			
+			if (!tab) {
+				tab = this.sqlQuery;
+			}
+			let target = tab.querySelector('.query-container.schema');
+			target.textContent = '';
+			target.insertAdjacentHTML(
+				'beforeend', html);
+			target.querySelectorAll('[data-action]')
+			.forEach(
+				tag => {
+					let [method, ...params] = tag.dataset.action.split('\t');
+					tag.addEventListener('click', e => {this[method].call(this, ...params);});
+					if (method === 'mapTable') {
+						if (params[1] in this.layersOnMap) {
+							tag.textContent = 'unmap';
+						}
+					}
+				}
+			);
+		});
 	}
 	
 	createMapTab() {
@@ -1538,6 +1860,12 @@ class SQLQuery {
 		tab.addEventListener('click', e => {this.tabClick(tab)});
 	}
 	
+	tabActivate = tab => {
+		if (!(tab.classList.contains('active'))) {
+			this.tabClick(tab);
+		}
+	}
+	
 	createTab(label, content, {
 		withClose=false,
 		events={},
@@ -1576,6 +1904,15 @@ class SQLQuery {
 		return [tab, tabInfo];
 	}
 	
+	queryOnClick(tab) {
+		let mapButton = tab.querySelector('.map-query');
+		let prefix = '';
+		if (tab.dataset.tabInfo in this.layersOnMap) {
+			prefix = 'un';
+		}
+		mapButton.textContent = prefix + 'map';
+	}
+	
 	addQueryTab = (label, query='') => {
 		let html = `
 			<div class="query-with-controls" style="width: 100%;">
@@ -1603,7 +1940,12 @@ class SQLQuery {
 				</table>
 			</div>
 			`;
-		let [tab, tabInfo] = this.createTab(label, html, {withClose: true});
+		let [tab, tabInfo] = this.createTab(label, html, {
+			withClose: true,
+			events: {
+				click: this.queryOnClick,
+			}
+		});
 		tabInfo.querySelector('.query').value = query;
 		tabInfo.querySelector('button.add-param')
 			.addEventListener('click', e => {this.addParam(e.currentTarget);});
@@ -1644,7 +1986,8 @@ class SQLQuery {
 	}
 	
 	tabFetch(tabValue) {
-		return this.sqlQuery.querySelector(`span[data-tab-value="${tabValue}"]`);
+		return this.sqlQuery.querySelector(
+			`span[data-tab-value="${tabValue}"]`);
 	}
 };
 

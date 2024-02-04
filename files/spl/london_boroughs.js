@@ -56,7 +56,7 @@ function lines_features(data) {
 						color: branchColors[branch]
 					},
 					flatstyle: {
-						color: branchColors[branch]
+						'stroke-color': branchColors[branch]
 					},
 				},
 				geometry: {
@@ -70,7 +70,7 @@ function lines_features(data) {
 	return linesFeatures;
 }
 
-function makeLinesLayers(mount) {
+function makeLinesLayers(db, mount) {
 	let linesFeatures = lines_features(mount.data);
 	mount.layers = Object.entries(linesFeatures)
 		.map(entry => {
@@ -80,7 +80,7 @@ function makeLinesLayers(mount) {
 		});
 }
 
-function makeStationsLayer(mount) {
+function makeStationsLayer(db, mount) {
 	let layer = makeLayerJSON('tfl_stations');
 	mount.layers = [layer];
 	addJSON(layer, mount.data);

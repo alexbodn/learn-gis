@@ -92,11 +92,12 @@
 				//layerControl.addOverlay(transparentLayer);
 				
 				for (let [name, layerInfo] of Object.entries(layers)) {
-					let layer = makeLayerJSON(layerInfo.data, name, {
+					let layer = makeLayerJSON(false, name, {
 						"opacity": 1,
 						width: 0.2,
 						"fillOpacity": 0.05 // value between 0-1 or 0% - 100%
 					});
+					layer.addData(layerInfo.data)
 					map.addLayer(layer);
 					layerControl.addOverlay(layer, name);
 				}

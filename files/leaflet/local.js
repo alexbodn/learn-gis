@@ -27,14 +27,16 @@ function onEachFeature(feature, layer) {
 	if (label) {
 		//layer.bindPopup(label);
 	}
-	if (feature?.properties?.style) {
-		//
+	let style = feature?.properties?.style;
+	if (style) {
+		//console.log(feature, layer);
+		layer.setStyle(style);
 	}
 	layer.on('click', onLayerClick);
 }
 
-function makeLayerJSON(json, name, style) {
-	console.log(json, name, style);
+function makeLayerJSON(name, style) {
+	console.log(name, style);
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
 	}
@@ -50,40 +52,11 @@ function makeLayerJSON(json, name, style) {
 	let layer =
 	L.Proj.geoJson
 	//L.geoJSON
-		(json, {
+		(false, {
 		filter,
 		onEachFeature,
 		pointToLayer,
-		style: style || json?.properties?.style,
-	});
-	let crsSection = json?.crs;
-	let crs;
-	if (crsSection?.type === 'name') {
-		crs = new L.Proj.CRS(
-			crsSection.properties.name);
-	}
-	else if (crsSection?.type) {
-		crs = new L.Proj.CRS(
-			crsSection.type + ':' + crsSection.properties.code);
-	}
-	if (crs !== undefined) {
-		layer.options.latLngToCoords = function(latlng) {
-			//console.log('conv', latlng);
-			return crs.projection.project(latlng);
-		};
-	}
-	else {
-		layer.options.latLngToCoords = function(latlng) {
-			let point = new L.point(latlng.lng, latlng.lat);
-			//console.log('no conv', latlng, point);
-			return point;
-		};
-	}
-	//console.log('build', crs, layer.options);
-	
-	layer.eachLayer(featureInstanceLayer => {
-		let style = featureInstanceLayer.feature?.properties?.style;
-		featureInstanceLayer.setStyle(style);
+		style,
 	});
 	
 	return layer;

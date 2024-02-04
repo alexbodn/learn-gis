@@ -60,6 +60,10 @@ function build_map(target='map') {
 	});
 }
 
+function addLayer(map, layer) {
+	map.addLayer(layer);
+}
+
 function calcExtent(layers) {
 	let extent = ol.extent.createEmpty();
 	layers.forEach(layer => {
@@ -82,11 +86,13 @@ function calcExtent(layers) {
 			if (layerExtent) {
 				ol.extent.extend(extent, layerExtent);
 			}
+//console.log('xxx', layer, layerExtent);
 		}
 		catch (err) {
 			console.log('layer without extent', err);
 		}
 	});
+//console.log('calc extent', extent);
 	return extent;
 }
 
@@ -116,14 +122,18 @@ function applySLD(vectorLayer, text) {
 	);
 }
 
-function makeLayerJSON(name, {sldStyle, style}={}) {
+function makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
 	ol.proj.proj4.register(proj4);
-	const vectorSource = new ol.source.Vector();
+	const vectorSource = new ol.source.Vector({
+		extent,
+	});
 	const vectorLayer = new ol.layer.Vector({
 		title: name,
 		source: vectorSource,
 		style,
 	});
+	vectorLayer.set('id', id);
+console.log('sld', sldStyle, 'style', style);
 	if (sldStyle) {
 		applySLD(vectorLayer, sldStyle);
 	}
@@ -163,16 +173,22 @@ function addJSON(layer, json, dataProjection='CRS:84', featureProjection='EPSG:3
 	layer.getSource().addFeatures(features);
 }
 
-function makeLayerGroup(data, name) {
+function makeLayerGroup(data, name, id) {
+	let layers = [];
+	for (let [name, json] of Object.entries(data)) {
+		let layer = makeLayerJSON(name);
+	//	console.log(layerGroup, layer);
+	//	layerGroup.addLayer(layer);
+		addJSON(layer, json);
+		layers.push(layer);
+	}
 	let layerGroup = new ol.layer.Group({
 		title: name,
 		fold: 'close',
 		combined: false,
+		layers,
 	});
-	for (let [name, json] of Object.entries(data)) {
-		let layer = makeLayerJSON(json, name);
-		layerGroup.addLayer(layer);
-	}
+	layerGroup.set('id', id);
 	return layerGroup;
 }
 
@@ -260,6 +276,7 @@ function colorStyle(mainColor='orange', opacity=0.05) {
 let commonClickStyle = colorStyle('orange');
 
 function show_map(map, displayProjection, hitToleranceSelector) {
+	map.updateSize();
 	let mapView = new ol.View({
 		projection: displayProjection,
 		maxZoom: 28,
@@ -268,7 +285,7 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 		zoom: 2,
 	});
 	let extent = calcExtent(map.getLayers());
-	console.log(extent, map.getSize());
+	console.log('fit', extent, map.getSize());
 	if (!ol.extent.isEmpty(extent)) {
 		mapView.fit(extent, {
 			size: map.getSize(),
@@ -406,7 +423,7 @@ tileLoadFunction: async function (tile, src) {
     });
 }
 
-function makeTiledLayer(name, {min_zoom, max_zoom, bounds, fetchTile}) {
+function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
 	
 	let extentw = [
 		bounds[0].lng,
@@ -418,7 +435,6 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, fetchTile}) {
 		extentw, 'EPSG:4326', 'EPSG:3857');
 	
 	let tileSource = new ol.source.XYZ({
-		
 		attributions: '&copy;',
 		tileUrlFunction: function(tileCoord) {
 			// create a simplified url for use in the tileLoadFunction
@@ -459,5 +475,12 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, fetchTile}) {
 		maxZoom: max_zoom,
 		minZoom: min_zoom,
 	});
+	layer.set('id', id);
 	return layer;
- }
+}
+
+function remove_layer(map, layerId) {
+	map.getLayers().getArray()
+		.filter(layer => layer.get('id') === layerId)
+		.forEach(layer => map.removeLayer(layer));
+}

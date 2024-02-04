@@ -31,13 +31,12 @@ function onEachFeature(feature, layer) {
 	}
 	let style = feature?.properties?.style;
 	if (style) {
-		//console.log(feature, layer.options.name);
 		layer.setStyle(style);
 	}
 	layer.on('click', onLayerClick);
 }
 
-function makeLayerJSON(name, {sldStyle, style, dataProjection}={}) {
+function makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
 	}
@@ -58,6 +57,11 @@ function makeLayerJSON(name, {sldStyle, style, dataProjection}={}) {
 		return marker
 			.bindPopup(feature.properties.name);
 	}
+	if (sldStyle) {
+		let SLDStyler = new L.SLDStyler(sldStyle);
+		style = SLDStyler.getStyleFunction();
+		pointToLayer = SLDStyler.getPointToLayerFunction();
+	}
 	let layer =
 	L.Proj.geoJson (
 	//L.geoJSON (
@@ -67,27 +71,18 @@ function makeLayerJSON(name, {sldStyle, style, dataProjection}={}) {
 		pointToLayer,
 		style,
 	});
+	if (extent && extent.length) {
+		let bounds = L.latLngBounds(
+			L.latLng(...extent[0].toReversed()),
+			L.latLng(...extent[2].toReversed()),
+		);
+		layer.options.bounds = bounds;
+	}
 	layer.options.name = name;
-	if (sldStyle) {
-		let SLDStyler = new L.SLDStyler(sldStyle);
-		layer.setStyle(SLDStyler.getStyleFunction);
-	}
-	/*
-	let crsSection = json?.crs;
-	let crs;
-	if (crsSection?.type === 'name') {
-		crs = new L.Proj.CRS(
-			crsSection.properties.name);
-	}
-	else if (crsSection?.type) {
-		crs = new L.Proj.CRS(
-			crsSection.type + ':' + crsSection.properties.code);
-	}
-	*/
+	layer.options.id = id;
 	if (dataProjection) {
 		let crs = new L.Proj.CRS(dataProjection);
 		layer.options.latLngToCoords = function(latlng) {
-			///console.log('11111', latlng)
 			return crs.projection.project(latlng);
 		};
 	}
@@ -106,7 +101,6 @@ function makeLayerJSON(name, {sldStyle, style, dataProjection}={}) {
 			featureInstanceLayer?.setStyle(style);
 		}
 	});*/
-	
 	return layer;
 }
 
@@ -114,9 +108,10 @@ async function addJSON(layer, json, dataProjection='CRS:84', featureProjection='
 	layer.addData(json);
 }
 
-function makeLayerGroup(data, name) {
+function makeLayerGroup(data, name, id) {
 	let layerGroup = L.layerGroup();
 	layerGroup.options.name = name;
+	layerGroup.options.id = id;
 	for (let [name, json] of Object.entries(data)) {
 		let layer = makeLayerJSON(name);
 		layerGroup.addLayer(layer);
@@ -127,6 +122,7 @@ function makeLayerGroup(data, name) {
 
 function tile_layer(title, url, options) {
 	let layer = L.tileLayer(url, options);
+	layer.options.name = title;
 	return layer;
 }
 
@@ -173,6 +169,12 @@ function build_map(target) {
 	L.control.scale({metric: true}).addTo(map);
 	
 	return map;
+}
+
+function addLayer(map, layer) {
+	let group = L.layerGroup([layer]);
+	group.options.id = `g_${layer.options.id}`;
+	map.addLayer(group);
 }
 
 function build_map1(target='map') {
@@ -277,26 +279,33 @@ function build_map1(target='map') {
 
 
 function show_map(map, viewOptions=[]) {
+	map.invalidateSize();
 	//todo break viewOptions in center & zoom
 	if (viewOptions && viewOptions.length) {
 		map.setView(...viewOptions);
 	}
 	else {
-		let bounds;
+		let bounds = L.latLngBounds();
+//console.log('initial valid?', bounds.isValid(), bounds)
 		map.eachLayer(function(layer) {
 	//console.log('/////', layer.options);
 			let layerBounds = layer.getBounds ?
-				layer.getBounds() : null//layer.options.bounds;
+				layer.getBounds() : layer.options.bounds;
+			if (!(layerBounds && layerBounds.isValid())) {
+//console.log('layer w/o bounds', layer);
+				return;
+			}
 //console.log('xxx', layer.options.name, layerBounds, layerBounds?.isValid());
-			if (!bounds || !bounds.isValid()) {
+			if (!bounds.isValid()) {
 				bounds = layerBounds;
 			}
-			else if (layerBounds && layerBounds.isValid()) {
+			else {
 				bounds.extend(layerBounds);
 			}
 		});
-//	console.log('calc bounds', bounds?.isValid(), bounds.getCenter());
-		if (bounds && bounds.isValid()) {
+//console.log('calc bounds', bounds.isValid(), bounds);
+		if (bounds.isValid()) {
+//console.log('center', bounds.getCenter());
 			map.fitBounds(bounds);
 		}
 		else {
@@ -317,7 +326,7 @@ function show_map(map, viewOptions=[]) {
 	);
 }
 
-function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
+function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
 	
 	let layer = new L.GridLayer({
 		noWrap: true,
@@ -326,10 +335,11 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile})
 		maxZoom: max_zoom,
 	});
 	layer.options.name = name;
+	layer.options.id = id;
 	if (bounds) {
 		layer.options.bounds = L.latLngBounds(...bounds);
 	}
-	layer.options.imgSizes = imgSizes;
+	layer.options.imgSizes = imgSizes || {};
 	layer.options.fetchTile = fetchTile;
 	layer.options.emptyCache = {};
 	
@@ -348,8 +358,9 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile})
 			layer.options.emptyCache[key] = canvas.toDataURL('image/png');
 		}
 		
-		let img = new Image(width, height);
-		img.src = layer.options.emptyCache[key];
+		let img = L.DomUtil.create('img');
+		//let img = new Image(width, height);
+		img.src = layer.options?.emptyCache[key];
 		img.crossOrigin = "anonymous";
 		img.style.outline = '1px solid red';
 		
@@ -383,8 +394,37 @@ function makeTiledLayer(name, {min_zoom, max_zoom, bounds, imgSizes, fetchTile})
 			done(error, img);
 		});
 		return img;
-	}
+	};
+	/*
+	layer.createTile = function (coords) {
+		var tile = L.DomUtil.create('div', 'tile-hoverable');
+	
+		// Ensure that this tile will respond to pointer events,
+		// by setting its CSS 'pointer-events' property programatically
+		tile.style.pointerEvents = 'initial';
+	
+		// Attach some event handlers to this particular tile
+		L.DomEvent.on(tile, 'mouseover', function(){
+			tile.style.background = 'red';
+		});
+		L.DomEvent.on(tile, 'mouseout', function(){
+			tile.style.background = 'transparent';
+		});
+		return tile;
+	};
+	*/
 	
 	return layer;
 }
 
+function remove_layer(map, layerId) {
+	let group, toRemove;
+	map.eachLayer(function(layer) {
+		if (layer.options.id == `g_${layerId}`) {
+			toRemove = layer;
+		}
+	});
+	if (toRemove) {
+		map.removeLayer(toRemove);
+	}
+}

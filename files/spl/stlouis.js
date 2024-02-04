@@ -107,7 +107,6 @@ let stlouis_styles = {
 };
 
 let url = stlouis_local;
-//url = rivers_local;
 //window.viewOptions
 //= stlouis_view;
 //= [{lat: 38.63400357606173, lng: -90.252685546875}, 14];
@@ -120,5 +119,15 @@ window.userData = [
 		isdb: true,
 		url,
 		method: 'arrayBuffer',
+		onDb: (db) => {
+			let res = db.read(`
+				--nga gpkg have these hacks
+				drop view if exists spatial_ref_sys;
+				drop view if exists st_spatial_ref_sys;
+				drop view if exists geometry_columns;
+				drop view if exists st_geometry_columns;
+			`);
+			return res;
+		}
 	},
 ];

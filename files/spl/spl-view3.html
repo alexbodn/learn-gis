@@ -25,6 +25,20 @@
 				});
 			}
 		</script>
+		<script>
+			function prependScript(url) {
+				return new Promise((resolve, reject) => {
+					let s = document.createElement('script');
+					s.src = url;
+					s.onload = resolve;
+					s.onerror = reject;
+					document.currentScript.parentNode.insertBefore(
+						s,
+						document.currentScript,
+					);
+				});
+			}
+		</script>
 		<!--
 		<link href="./lib/leaflet.css" rel="stylesheet" />
 		<link href="./lib/leaflet.zoomdisplay.css" rel="stylesheet" />
@@ -54,6 +68,7 @@
 				width: 98vw;
 				height: 59vh;
 				margin-top: 1vh;
+				margin-right: 1vw;
 				margin-left: 1vw;
 				border: solid 1px gray;
 				
@@ -61,7 +76,7 @@
 			}
 		</style>
 		<title>
-			Import a GeoPackage
+			spl-view
 		</title>
 	</head>
 	<body>
@@ -113,10 +128,10 @@ let displayProjection = {
 	srs_code: 'EPSG:3857',
 };
 
-// mountpoint has to be unique.
+// mountpoint/filename has to be unique.
 // but the array is used, to fetch files without mounting
-/**/
-let url = db_small;
+/**
+let url = natural_earth_local;
 window.userData = [
 	{
 		mountpoint: dbMount,
@@ -158,13 +173,15 @@ const OpenLayers = {
 		"./lib/sldreader.js",
 		"./lib/map_show_ol.js",
 	],
+	
 };
 
 let driver = Leaflet;
 
 let program;
-//program = "./stlouis.js";
+program = "./stlouis.js";
 //program = "./london_boroughs.js";
+//program = "./lights.js";
 
 let jsAll = Promise.resolve();
 let scripts = [
@@ -184,15 +201,19 @@ for (let css of driver.css) {
 
 window.userPromises = [jsAll, cssAll];
 
-function onMounted(db, fetched, {baseLayers, overLayers}) {
-//console.log(db, fetched, {baseLayers, overLayers});
+function onMounted(db, fetched) {
+	
+	tileLayers = [];
+	featureLayers = [];
+	
 	let map, xplorer;
-	let body = document.querySelector('body');
+	document.head.querySelector('title')
+		.textContent = program;
 	if (1) {
 		let html = `<div id="sqlQuery"></div>`;
-		body.insertAdjacentHTML('beforeend', html);
+		document.body.insertAdjacentHTML('beforeend', html);
 		let div = document.querySelector('div#sqlQuery');
-		xplorer = new SQLQuery(div, db);
+		xplorer = new SQLQuery(div, db, {build_map});
 		map = xplorer.getMap();
 	}
 	else {
@@ -200,30 +221,31 @@ function onMounted(db, fetched, {baseLayers, overLayers}) {
 		<div id="map"></div>
 		<!--div id="explanation">OpenLayers displaying a .osm file directly. This <a href="display-osm.osm">display-osm.osm</a> is a very small example. Most .osm files would be too large to do this, and in general you're more likely to load in vector features in a different way</div-->
 		`;
-		body.insertAdjacentHTML('beforeend', html);
+		document.body.insertAdjacentHTML('beforeend', html);
 		let div = document.querySelector('div#map');
 		map = build_map(div);
 	}
 	/**/
-	if (!baseLayers.length) {
+	if (true||!tileLayers.length) {
 		map.addLayer(osm_layer());
 	}
 	else {
 		map.addLayer(bw_layer());
 	}
 	/**/
+	/*
 	let maxBounds;
-	for (let layer of baseLayers) {
+	for (let layer of tileLayers) {
 	//console.log(layer);
 		map.addLayer(layer);
 		//layer.bringToFront();
 		//maxBounds = layer.options.bounds;
 	}
-	for (let layer of overLayers) {
+	for (let layer of featureLayers) {
 	//console.log(layer);
 		map.addLayer(layer);
 	}
-	
+	*/
 	for (let [mount, info] of Object.entries(fetched)) {
 		if ('layers' in info) {
 			for (let layer of info.layers) {
@@ -233,7 +255,9 @@ function onMounted(db, fetched, {baseLayers, overLayers}) {
 	}
 	
 	if (xplorer) {
-		xplorer.showMap();
+		xplorer.addSnippets(
+			window.extraSnippets || {});
+		//xplorer.showMap();
 	}
 	else {
 		if (typeof 'viewOptions' === 'undefined') {
