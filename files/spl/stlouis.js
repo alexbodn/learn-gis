@@ -119,7 +119,7 @@ window.userData = [
 		isdb: true,
 		url,
 		method: 'arrayBuffer',
-		onDb: (db) => {
+		onDbLoad: (db) => {
 			let res = db.read(`
 				--nga gpkg have these hacks
 				drop view if exists spatial_ref_sys;

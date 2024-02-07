@@ -275,17 +275,21 @@ function colorStyle(mainColor='orange', opacity=0.05) {
 
 let commonClickStyle = colorStyle('orange');
 
-function show_map(map, displayProjection, hitToleranceSelector) {
+function show_map(map, viewOptions) {
 	map.updateSize();
+	let center = [0, 0];
+	let zoom = 2;
+	if (viewOptions && viewOptions.length) {
+		[center, zoom] = viewOptions;
+	}
 	let mapView = new ol.View({
-		projection: displayProjection,
 		maxZoom: 28,
 		minZoom: 1,
-		center: [0, 0],
-		zoom: 2,
+		center,
+		zoom,
 	});
 	let extent = calcExtent(map.getLayers());
-	console.log('fit', extent, map.getSize());
+//	console.log('fit', extent, map.getSize());
 	if (!ol.extent.isEmpty(extent)) {
 		mapView.fit(extent, {
 			size: map.getSize(),
@@ -316,10 +320,12 @@ function show_map(map, displayProjection, hitToleranceSelector) {
 		return style;
 	}
 	
+	/*
 	let selectHitTolerance;
 	if (hitToleranceSelector) {
 		selectHitTolerance = new SelectHitTolerance(hitToleranceSelector);
 	}
+	*/
 	
 	map.on('singleclick', (evt) => {
 		var coordinates = map.getEventCoordinate(evt.originalEvent);
@@ -470,7 +476,6 @@ function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
 	tileSource.setProperties({extent});
 	let layer = new ol.layer.Tile({
 		title: name,
-//		extent,
 		source: tileSource,
 		maxZoom: max_zoom,
 		minZoom: min_zoom,

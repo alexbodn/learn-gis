@@ -645,6 +645,10 @@ null, null
 from stored_variables`,
 };
 
+const isInteger = value => Number.isInteger(value);
+function isFloat(n){
+	return Number(n) === n && n % 1 !== 0;
+}
 const isString = value => typeof value === 'string' || value instanceof String;
 
 class SQLQuery {
@@ -745,26 +749,35 @@ class SQLQuery {
 		return tab;
 	}
 	
-	addParam(button, name='') {
-		function typeOptions(fieldTypes) {
+	addParam(button, name='', value, type) {
+		function typeOptions(fieldTypes, choice='NULL') {
 			return Object.keys(fieldTypes)
-				.map(type => `<option value="${type}" ${type == 'NULL' ? 'selected="selected"' : ''}>${type}</option>`)
+				.map(oneType => `<option value="${oneType}" ${oneType == choice ? 'selected="selected"' : ''}>${oneType}</option>`)
 				.reduce((a, b) => (a + '\n' + b), '')
 				;
 		}
+		if (typeof type === 'undefined') {
+			let detect = this.dataStringify(value);
+			[value, type] = detect;
+		}
+		let longForm = name.startsWith('+');
+		if (longForm) {
+			name = name.slice(1);
+		}
 		let row = `
 			<tr>
-				<td style="width: 30%">
+				<td style="width: 29%">
 					<input class="variable" type="text" value="${name}" placeholder="name" style="width: 100%" />
 				</td>
-				<td style="width: 30%">
+				<td style="width: 29%">
 					<select class="type" style="width: 100%">
-						${typeOptions(this.fieldTypes)}
+						${typeOptions(this.fieldTypes, type)}
 					</select>
 				</td>
-				<td style="width: 30%">
-					<input class="value" pattern="/^$/" disabled="disabled" value="" placeholder="null" style="width: 100%" />
+				<td style="width: 29%">
+					<input class="value" pattern="/^$/" disabled="disabled" value="${value || ''}" placeholder="null" style="width: 100%" />
 				</td>
+				<td style="width: 3%"><input type="checkbox" class="long-form" style="width: 100%" /></td>
 				<td style="width: 10%"><button class="del-param">del</button></td>
 			</tr>
 			`;
@@ -781,6 +794,7 @@ class SQLQuery {
 			this.buildParams(e.currentTarget);
 			e.stopPropagation();
 		});
+		newVar.querySelector('input.long-form').checked = longForm;
 		newVar.querySelector('button.del-param').addEventListener('click', e => {this.delParam(e.currentTarget);});
 		newVar.querySelector('input.variable').focus();
 	}
@@ -798,6 +812,7 @@ class SQLQuery {
 			let varField = curr.querySelector('.variable');
 			let variable = varField.value;
 			let type = curr.querySelector('.type').value;
+			let longForm = curr.querySelector('.long-form').checked;
 			let valField = curr.querySelector('.value');
 			let value = valField.value;
 			let [pattern, dflt, fmt, disabled, placeholder] = this.fieldTypes[type];
@@ -817,7 +832,13 @@ class SQLQuery {
 				valField.focus();
 				return;
 			}
-			params[variable] = fmt(value);
+			if (longForm) {
+				value = `@${variable}@=${value}`
+			}
+			else {
+				value = fmt(value);
+			}
+			params[variable] = value;
 		});
 		return params;
 	}
@@ -836,11 +857,30 @@ class SQLQuery {
 		}
 	}
 	
+	createMainMenu() {
+		this.createTab(
+			'☰', `
+			<div class="query-container">
+				<table border="1"><tbody class="mainMenu"></tbody></table>
+			</div>`
+		);
+	}
+	
+	createSnippetsTab() {
+		this.createTab(
+			'snippets', `
+			<div class="query-container">
+				<table border="1"><tbody class="snippetsMenu"></tbody></table>
+			</div>`
+		);
+		this.buildSnippetsMenu();
+	}
+	
 	addSnippets = (snippets, deleting=false) => {
 		if ('snippets' in this) {
 			for (let [name, snippet] of Object.entries(snippets)) {
 				if (!snippet.spatial || this.isSpatial) {
-					this.snippets[name] = snippet.query;
+					this.snippets[name] = snippet;
 					if (deleting) {
 						delete snippets[name];
 					}
@@ -882,7 +922,7 @@ class SQLQuery {
 	}
 	
 	snippetQuery(snippet, preprocessed=false) {
-		let query = this.snippets[snippet];
+		let {query} = this.snippets[snippet];
 		if (preprocessed) {
 			query = this.prepQuery(query);
 		}
@@ -901,9 +941,9 @@ class SQLQuery {
 		return snippet;
 	}
 	
-	cpSnippet(snippet, currentTarget, data) {
+	cpSnippet(snippet, currentTarget) {
 		snippet = this.currentSnippet(snippet, currentTarget);
-		let query = data || this.snippets[snippet];
+		let {query} = this.snippets[snippet];
 		query = this.unindent(query);
 		navigator.clipboard.writeText(query).then(
 			() => {
@@ -915,11 +955,11 @@ class SQLQuery {
 		);
 	}
 	
-	openSnippet(snippet, currentTarget, data) {
+	openSnippet(snippet, currentTarget) {
 		snippet = this.currentSnippet(snippet, currentTarget);
-		let query = data || this.snippets[snippet];
+		let {query, params} = this.snippets[snippet];
 		query = this.unindent(query);
-		this.addQueryTab(snippet, query);
+		this.addQueryTab(snippet, query, params);
 	}
 	
 	ppQuery(button) {
@@ -985,6 +1025,48 @@ class SQLQuery {
 			hexOctets.push(byteToHex[buff[i]]);
 		}
 		return hexOctets.join('');
+	}
+	
+	dataStringify(data) {
+		let str, type;
+		if (typeof data === 'object') {
+			if (data === null) {
+				str = '';
+				type = 'NULL';
+			}
+			else if (data.constructor == Uint8Array) {
+				let hex = this.hexUint8(data);
+				str = `x'${hex}'`;
+				type = 'BLOB';
+			}
+			else if (data.constructor == ArrayBuffer) {
+				let hex = this.hex(data);
+				str = `x'${hex}'`;
+				type = 'BLOB';
+			}
+			else {
+				str = JSON.stringify(data)
+					.replaceAll('\\n', '\n')
+					.replaceAll('\\t', '\t');
+				type = 'TEXT';
+			}
+		}
+		else if (isString(data)) {
+			str = data;
+			type = 'TEXT';
+		}
+		else if (isInteger(data)) {
+			str = data.toString();
+			type = 'INTEGER';
+		}
+		else if (isFloat(data)) {
+			str = data.toString();
+			type = 'REAL';
+		}
+		else {
+			[str, type] = ['', 'NULL'];
+		}
+		return [str, type];
 	}
 	
 	showTable(queryTab, rows, colnames, error, duration=0) {
@@ -1418,7 +1500,7 @@ class SQLQuery {
 		}
 		let depth = 0;
 		const replacer = (match, snippet) => {
-			let replaced = this.snippets[snippet];
+			let replaced = this.snippets[snippet].query;
 			++depth;
 			replaced = this.indent(replaced, depth);
 			replaced = `(\n${replaced})`;
@@ -1516,7 +1598,7 @@ class SQLQuery {
 				}
 				#${this.rootId} .tabs span {
 					background: rgb(16, 153, 9);
-					padding: 10px;
+					max-height: 2.5em;
 					border: 1px solid white;
 					
 					float: inline-start;
@@ -1573,6 +1655,10 @@ class SQLQuery {
 				#${this.rootId} table.sqlResults {
 					height: 100%;
 					width: 100%;
+				}
+				#${this.rootId} .sqlParams td * {
+					box-sizing: border-box;
+					-moz-box-sizing: border-box;
 				}
 				#${this.rootId} table.sqlResults thead,
 				#${this.rootId} table.sqlResults tfoot {
@@ -1671,14 +1757,9 @@ class SQLQuery {
 		this.sqlQuery.insertAdjacentHTML('beforeend', html);
 		this.sqlQuery.querySelector('.popupclose')
 			.addEventListener('click', e => {this.popupClose()});
+		this.createMainMenu();
 		this.createMapTab();
-		this.createTab(
-			'snippets', `
-			<div class="query-container">
-				<table border="1"><tbody class="snippetsMenu"></tbody></table>
-			</div>`
-		);
-		this.buildSnippetsMenu();
+		this.createSnippetsTab();
 		this.sqlQuery.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
 		this.schemaTree();
@@ -1913,7 +1994,7 @@ class SQLQuery {
 		mapButton.textContent = prefix + 'map';
 	}
 	
-	addQueryTab = (label, query='') => {
+	addQueryTab = (label, query='', params={}) => {
 		let html = `
 			<div class="query-with-controls" style="width: 100%;">
 				<table border="0"><tbody class="sqlParams"></tbody></table>
@@ -1928,6 +2009,7 @@ class SQLQuery {
 						<button class="log-query">log</button>
 						<button class="run-query">run</button>
 						<button class="map-query">map</button>
+						<button onclick="window.open('https://github.com/jvail/spl.js', '_BLANK', '', '');">spl.js</button>
 					</div>
 					<div class="clear" />
 				</div>
@@ -1947,8 +2029,11 @@ class SQLQuery {
 			}
 		});
 		tabInfo.querySelector('.query').value = query;
-		tabInfo.querySelector('button.add-param')
-			.addEventListener('click', e => {this.addParam(e.currentTarget);});
+		let addParam = tabInfo.querySelector('button.add-param');
+		for (let [name, value] of Object.entries(params)) {
+			this.addParam(addParam, name, value);
+		}
+		addParam.addEventListener('click', e => {this.addParam(e.currentTarget);});
 		tabInfo.querySelector('button.make-params')
 			.addEventListener('click', e => {this.makeParams(e.currentTarget);});
 		tabInfo.querySelector('button.pp-query')

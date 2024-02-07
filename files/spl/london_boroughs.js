@@ -53,10 +53,12 @@ function lines_features(data) {
 				properties: {
 					name: line,
 					style: {
-						color: branchColors[branch]
+						color: branchColors[branch],
+						weight: 1,
 					},
 					flatstyle: {
-						'stroke-color': branchColors[branch]
+						'stroke-color': branchColors[branch],
+						'stroke-weight': 1,
 					},
 				},
 				geometry: {
@@ -101,14 +103,14 @@ window.userData = [
 		//filename: 'tfl_lines.json',
 		url: new URL('./test/files/dbs/tfl_lines.json', window.location.href).toString(),
 		method: 'json',
-		onFetch: makeLinesLayers,
+		onData: makeLinesLayers,
 	},
 	{
 		mountpoint: 'tfl_stations',
 		//filename: 'tfl_stations.json',
 		url: new URL('./test/files/dbs/tfl_stations.json', window.location.href).toString(),
 		method: 'json',
-		onFetch: makeStationsLayer,
+		onData: makeStationsLayer,
 	},
 ];
 

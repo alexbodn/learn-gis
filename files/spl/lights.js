@@ -3,8 +3,7 @@ const lights_local = new URL('./test/files/dbs/lights.zip', window.location.href
 let url = lights_local;
 
 function makeLightsLayer(db, mount) {
-	//addJSON(layer, mount.data);
-	db.exec(
+	return db.exec(
 		'SELECT ImportZipSHP(?, ?, ?, ?, ?)', [
 		'/data/lights.zip', 'lights', 'lights', 'UTF-8', 4326
 	]);
@@ -17,7 +16,7 @@ window.userData = [
 		isdb: false,
 		url,
 		method: 'blob',
-		onFetch: makeLightsLayer,
+		onData: makeLightsLayer,
 	},
 ];
 

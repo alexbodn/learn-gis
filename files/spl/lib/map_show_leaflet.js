@@ -25,7 +25,7 @@ function onEachFeature(feature, layer) {
 		//layer.setText(label, {below: true});
 		layer.bindTooltip(label, {
 			permanent: true,
-			className: 'myClass',
+			className: 'leaflet-tooltip',
 			direction: 'center',
 		}).openTooltip();
 	}
@@ -41,7 +41,7 @@ function makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 		return !feature.properties.hide_on_map;
 	}
 	function pointToLayer(feature, latlng) {
-		let defaultPoint = {radius: 5, weight: 0.5, opacity: 0.5, fillOpacity: 0};
+		let defaultPoint = {radius: 5, weight: 0.5, opacity: 0.1, fillOpacity: 0};
 		let featureStyle = feature?.properties?.style || style || defaultPoint;
 		let marker;
 		if ('iconMarker' in featureStyle) {

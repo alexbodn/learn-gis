@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script>
+			function onMapClick(e) {
+    popLocation = e.latlng;
+    var popup = L.popup({
+        closeButton: true})
+        .setLatLng(e.latlng)
+        .setContent(popupForm)
+        .openOn(map);
+
+    $("#popup-form").submit(function(e){
+         e.preventDefault();
+         console.log(e);
+         var geojsonFeature = {
+            "type": "Feature",
+            "properties": {
+                "type": $("input[name='goodBad']:checked").val(),
+                "location":  L.DomUtil.get('location').value,
+                "reason": L.DomUtil.get('reason').value,
+                "improve": L.DomUtil.get('improve').value
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": popLocation
+            }
+        };
+
+        L.geoJson(geojsonFeature, {
+            pointToLayer: function (feature, latlng) {
+                marker = L.marker(geojsonFeature.geometry.coordinates, {
+                    icon: L.AwesomeMarkers.icon({icon: 'info', prefix: 'fa', markerColor: markCol}),
+                    riseOnHover: true,
+                    draggable: true //define the content to be added to the marker
+                }).bindPopup(popupForm);
+                marker.on("popupopen", onPopupOpen);
+                openOn(map);
+                return marker;
+            }
+        }).addTo(map);
+        map.closePopup();
+    });
+
+var popupForm = `
+<form id="popup-form" class="form-container">
+	<h2>Add a point:</h2>
+	<strong> The air quality here is: </strong> <br/>
+	<label for="type">Good</label>
+	<input type="radio" name="goodBad" value="good" id="good"/>
+	<label for="type">Bad</label>
+	<input type="radio" name="goodBad" value="bad" id="bad"/>
+	<br/><br/>
+	<label for="location"><b>Location Name</b></label>
+	<input type="text" placeholder="eg. Redbridge flyover" id="location"/>
+	<label for="reason"><b>Why are you adding this point? - be specific!</b></label>
+	<input type="text" placeholder="eg. There is a traffic jam every saturday 11am" id="reason"/>
+	<label for="solution"><b>How would you improve air quality at this location? <br/>(If you ran the city)</b></label>
+	<input type="text" placeholder="eg. I\'d close the road when when school starts and stops" id="improve"/>
+	<button type="submit" id="btn-submit" class="btn">Save</button>
+	<input type="hidden" id="hiddenField" name="id" value=""/>
+</form>`;
+function updateFeature(updatedGeoJsonData) {
+	var updatedFeature = myFeaturesMap[updatedGeoJsonData.properties.objectID];
+	updatedFeature.clearLayers(); // Remove the previously created layer.
+	updatedFeature.addData(updatedGeoJsonData); // Replace it by the new data.
+}
+		</script>
+	</head>
+	<body>
+		
+	</body>
+</html>

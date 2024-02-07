@@ -15,10 +15,13 @@
 			}
 		</script>
 		<script>
-			function jsLoad(src) {
+			function jsLoad(src, module=false) {
 				return new Promise((resolve, reject) => {
 					let s = document.createElement('script');
 					s.src = src;
+					if (module) {
+						s.type='module';
+					}
 					s.onload = resolve;
 					s.onerror = reject;
 					document.head.append(s);
@@ -71,33 +74,8 @@
 		</title>
 	</head>
 	<body>
-		<!--
-		<script src="./lib/proj4.js"></script>
-		-->
-		
-		<!--
-		<script src="./lib/leaflet-src.js"></script>
-		<script src="./lib/leaflet.sld.js"></script>
-		<script src="./lib/proj4leaflet.js"></script>
-		<script src="./lib/leaflet.zoomdisplay-src.js"></script>
-		<script src="./lib/map_show_leaflet.js"></script>
-		-->
-		<!--script src="./lib/leaflet.textpath.js"></script-->
-		
-		<!--
-		<script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
-		<script src="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js"></script>
-		<script src="./sld/sldreader.js"></script>
-		<script src="./lib/map_show_ol.js"></script>
-		-->
-		
 		
 		<script src="./lib/sqlquery.js"></script>
-
-<!--
-<script src="./stlouis.js"></script>
-<script src="./london_boroughs.js"></script>
--->
 
 		<script>
 
@@ -108,24 +86,14 @@ const dctour_local = new URL('./test/files/dbs/dctour.gpkg', window.location.hre
 const rivers_remote = 'https://www.geopackage.org/data/rivers.gpkg';
 const rivers_local = new URL('./test/files/dbs/rivers.gpkg', window.location.href).toString();
 const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.href).toString();
- 
-//autoGeoJSON = false;
-
-const dbMount = 'data';
-
-// Map View Projection
-let displayProjection = {
-	srs_id: 3857,
-	srs_code: 'EPSG:3857',
-};
 
 // mountpoint/filename has to be unique.
 // but the array is used, to fetch files without mounting
 /**
-let url = natural_earth_local;
+let url = db_small;
 window.userData = [
 	{
-		mountpoint: dbMount,
+		mountpoint: 'data',
 		filename: 'db_small.sqlite',
 		isdb: true,
 		url,
@@ -167,13 +135,13 @@ const OpenLayers = {
 	
 };
 
-let driver = Leaflet;
+let driver = OpenLayers;
 
 let program;
-//program = "./stlouis.js";
+program = "./stlouis.js";
 //program = "./london_boroughs.js";
 //program = "./lights.js";
-program = "./tri.js";
+//program = "./tri.js";
 
 let jsAll = Promise.resolve();
 let scripts = [
@@ -186,17 +154,18 @@ for (let js of scripts) {
 	}
 	jsAll = jsAll.then(() => jsLoad(js));
 }
+jsAll = jsAll.then(() => jsLoad('./lib/spl-view4.js', true))
+
 let cssAll = Promise.resolve();
 for (let css of driver.css) {
 	cssAll = cssAll.then(() => cssLoad(css));
 }
 
-window.userPromises = [jsAll, cssAll];
+let userPromises = [jsAll, cssAll];
 
-function onMounted(db, fetched) {
-	
-	tileLayers = [];
-	featureLayers = [];
+Promise.all(userPromises);
+
+function onData(db, fetched) {
 	
 	let map, xplorer;
 	document.head.querySelector('title')
@@ -217,27 +186,8 @@ function onMounted(db, fetched) {
 		let div = document.querySelector('div#map');
 		map = build_map(div);
 	}
-	/**/
-	if (true||!tileLayers.length) {
-		map.addLayer(osm_layer());
-	}
-	else {
-		map.addLayer(bw_layer());
-	}
-	/**/
-	/*
-	let maxBounds;
-	for (let layer of tileLayers) {
-	//console.log(layer);
-		map.addLayer(layer);
-		//layer.bringToFront();
-		//maxBounds = layer.options.bounds;
-	}
-	for (let layer of featureLayers) {
-	//console.log(layer);
-		map.addLayer(layer);
-	}
-	*/
+	//map.addLayer(osm_layer());
+	map.addLayer(bw_layer());
 	for (let [mount, info] of Object.entries(fetched)) {
 		if ('layers' in info) {
 			for (let layer of info.layers) {
@@ -258,41 +208,8 @@ function onMounted(db, fetched) {
 		show_map(map, viewOptions);
 	}
 }
-
-		</script>
-		<script src="./lib/jszip.min.js" type="text/javascript"></script>
-		<script src="./lib/filesaver.js" type="text/javascript"></script>
-		<script>
-			function saveFile(fileName, data) {
-				let zip = new JSZip();
-				zip.file(
-					fileName,
-					data
-					);
-				zip.generateAsync({
-					type: "blob",
-					compression: "DEFLATE"
-				})
-				.then((arc) => {
-					// see FileSaver.js
-					//saveAs(content, `${table_name}.zip`);
-					saveAs(arc, `${fileName}.zip`);
-				});
-			}
 		</script>
 		<!--script src="./lib/eruda.js" type="text/javascript"></script-->
-		<script type="module" src="./lib/spl-view3.js"></script>
-		<script>
-		/*
-		create temp table if not exists t(a,b,c);
-		create temp trigger if not exists 
-		before insert on temp.t
-		--for each row 
-		begin
-		select raise (abort, 'message');
-		end;
-		insert into temp.t(a) values(123);
-		*/
-		</script>
+		<!--script type="module" src="./lib/spl-view4.js"></script-->
 	</body>
 </html>

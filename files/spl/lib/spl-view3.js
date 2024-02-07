@@ -542,7 +542,7 @@ async function main() {
 		{
 			autoGeoJSON,
 		},
-		[],
+		window.spl_extensions || [],
 	);
 	let projData = {
 		url: projdbUrl,
@@ -594,6 +594,9 @@ async function main() {
 				if (info?.onDb) {
 					db = info.onDb(db);
 				}
+				else if (window.onDb) {
+					db = onDb(db);
+				}
 				return db.read(init_sql());
 			}
 		};
@@ -617,8 +620,8 @@ async function main() {
 				info.tileLayers = tileLayers;
 				info.featureLayers = featureLayers;
 			}
-			if ('onFetch' in info) {
-				info.onFetch(dbs[0], info);
+			if ('onData' in info) {
+				info.onData(dbs[0], info);
 			}
 		}
 		if ('onMounted' in window) {
