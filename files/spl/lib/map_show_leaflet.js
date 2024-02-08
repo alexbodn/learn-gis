@@ -104,7 +104,7 @@ function makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 	return layer;
 }
 
-async function addJSON(layer, json, dataProjection='CRS:84', featureProjection='EPSG:3857') {
+async function addJSON(layer, json) {
 	layer.addData(json);
 }
 

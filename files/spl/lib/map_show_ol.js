@@ -133,14 +133,15 @@ function makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
 		style,
 	});
 	vectorLayer.set('id', id);
-console.log('sld', sldStyle, 'style', style);
 	if (sldStyle) {
 		applySLD(vectorLayer, sldStyle);
 	}
 	return vectorLayer;
 }
 
-function addJSON(layer, json, dataProjection='CRS:84', featureProjection='EPSG:3857') {
+function addJSON(layer, json) {
+	const featureProjection = 'EPSG:3857';
+	let dataProjection='CRS:84';
 	let crsSection = json?.crs;
 	if (crsSection?.type === 'name' || crsSection?.properties?.name && !crsSection.type) {
 		dataProjection = crsSection.properties.name;
@@ -166,9 +167,9 @@ function addJSON(layer, json, dataProjection='CRS:84', featureProjection='EPSG:3
 			let style = ol.render.canvas.style.buildStyle(flatstyle, parsingContext)();
 			feature.setStyle(style);
 		}
+		//todo do i need copy properties explicitly?
+		//features[0].setProperties(features.properties);
 	}
-	//todo do i need copy properties explicitly?
-	//features[0].setProperties(features.properties);
 	layer.getSource().setProperties({origProjection: dataProjection});
 	layer.getSource().addFeatures(features);
 }
