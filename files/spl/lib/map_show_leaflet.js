@@ -36,7 +36,28 @@ function onEachFeature(feature, layer) {
 	layer.on('click', onLayerClick);
 }
 
-function makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
+class DisplayLeaflet extends DisplayDriver{
+static resource_urls = {
+	css: [
+		"./leaflet.css",
+		"./leaflet.zoomdisplay.css",
+	],
+	js: [
+		"./proj4.js",
+		"./leaflet-src.js",
+		"./leaflet.sld.js",
+		"./proj4leaflet.js",
+		"./leaflet.zoomdisplay-src.js",
+		//"./leaflet.textpath.js",
+	],
+};
+
+	constructor(target='map') {
+		super();
+		this._map = this.build_map(target);
+	}
+
+makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
 	}
@@ -104,11 +125,11 @@ function makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 	return layer;
 }
 
-async function addJSON(layer, json) {
+async addJSON(layer, json) {
 	layer.addData(json);
 }
 
-function makeLayerGroup(data, name, id) {
+makeLayerGroup(data, name, id) {
 	let layerGroup = L.layerGroup();
 	layerGroup.options.name = name;
 	layerGroup.options.id = id;
@@ -120,36 +141,13 @@ function makeLayerGroup(data, name, id) {
 	return layerGroup;
 }
 
-function tile_layer(title, url, options) {
+tile_layer(title, url, options) {
 	let layer = L.tileLayer(url, options);
 	layer.options.name = title;
 	return layer;
 }
 
-function osm_layer() {
-	let osm = tile_layer(
-		'base layer (OSM)',
-		'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	});
-	return osm;
-}
-
-function bw_layer() {
-	return tile_layer(
-		'bw osm',
-		'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png', {
-		maxZoom: 16,
-		attribution: `
-			&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>
-			&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
-			&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>
-		`
-	});
-}
-
-function build_map(target) {
+build_map(target='map') {
 	let map = L.map(target, {
 		// https://leafletjs.com/reference.html#map-zoomsnap
 		zoomSnap: 0,
@@ -171,13 +169,13 @@ function build_map(target) {
 	return map;
 }
 
-function addLayer(map, layer) {
+addLayer(layer) {
 	let group = L.layerGroup([layer]);
 	group.options.id = `g_${layer.options.id}`;
-	map.addLayer(group);
+	this._map.addLayer(group);
 }
 
-function build_map1(target='map') {
+build_map1(target='map') {
 	let mapdef = 
 	//'map'
 	document.querySelector('#map')
@@ -277,8 +275,8 @@ function build_map1(target='map') {
 	return map;
 }
 
-
-function show_map(map, viewOptions=[]) {
+show_map(viewOptions=[]) {
+	let map = this._map;
 	map.invalidateSize();
 	//todo break viewOptions in center & zoom
 	if (viewOptions && viewOptions.length) {
@@ -326,7 +324,7 @@ function show_map(map, viewOptions=[]) {
 	);
 }
 
-function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
+makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
 	
 	let layer = new L.GridLayer({
 		noWrap: true,
@@ -417,7 +415,8 @@ function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTi
 	return layer;
 }
 
-function remove_layer(map, layerId) {
+remove_layer(layerId) {
+	let map = this._map;
 	let group, toRemove;
 	map.eachLayer(function(layer) {
 		if (layer.options.id == `g_${layerId}`) {
@@ -428,3 +427,4 @@ function remove_layer(map, layerId) {
 		map.removeLayer(toRemove);
 	}
 }
+};

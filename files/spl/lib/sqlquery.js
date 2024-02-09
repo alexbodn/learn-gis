@@ -713,6 +713,7 @@ class SQLQuery {
 			this.has_layer_styles = has_layer_styles;
 		});
 		this.withMap = !!build_map;
+		this.build_map = build_map;
 		this.layersOnMap = {};
 		
 		this.tabCounter = 0;
@@ -1336,9 +1337,9 @@ class SQLQuery {
 			}, {});
 		});
 		
-		let layer = makeTiledLayer(
+		let layer = this.map.makeTiledLayer(
 			layerLabel, layerId, tableInfo);
-		addLayer(this.map, layer);
+		this.map.addLayer(layer);
 		this.layersOnMap[layerId] = layerLabel;
 		
 		this.showMap();
@@ -1394,7 +1395,7 @@ class SQLQuery {
 	}
 	
 	showLayer(tabId, tabLabel, rows, extent, {sldStyle}={}) {
-		let layer = makeLayerJSON(
+		let layer = this.map.makeLayerJSON(
 			tabLabel, tabId, {extent, sldStyle});
 		let dataProjection = 'EPSG:900913';
 		//may set layer projection afterwards 
@@ -1430,16 +1431,16 @@ class SQLQuery {
 				}
 				feature.crs = crs;
 			}
-			addJSON(layer, feature);
+			this.map.addJSON(layer, feature);
 		}
-		addLayer(this.map, layer);
+		this.map.addLayer(layer);
 		this.layersOnMap[tabId] = tabLabel;
 		this.showMap();
 	}
 	
 	removeLayer(layerId) {
 		if (layerId in this.layersOnMap) {
-			remove_layer(this.map, layerId);
+			this.map.remove_layer(layerId);
 			delete this.layersOnMap[layerId];
 			this.showMap();
 		}
@@ -1449,7 +1450,7 @@ class SQLQuery {
 		let map_tab = this.tabFetch(this.map_tab);
 		if (map_tab) {
 			this.tabActivate(map_tab);
-			show_map(this.map);
+			this.map.show_map();
 		}
 	}
 	
@@ -1897,7 +1898,7 @@ class SQLQuery {
 			'.query-container .map-container'
 		);
 		
-		this.map = build_map(map_container);
+		this.map = new this.build_map(map_container);
 		this.map_tab = tab.dataset.tabValue;
 	}
 	

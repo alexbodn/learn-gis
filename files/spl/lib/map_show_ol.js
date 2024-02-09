@@ -51,7 +51,28 @@ class SelectHitTolerance {
 	}
 };
 
-function build_map(target='map') {
+class DisplayOpenLayers extends DisplayDriver{
+	static resource_urls = {
+		css: [
+			"https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css",
+			"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css",
+		],
+		js: [
+			"./proj4.js",
+			"https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js",
+			"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js",
+			"./sldreader.js",
+//			"./lib/map_show_ol.js",
+		],
+	};
+	
+	constructor(target='map') {
+		super();
+		this._map = this.build_map(target);
+		this.commonClickStyle = this.colorStyle('orange');
+	}
+	
+build_map(target='map') {
 //	ol.proj.proj4.register(proj4);
 	// Create Map canvas and View
 	return new ol.Map({
@@ -60,11 +81,12 @@ function build_map(target='map') {
 	});
 }
 
-function addLayer(map, layer) {
+addLayer(layer) {
+	let map = this._map;
 	map.addLayer(layer);
 }
 
-function calcExtent(layers) {
+calcExtent(layers) {
 	let extent = ol.extent.createEmpty();
 	layers.forEach(layer => {
 		try {
@@ -101,7 +123,7 @@ function calcExtent(layers) {
  * @param {string} text the xml text
  * apply sld
  */
-function applySLD(vectorLayer, text) {
+applySLD(vectorLayer, text) {
 	const sldObject = SLDReader.Reader(text);
 	// for debugging
 	//	window.sldObject = sldObject;
@@ -122,7 +144,7 @@ function applySLD(vectorLayer, text) {
 	);
 }
 
-function makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
+makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
 	ol.proj.proj4.register(proj4);
 	const vectorSource = new ol.source.Vector({
 		extent,
@@ -139,7 +161,7 @@ function makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
 	return vectorLayer;
 }
 
-function addJSON(layer, json) {
+async addJSON(layer, json) {
 	const featureProjection = 'EPSG:3857';
 	let dataProjection='CRS:84';
 	let crsSection = json?.crs;
@@ -174,7 +196,7 @@ function addJSON(layer, json) {
 	layer.getSource().addFeatures(features);
 }
 
-function makeLayerGroup(data, name, id) {
+makeLayerGroup(data, name, id) {
 	let layers = [];
 	for (let [name, json] of Object.entries(data)) {
 		let layer = makeLayerJSON(name);
@@ -193,7 +215,7 @@ function makeLayerGroup(data, name, id) {
 	return layerGroup;
 }
 
-function tile_layer(title, url, options) {
+tile_layer(title, url, options) {
 	let {attribution, ...rest} = options;
 	let source = new ol.source.XYZ({
 		url,
@@ -210,35 +232,7 @@ function tile_layer(title, url, options) {
 	return layer;
 }
 
-function bw_layer() {
-	return tile_layer(
-		'bw osm',
-		'https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png', {
-		maxZoom: 16,
-		attribution: `
-			&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>
-			&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
-			&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>
-		`
-	});
-}
-
-function osm_layer() {
-	let sourceOSM = new ol.source.OSM({
-		tileLoadFunction: function(imageTile, src) {
-			imageTile.getImage().src = src;
-		}
-	});
-	sourceOSM.set({
-		origProjection: sourceOSM.projection.code,
-	});
-	return new ol.layer.Tile({
-		title: 'base layer (OSM)',
-		source: sourceOSM,
-	});
-}
-
-function colorStyle(mainColor='orange', opacity=0.05) {
+colorStyle(mainColor='orange', opacity=0.05) {
 	const dimColor = ol.color.asString(
 		ol.color.asArray(mainColor).slice(0, 3).concat(opacity));
 	return new ol.style.Style({
@@ -274,9 +268,8 @@ function colorStyle(mainColor='orange', opacity=0.05) {
 	});
 }
 
-let commonClickStyle = colorStyle('orange');
-
-function show_map(map, viewOptions) {
+show_map(viewOptions) {
+	let map = this._map;
 	map.updateSize();
 	let center = [0, 0];
 	let zoom = 2;
@@ -289,7 +282,7 @@ function show_map(map, viewOptions) {
 		center,
 		zoom,
 	});
-	let extent = calcExtent(map.getLayers());
+	let extent = this.calcExtent(map.getLayers());
 //	console.log('fit', extent, map.getSize());
 	if (!ol.extent.isEmpty(extent)) {
 		mapView.fit(extent, {
@@ -316,7 +309,7 @@ function show_map(map, viewOptions) {
 	/**/
 	
 	function styleOnClick(feature, resolution, dom) {
-		let style = commonClickStyle;
+		let style = this.commonClickStyle;
 		style.getText().setText(feature.get("name"));
 		return style;
 	}
@@ -375,62 +368,7 @@ function show_map(map, viewOptions) {
 	}
 }
 
-function data_tile() {
-var tileSource = new ol.source.XYZ({
-    tileUrlFunction: function(tileCoord, pixelRatio, projection){
-        // tileCoord is representing the location of a tile in a tile grid (z, x, y)
-        var z = tileCoord[0].toString();
-        var x = tileCoord[1].toString();
-        var y = tileCoord[2].toString();
-
-        // add the part /1/1-0.jpg, --> {z}/{x}-{y}.jpg
-        path += '/' + z + '/' + x + '-' + y + '.jpg';
-        return path;
-    },
-tileLoadFunction: async function (tile, src) {
-  const coordinates = tile.getTileCoord();
-  let row = await db.tiles.get({
-    zoom: coordinates[0],
-    column: coordinates[1],
-    tile: coordinates[2]
-  })
-
-  const image = tile.getImage();
-  if (row) {
-    // if tile image exists in database, return its URL
-    const result = URL.createObjectURL(row.blob);
-    image.addEventListener('load', function() {
-       URL.revokeObjectURL(result);
-    });
-    image.src = result;
-  } else {
-    image.src = src;
-  }
-}
-});
-    return new TileLayer({
-      source: new DataTile({
-        loader: function (z, x, y) {
-          const half = size / 2;
-          context.clearRect(0, 0, size, size);
-          context.fillStyle = 'rgba(100, 100, 100, 0.5)';
-          context.fillRect(0, 0, size, size);
-          context.fillStyle = 'black';
-          context.fillText(`z: ${z}`, half, half - lineHeight);
-          context.fillText(`x: ${x}`, half, half);
-          context.fillText(`y: ${y}`, half, half + lineHeight);
-          context.strokeRect(0, 0, size, size);
-          const data = context.getImageData(0, 0, size, size).data;
-          // converting to Uint8Array for increased browser compatibility
-          return new Uint8Array(data.buffer);
-        },
-        // disable opacity transition to avoid overlapping labels during tile loading
-        transition: 0,
-      }),
-    });
-}
-
-function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
+makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
 	
 	let extentw = [
 		bounds[0].lng,
@@ -485,8 +423,11 @@ function makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
 	return layer;
 }
 
-function remove_layer(map, layerId) {
+remove_layer(layerId) {
+	let map = this._map;
 	map.getLayers().getArray()
 		.filter(layer => layer.get('id') === layerId)
 		.forEach(layer => map.removeLayer(layer));
 }
+};
+

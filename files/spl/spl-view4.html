@@ -102,68 +102,27 @@ window.userData = [
 ];
 /**/
 
-let Leaflet = {
-	name: 'Leaflet',
-	css: [
-		"./lib/leaflet.css",
-		"./lib/leaflet.zoomdisplay.css",
-	],
-	js: [
-		"./lib/proj4.js",
-		"./lib/leaflet-src.js",
-		"./lib/leaflet.sld.js",
-		"./lib/proj4leaflet.js",
-		"./lib/leaflet.zoomdisplay-src.js",
-		"./lib/map_show_leaflet.js",
-		//"./lib/leaflet.textpath.js",
-	],
-};
-
-const OpenLayers = {
-	name: 'OpenLayers',
-	css: [
-		"https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css",
-		"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css",
-	],
-	js: [
-		"./lib/proj4.js",
-		"https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js",
-		"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js",
-		"./lib/sldreader.js",
-		"./lib/map_show_ol.js",
-	],
-	
-};
-
-let driver = Leaflet;
-
 let program;
 program = "./stlouis.js";
 //program = "./london_boroughs.js";
 //program = "./lights.js";
 //program = "./tri.js";
 
-let jsAll = Promise.resolve();
-let scripts = [
-	...driver.js,
-	program,
-];
-for (let js of scripts) {
-	if (!js) {
-		continue;
-	}
-	jsAll = jsAll.then(() => jsLoad(js));
-}
-jsAll = jsAll.then(() => jsLoad('./lib/spl-view4.js', true))
-
-let cssAll = Promise.resolve();
-for (let css of driver.css) {
-	cssAll = cssAll.then(() => cssLoad(css));
-}
-
-let userPromises = [jsAll, cssAll];
-
-Promise.all(userPromises);
+const driver_href = "./lib/map_show.js";
+const driver_url = new URL(driver_href, window.location.href).toString();
+jsLoad(driver_url)
+.then(() => jsLoad("./lib/map_show_leaflet.js"))
+.then(() => jsLoad("./lib/map_show_ol.js"))
+.then(() => {
+	//window.DisplayClass = DisplayLeaflet;
+	window.DisplayClass = DisplayOpenLayers;
+	return Promise.all(
+		window.DisplayClass.resources(driver_url)
+	);
+})
+.then(() => program ? jsLoad(program) : Promise.resolve())
+.then(() => jsLoad('./lib/spl-view4.js', true))
+;
 
 function onData(db, fetched) {
 	
@@ -174,7 +133,9 @@ function onData(db, fetched) {
 		let html = `<div id="sqlQuery"></div>`;
 		document.body.insertAdjacentHTML('beforeend', html);
 		let div = document.querySelector('div#sqlQuery');
-		xplorer = new SQLQuery(div, db, {build_map});
+		xplorer = new SQLQuery(div, db, {
+			build_map: window.DisplayClass,
+		});
 		map = xplorer.getMap();
 	}
 	else {
@@ -186,8 +147,8 @@ function onData(db, fetched) {
 		let div = document.querySelector('div#map');
 		map = build_map(div);
 	}
-	//map.addLayer(osm_layer());
-	map.addLayer(bw_layer());
+	//map.addLayer(map.osm_layer());
+	map.addLayer(map.bw_layer());
 	for (let [mount, info] of Object.entries(fetched)) {
 		if ('layers' in info) {
 			for (let layer of info.layers) {
@@ -199,17 +160,15 @@ function onData(db, fetched) {
 	if (xplorer) {
 		xplorer.addSnippets(
 			window.extraSnippets || {});
-		//xplorer.showMap();
 	}
 	else {
 		if (typeof 'viewOptions' === 'undefined') {
 			var viewOptions = null;
 		}
-		show_map(map, viewOptions);
+		map.show_map(viewOptions);
 	}
 }
 		</script>
 		<!--script src="./lib/eruda.js" type="text/javascript"></script-->
-		<!--script type="module" src="./lib/spl-view4.js"></script-->
 	</body>
 </html>
