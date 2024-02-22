@@ -232,7 +232,7 @@ FROM sqlite_schema
 left outer JOIN pragma_table_info(sqlite_schema.name) table_fields
 left outer JOIN pragma_index_info(sqlite_schema.name) index_fields
 WHERE sqlite_schema.name NOT LIKE 'sqlite_%'
-and sqlite_schema.type<>'view'
+--and sqlite_schema.type<>'view'
 order by 
 tbl_name, 
 sqlite_schema.type desc,
@@ -411,7 +411,7 @@ coalesce(index_fields.seqno, 0)
 				) as style,
 				cast (n as text) as name
 			FROM t1`,
-		spatial: false,
+		spatial: true,
 	},
 	polygonFeatures: {
 		query: `
@@ -428,7 +428,7 @@ coalesce(index_fields.seqno, 0)
 					)
 				) as feature
 			FROM t1`,
-		spatial: false,
+		spatial: true,
 	},
 	featuresCollection: {
 		query: `
@@ -444,7 +444,7 @@ coalesce(index_fields.seqno, 0)
 					)
 				) as feature
 			FROM t1`,
-		spatial: false,
+		spatial: true,
 	},
 	builtPolygons: {
 		query: `
@@ -497,7 +497,7 @@ coalesce(index_fields.seqno, 0)
 					)
 				) as feature
 			FROM t1`,
-		spatial: false,
+		spatial: true,
 	},
 	builtCollection: {
 		query: `
@@ -557,93 +557,93 @@ coalesce(index_fields.seqno, 0)
 
 let conditionalSchema = {
 	gpkg_contents: `
-SELECT 
-'gpkg' as gpkg,
-data_type,
-gpkg_contents.table_name ||
-case
-	when data_type='attributes'
-	then ''
-	else ' [button\tmap\tmapTable\t' ||
-	data_type || '\t' ||
-	gpkg_contents.table_name ||
-	case
-		when data_type='tiles'
-		then ''
-		else '\t' || column_name
-	end || ']'
-end,
-'column ' || column_name || ' ' || 
-geometry_type_name || ' ' ||
-'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
-'x y' ||
-case when z<>0 then ' z' else '' end ||
-case when m<>0 then ' m' else '' end
-as column
-FROM gpkg_contents
-left outer join gpkg_geometry_columns 
-on gpkg_contents.table_name=gpkg_geometry_columns.table_name
-order by data_type, gpkg_contents.table_name, column`,
+		SELECT 
+		'gpkg' as gpkg,
+		data_type,
+		gpkg_contents.table_name ||
+		case
+			when data_type='attributes'
+			then ''
+			else ' [button\tmap\tmapTable\t' ||
+			data_type || '\t' ||
+			gpkg_contents.table_name ||
+			case
+				when data_type='tiles'
+				then ''
+				else '\t' || column_name
+			end || ']'
+		end,
+		'column ' || column_name || ' ' || 
+		geometry_type_name || ' ' ||
+		'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
+		'x y' ||
+		case when z<>0 then ' z' else '' end ||
+		case when m<>0 then ' m' else '' end
+		as column
+		FROM gpkg_contents
+		left outer join gpkg_geometry_columns 
+		on gpkg_contents.table_name=gpkg_geometry_columns.table_name
+		order by data_type, gpkg_contents.table_name, column`,
 	geometry_columns: `
-with
-	geometry_types as (
-		${snippets.geometryTypes.query}
-	)
-select 'spatialite', 'geometries', 'tables',
-f_table_name ||
-	' [button\tmap\tmapTable\tfeatures\t' ||
-	f_table_name || '\t' ||
-	f_geometry_column || ']'
-	as [table],
-f_geometry_column || ' ' ||
-coalesce(
-	geometry_types.name,
-	cast (geometry_type as TEXT)
-) as column
-from geometry_columns
-left outer join geometry_types
-	on geometry_types.number=geometry_type
-`,
+		with
+			geometry_types as (
+				${snippets.geometryTypes.query}
+			)
+		select 'spatialite', 'geometries', 'tables',
+		f_table_name ||
+			' [button\tmap\tmapTable\tfeatures\t' ||
+			f_table_name || '\t' ||
+			f_geometry_column || ']'
+			as [table],
+		f_geometry_column || ' ' ||
+		coalesce(
+			geometry_types.name,
+			cast (geometry_type as TEXT)
+		) as column
+		from geometry_columns
+		left outer join geometry_types
+			on geometry_types.number=geometry_type
+		`,
 	views_geometry_columns: `
-select 'spatialite', 'geometries', 'views',
-view_name as [view],
-view_geometry as geometry
-from views_geometry_columns`,
+		select 'spatialite', 'geometries', 'views',
+		view_name as [view],
+		view_geometry as geometry
+		from views_geometry_columns`,
 	virts_geometry_columns: `
-select 'spatialite', 'geometries', 'virts',
-virt_name as virt,
-virt_geometry as geometry
-from virts_geometry_columns`,
+		select 'spatialite', 'geometries', 'virts',
+		virt_name as virt,
+		virt_geometry as geometry
+		from virts_geometry_columns`,
 	networks: `
-select 'spatialite', 'networks',
-network_name,
-null, null
-from networks`,
+		select 'spatialite', 'networks',
+		network_name,
+		null, null
+		from networks`,
 	topologies: `
-select 'spatialite', 'topologies',
-topology_name,
-null, null
-from topologies`,
+		select 'spatialite', 'topologies',
+		topology_name,
+		null, null
+		from topologies`,
 	raster_coverages: `
-select 'spatialite', 'raster_coverages',
-coverage_name,
-null, null
-from raster_coverages`,
+		select 'spatialite', 'raster_coverages',
+		coverage_name,
+		null, null
+		from raster_coverages`,
 	vector_coverages: `
-select 'spatialite', 'vector_coverages',
-coverage_name,
-null, null
-from vector_coverages`,
+		select 'spatialite', 'vector_coverages',
+		coverage_name,
+		null, null
+		from vector_coverages`,
 	stored_procedures: `
-select 'spatialite', 'stored_procedures',
-name,
-null, null
-from stored_procedures`,
+		select 'spatialite', 'stored_procedures',
+		name,
+		null, null
+		from stored_procedures`,
 	stored_variables: `
-select 'spatialite', 'stored_variables',
-name,
-null, null
-from stored_variables`,
+		select 'spatialite', 'stored_variables',
+		name,
+		null, null
+		from stored_variables`,
 };
 
 const isInteger = value => Number.isInteger(value);
@@ -675,10 +675,60 @@ class SQLQuery {
 		this.sqlQuery.style.width = '100%';
 		this.container.appendChild(this.sqlQuery);
 		
+		this.withMap = !!build_map;
+		this.build_map = build_map;
+		this.layersOnMap = {};
+		
+		this.tabCounter = 0;
+		this.tabEvents = {};
+		
+		this.waitingSnippets = {};
+		
+		this.buildForm();
+		
 		this.db = db;
 		
 		this.isSpatial = false;
 		this.isGpkg = undefined;
+		this.has_layer_styles = undefined;
+		
+		this.exec_driver = this.getAPI;
+		this.performQuery(`SELECT 'getAPI'`).first
+			.then(getAPI => {
+				if (getAPI !== 'getAPI') {
+					this.exec_driver = this.classicExec;
+				}
+			})
+			.catch(wrongAPI => {
+				this.exec_driver = this.classicExec;
+			})
+			.then(() => {
+				this.checkIsGpkg();
+				this.checkIsSpatial();
+			});
+	}
+	
+	checkIsSpatial() {
+		this.performQuery(`SELECT spatialite_version();`).first
+			.then(isSpatial => {
+				this.isSpatial = !!isSpatial;
+			})
+			.catch(error => {})
+			.finally(x => {
+				if (!this.isSpatial) {
+					this.db.createFunction({
+						name: 'json',
+						xFunc: (pCx, arg) => { // note the call arg count
+							return this.parse_json + arg;
+						}
+					});
+				}
+				this.setSnippets(snippets);
+				this.addSnippets(this.waitingSnippets, true);
+			});
+	}
+	
+	checkIsGpkg() {
 		this.performQuery(`
 			SELECT count(*) as isGpkg
 			FROM sqlite_schema
@@ -705,44 +755,17 @@ class SQLQuery {
 					console.log('error loading projections', error);
 				});
 			}
+			if (isGpkg) {
+				this.performQuery(`
+					SELECT count(*)
+					FROM sqlite_schema
+					WHERE name like 'layer_styles'
+				`).first
+				.then(has_layer_styles => {
+					this.has_layer_styles = has_layer_styles;
+				});
+			}
 		});
-		this.has_layer_styles = undefined;
-		this.performQuery(`
-			SELECT count(*)
-			FROM sqlite_schema
-			WHERE name like 'layer_styles'
-		`).first
-		.then(has_layer_styles => {
-			this.has_layer_styles = has_layer_styles;
-		});
-		this.withMap = !!build_map;
-		this.build_map = build_map;
-		this.layersOnMap = {};
-		
-		this.tabCounter = 0;
-		this.tabEvents = {};
-		
-		this.waitingSnippets = {};
-		
-		this.buildForm();
-		
-		this.performQuery(`SELECT spatialite_version();`).first
-			.then(isSpatial => {
-				this.isSpatial = !!isSpatial;
-			})
-			.catch(error => {})
-			.finally(x => {
-				if (!this.isSpatial) {
-					this.db.createFunction({
-						name: 'json',
-						xFunc: (pCx, arg) => { // note the call arg count
-							return this.parse_json + arg;
-						}
-					});
-				}
-				this.setSnippets(snippets);
-				this.addSnippets(this.waitingSnippets, true);
-			});
 	}
 	
 	paramType(_this) {
@@ -1569,11 +1592,13 @@ class SQLQuery {
 	performQuery(query, params={}, {
 		timeLabel
 	}={}) {
-		let cols = Promise.resolve([]);
-		let rows = Promise.resolve([]);
-		let objs = Promise.resolve([]);
-		let first = Promise.resolve();
-		let flat = Promise.resolve([]);
+		let promises = {
+			cols: Promise.resolve([]),
+			rows: Promise.resolve([]),
+			objs: Promise.resolve([]),
+			first: Promise.resolve(),
+			flat: Promise.resolve([]),
+		};
 		let error = '';
 		[params, query, error] = this.prepKeys(params, query, timeLabel);
 		if (!error) {
@@ -1581,40 +1606,56 @@ class SQLQuery {
 				console.time(timeLabel);
 			}
 			try {
-				let columnNames = [];
-				let resultRows = [];
-				let rs = this.db.exec({
-					sql: query,
-					bind: params,
-					rowMode: 'object',
-					columnNames: columnNames,
-					resultRows: resultRows,
-					returnValue: "resultRows",
-				});
-				cols = Promise.resolve(columnNames);
-				let jsonStart = this.parse_json.length;
-				for (let row of resultRows) {
-					for (let col of columnNames) {
-						if (isString(row[col]) && row[col].startsWith(this.parse_json)) {
-							row[col] = JSON.parse(row[col].slice(jsonStart));
-						}
-					}
-				}
-				objs = Promise.resolve(resultRows);
-				rows = resultRows.map(row => Object.values(row));
-				flat = [];
-				rows.forEach(row => flat.push(...row));
-				first = Promise.resolve(flat ? flat[0] : undefined);
-				flat = Promise.resolve(flat);
+				promises = this.exec_driver.call(
+					this, this.db, query, params);
 			}
 			catch (exception) {
 				error = exception;
+				console.log({error});
 			}
 			if (timeLabel) {
 				console.timeEnd(timeLabel);
 			}
 		}
-		return {objs, rows, cols, first, flat, error};
+		return {...promises, error};
+	}
+	
+	getAPI(db, query, params) {
+		let {cols, rows, objs, first, flat} = db.exec(
+			query, params).get;
+		return {cols, rows, objs, first, flat};
+	}
+	
+	classicExec (db, query, params) {
+		let columnNames = [];
+		let resultRows = [];
+		let rs = db.exec({
+			sql: query,
+			bind: params,
+			rowMode: 'object',
+			columnNames: columnNames,
+			resultRows: resultRows,
+			returnValue: "resultRows",
+		});
+		let cols = Promise.resolve(columnNames);
+		let jsonStart = this.parse_json.length;
+		for (let row of resultRows) {
+			for (let col of columnNames) {
+				if (isString(row[col]) && row[col].startsWith(this.parse_json)) {
+					row[col] = JSON.parse(row[col].slice(jsonStart));
+				}
+			}
+		}
+		let objs = Promise.resolve(resultRows);
+		let rows = resultRows.map(
+			row => Object.values(row));
+		let flatRows = rows.reduce((acc, row) => {
+				acc.push(...row);
+				return acc;
+			}, []);
+		let first = Promise.resolve(flatRows.length ? flatRows[0] : undefined);
+		let flat = Promise.resolve(flatRows);
+		return {cols, rows, objs, first, flat};
 	}
 	
 	buildForm() {
