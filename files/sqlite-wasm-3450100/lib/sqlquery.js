@@ -411,7 +411,7 @@ coalesce(index_fields.seqno, 0)
 				) as style,
 				cast (n as text) as name
 			FROM t1`,
-		spatial: true,
+		spatial: false,
 	},
 	polygonFeatures: {
 		query: `
@@ -428,7 +428,7 @@ coalesce(index_fields.seqno, 0)
 					)
 				) as feature
 			FROM t1`,
-		spatial: true,
+		spatial: false,
 	},
 	featuresCollection: {
 		query: `
@@ -444,7 +444,7 @@ coalesce(index_fields.seqno, 0)
 					)
 				) as feature
 			FROM t1`,
-		spatial: true,
+		spatial: false,
 	},
 	builtPolygons: {
 		query: `
@@ -497,7 +497,7 @@ coalesce(index_fields.seqno, 0)
 					)
 				) as feature
 			FROM t1`,
-		spatial: true,
+		spatial: false,
 	},
 	builtCollection: {
 		query: `
@@ -675,60 +675,10 @@ class SQLQuery {
 		this.sqlQuery.style.width = '100%';
 		this.container.appendChild(this.sqlQuery);
 		
-		this.withMap = !!build_map;
-		this.build_map = build_map;
-		this.layersOnMap = {};
-		
-		this.tabCounter = 0;
-		this.tabEvents = {};
-		
-		this.waitingSnippets = {};
-		
-		this.buildForm();
-		
 		this.db = db;
 		
 		this.isSpatial = false;
 		this.isGpkg = undefined;
-		this.has_layer_styles = undefined;
-		
-		this.exec_driver = this.getAPI;
-		this.performQuery(`SELECT 'getAPI'`).first
-			.then(first => {
-				if (first !== 'getAPI') {
-					this.exec_driver = this.classicExec;
-				}
-			})
-			.catch(wrongAPI => {
-				this.exec_driver = this.classicExec;
-			})
-			.then(() => {
-				this.checkIsGpkg();
-				this.checkIsSpatial();
-			});
-	}
-	
-	checkIsSpatial() {
-		this.performQuery(`SELECT spatialite_version();`).first
-			.then(isSpatial => {
-				this.isSpatial = !!isSpatial;
-			})
-			.catch(error => {})
-			.finally(x => {
-				if (!this.isSpatial) {
-					this.db.createFunction({
-						name: 'json',
-						xFunc: (pCx, arg) => { // note the call arg count
-							return this.parse_json + arg;
-						}
-					});
-				}
-				this.setSnippets(snippets);
-				this.addSnippets(this.waitingSnippets, true);
-			});
-	}
-	
-	checkIsGpkg() {
 		this.performQuery(`
 			SELECT count(*) as isGpkg
 			FROM sqlite_schema
@@ -755,17 +705,44 @@ class SQLQuery {
 					console.log('error loading projections', error);
 				});
 			}
-			if (isGpkg) {
-				this.performQuery(`
-					SELECT count(*)
-					FROM sqlite_schema
-					WHERE name like 'layer_styles'
-				`).first
-				.then(has_layer_styles => {
-					this.has_layer_styles = has_layer_styles;
-				});
-			}
 		});
+		this.has_layer_styles = undefined;
+		this.performQuery(`
+			SELECT count(*)
+			FROM sqlite_schema
+			WHERE name like 'layer_styles'
+		`).first
+		.then(has_layer_styles => {
+			this.has_layer_styles = has_layer_styles;
+		});
+		this.withMap = !!build_map;
+		this.build_map = build_map;
+		this.layersOnMap = {};
+		
+		this.tabCounter = 0;
+		this.tabEvents = {};
+		
+		this.waitingSnippets = {};
+		
+		this.buildForm();
+		
+		this.performQuery(`SELECT spatialite_version();`).first
+			.then(isSpatial => {
+				this.isSpatial = !!isSpatial;
+			})
+			.catch(error => {})
+			.finally(x => {
+				if (!this.isSpatial) {
+					this.db.createFunction({
+						name: 'json',
+						xFunc: (pCx, arg) => { // note the call arg count
+							return this.parse_json + arg;
+						}
+					});
+				}
+				this.setSnippets(snippets);
+				this.addSnippets(this.waitingSnippets, true);
+			});
 	}
 	
 	paramType(_this) {
@@ -1592,13 +1569,11 @@ class SQLQuery {
 	performQuery(query, params={}, {
 		timeLabel
 	}={}) {
-		let promises = {
-			cols: Promise.resolve([]),
-			rows: Promise.resolve([]),
-			objs: Promise.resolve([]),
-			first: Promise.resolve(),
-			flat: Promise.resolve([]),
-		};
+		let cols = Promise.resolve([]);
+		let rows = Promise.resolve([]);
+		let objs = Promise.resolve([]);
+		let first = Promise.resolve();
+		let flat = Promise.resolve([]);
 		let error = '';
 		[params, query, error] = this.prepKeys(params, query, timeLabel);
 		if (!error) {
@@ -1606,53 +1581,40 @@ class SQLQuery {
 				console.time(timeLabel);
 			}
 			try {
-				promises = this.exec_driver.call(
-					this, this.db, query, params);
+				let columnNames = [];
+				let resultRows = [];
+				let rs = this.db.exec({
+					sql: query,
+					bind: params,
+					rowMode: 'object',
+					columnNames: columnNames,
+					resultRows: resultRows,
+					returnValue: "resultRows",
+				});
+				cols = Promise.resolve(columnNames);
+				let jsonStart = this.parse_json.length;
+				for (let row of resultRows) {
+					for (let col of columnNames) {
+						if (isString(row[col]) && row[col].startsWith(this.parse_json)) {
+							row[col] = JSON.parse(row[col].slice(jsonStart));
+						}
+					}
+				}
+				objs = Promise.resolve(resultRows);
+				rows = resultRows.map(row => Object.values(row));
+				flat = [];
+				rows.forEach(row => flat.push(...row));
+				first = Promise.resolve(flat ? flat[0] : undefined);
+				flat = Promise.resolve(flat);
 			}
 			catch (exception) {
 				error = exception;
-				console.log(error);
 			}
 			if (timeLabel) {
 				console.timeEnd(timeLabel);
 			}
 		}
-		return {...promises, error};
-	}
-	
-	getAPI(db, query, params) {
-		let {cols, rows, objs, first, flat} = db.exec(
-			query, params).get;
-		return {cols, rows, objs, first, flat};
-	}
-	
-	classicExec (db, query, params) {
-		let columnNames = [];
-		let resultRows = [];
-		let rs = db.exec({
-			sql: query,
-			bind: params,
-			rowMode: 'object',
-			columnNames: columnNames,
-			resultRows: resultRows,
-			returnValue: "resultRows",
-		});
-		cols = Promise.resolve(columnNames);
-		let jsonStart = this.parse_json.length;
-		for (let row of resultRows) {
-			for (let col of columnNames) {
-				if (isString(row[col]) && row[col].startsWith(this.parse_json)) {
-					row[col] = JSON.parse(row[col].slice(jsonStart));
-				}
-			}
-		}
-		objs = Promise.resolve(resultRows);
-		rows = resultRows.map(row => Object.values(row));
-		flat = [];
-		rows.forEach(row => flat.push(...row));
-		first = Promise.resolve(flat ? flat[0] : undefined);
-		flat = Promise.resolve(flat);
-		return {cols, rows, objs, first, flat};
+		return {objs, rows, cols, first, flat, error};
 	}
 	
 	buildForm() {

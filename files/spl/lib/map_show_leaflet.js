@@ -57,13 +57,13 @@ static resource_urls = {
 		this._map = this.build_map(target);
 	}
 
-makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
+static makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
+	let defaultStyle = {radius: 5, weight: 1, opacity: 1, fillOpacity: 0};
 	function filter(feature, layer, name) {
 		return !feature.properties.hide_on_map;
 	}
 	function pointToLayer(feature, latlng) {
-		let defaultPoint = {radius: 5, weight: 0.5, opacity: 0.1, fillOpacity: 0};
-		let featureStyle = feature?.properties?.style || style || defaultPoint;
+		let featureStyle = feature?.properties?.style || style || defaultStyle;
 		let marker;
 		if ('iconMarker' in featureStyle) {
 			let icon;
@@ -82,6 +82,9 @@ makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 		let SLDStyler = new L.SLDStyler(sldStyle);
 		style = SLDStyler.getStyleFunction();
 		pointToLayer = SLDStyler.getPointToLayerFunction();
+	}
+	else if (!style) {
+		style = defaultStyle;
 	}
 	let layer =
 	L.Proj.geoJson (
@@ -125,23 +128,18 @@ makeLayerJSON(name, id, {sldStyle, style, dataProjection, extent}={}) {
 	return layer;
 }
 
-async addJSON(layer, json) {
+static async addJSON(layer, json) {
 	layer.addData(json);
 }
 
-makeLayerGroup(data, name, id) {
-	let layerGroup = L.layerGroup();
+static makeLayerGroup(layers, name, id) {
+	let layerGroup = L.layerGroup(layers);
 	layerGroup.options.name = name;
 	layerGroup.options.id = id;
-	for (let [name, json] of Object.entries(data)) {
-		let layer = makeLayerJSON(name);
-		layerGroup.addLayer(layer);
-		addJSON(layer, json);
-	}
 	return layerGroup;
 }
 
-tile_layer(title, url, options) {
+servedTileLayer(title, url, options) {
 	let layer = L.tileLayer(url, options);
 	layer.options.name = title;
 	return layer;
@@ -169,7 +167,7 @@ build_map(target='map') {
 	return map;
 }
 
-addLayer(layer) {
+_addLayer(layer) {
 	let group = L.layerGroup([layer]);
 	group.options.id = `g_${layer.options.id}`;
 	this._map.addLayer(group);
@@ -324,7 +322,7 @@ show_map(viewOptions=[]) {
 	);
 }
 
-makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
+static makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTile}) {
 	
 	let layer = new L.GridLayer({
 		noWrap: true,

@@ -1,56 +1,6 @@
 
 'use strict';
 
-class SelectHitTolerance {
-	formCode = `
-		<form>
-			<label>
-				Hit tolerance for selecting features:
-				<br />Area: &nbsp;
-				<canvas class="circle" width="22" height="22" style="vertical-align: middle;"></canvas>
-				&nbsp;
-				<select class="hitTolerance">
-					<option value="0" selected>0 Pixels</option>
-					<option value="5">5 Pixels</option>
-					<option value="10">10 Pixels</option>
-				</select>
-			</label>
-		</form>
-		`;
-	hitTolerance = 0;
-	
-	constructor(formElem) {
-		this.formElem = document.querySelector(formElem);
-		this.formElem.textContent = '';
-		this.formElem.insertAdjacentHTML('beforeend', this.formCode);
-		this.selectHitTolerance = this.formElem.querySelector('.hitTolerance');
-		this.circleCanvas = this.formElem.querySelector('.circle');
-		this.selectHitTolerance.addEventListener('change', e => {this.changeHitTolerance();});
-		this.changeHitTolerance();
-	}
-	
-	changeHitTolerance() {
-		this.hitTolerance = parseInt(
-			this.selectHitTolerance.value, 10);
-		
-		const size = 2 * this.hitTolerance + 2;
-		this.circleCanvas.width = size;
-		this.circleCanvas.height = size;
-		const ctx = this.circleCanvas.getContext('2d');
-		ctx.clearRect(0, 0, size, size);
-		ctx.beginPath();
-		ctx.arc(
-			this.hitTolerance + 1,
-			this.hitTolerance + 1,
-			this.hitTolerance + 0.5,
-			0,
-			2 * Math.PI
-		);
-		ctx.fill();
-		ctx.stroke();
-	}
-};
-
 class DisplayOpenLayers extends DisplayDriver{
 	static resource_urls = {
 		css: [
@@ -81,7 +31,7 @@ build_map(target='map') {
 	});
 }
 
-addLayer(layer) {
+_addLayer(layer) {
 	let map = this._map;
 	map.addLayer(layer);
 }
@@ -144,7 +94,7 @@ applySLD(vectorLayer, text) {
 	);
 }
 
-makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
+static makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
 	ol.proj.proj4.register(proj4);
 	const vectorSource = new ol.source.Vector({
 		extent,
@@ -156,12 +106,12 @@ makeLayerJSON(name, id, {sldStyle, style, extent}={}) {
 	});
 	vectorLayer.set('id', id);
 	if (sldStyle) {
-		applySLD(vectorLayer, sldStyle);
+		this.applySLD(vectorLayer, sldStyle);
 	}
 	return vectorLayer;
 }
 
-async addJSON(layer, json) {
+static async addJSON(layer, json) {
 	const featureProjection = 'EPSG:3857';
 	let dataProjection='CRS:84';
 	let crsSection = json?.crs;
@@ -196,15 +146,11 @@ async addJSON(layer, json) {
 	layer.getSource().addFeatures(features);
 }
 
-makeLayerGroup(data, name, id) {
-	let layers = [];
-	for (let [name, json] of Object.entries(data)) {
-		let layer = makeLayerJSON(name);
-	//	console.log(layerGroup, layer);
-	//	layerGroup.addLayer(layer);
-		addJSON(layer, json);
-		layers.push(layer);
-	}
+/**
+ * @param {Array} layers 
+ * make layerGroup
+ */
+static makeLayerGroup(layers, name, id) {
 	let layerGroup = new ol.layer.Group({
 		title: name,
 		fold: 'close',
@@ -215,7 +161,7 @@ makeLayerGroup(data, name, id) {
 	return layerGroup;
 }
 
-tile_layer(title, url, options) {
+servedTileLayer(title, url, options) {
 	let {attribution, ...rest} = options;
 	let source = new ol.source.XYZ({
 		url,
@@ -368,7 +314,7 @@ show_map(viewOptions) {
 	}
 }
 
-makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
+static makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, fetchTile}) {
 	
 	let extentw = [
 		bounds[0].lng,

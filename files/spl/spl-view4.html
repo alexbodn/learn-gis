@@ -4,6 +4,9 @@
 		<meta charset="utf-8" />
 		<script>
 			function cssLoad(src) {
+				if (!src) {
+					return Promise.resolve();
+				}
 				return new Promise((resolve, reject) => {
 					let s = document.createElement('link');
 					s.rel = 'stylesheet';
@@ -16,6 +19,9 @@
 		</script>
 		<script>
 			function jsLoad(src, module=false) {
+				if (!src) {
+					return Promise.resolve();
+				}
 				return new Promise((resolve, reject) => {
 					let s = document.createElement('script');
 					s.src = src;
@@ -42,15 +48,6 @@
 				});
 			}
 		</script>
-		<!--
-		<link href="./lib/leaflet.css" rel="stylesheet" />
-		<link href="./lib/leaflet.zoomdisplay.css" rel="stylesheet" />
-		-->
-		
-		<!--
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.2.0/ol.css" />
-		<link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css" />
-		-->
 		
 		<style>
 			body {
@@ -90,7 +87,7 @@ const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.hre
 // mountpoint/filename has to be unique.
 // but the array is used, to fetch files without mounting
 /**
-let url = db_small;
+let url = rivers_local;
 window.userData = [
 	{
 		mountpoint: 'data',
@@ -111,16 +108,20 @@ program = "./stlouis.js";
 const driver_href = "./lib/map_show.js";
 const driver_url = new URL(driver_href, window.location.href).toString();
 jsLoad(driver_url)
-.then(() => jsLoad("./lib/map_show_leaflet.js"))
-.then(() => jsLoad("./lib/map_show_ol.js"))
+.then(() => Promise.all([
+	jsLoad("./lib/map_show_leaflet.js"),
+	jsLoad("./lib/map_show_ol.js"),
+]))
 .then(() => {
-	//window.DisplayClass = DisplayLeaflet;
-	window.DisplayClass = DisplayOpenLayers;
+	window.DisplayClass =
+	DisplayLeaflet
+	//DisplayOpenLayers
+	;
 	return Promise.all(
 		window.DisplayClass.resources(driver_url)
 	);
 })
-.then(() => program ? jsLoad(program) : Promise.resolve())
+.then(() => jsLoad(program))
 .then(() => jsLoad('./lib/spl-view4.js', true))
 ;
 
@@ -147,8 +148,8 @@ function onData(db, fetched) {
 		let div = document.querySelector('div#map');
 		map = build_map(div);
 	}
-	//map.addLayer(map.osm_layer());
-	map.addLayer(map.bw_layer());
+	//map._addLayer(map.osm_layer());
+	map._addLayer(map.bw_layer());
 	for (let [mount, info] of Object.entries(fetched)) {
 		if ('layers' in info) {
 			for (let layer of info.layers) {
@@ -160,6 +161,7 @@ function onData(db, fetched) {
 	if (xplorer) {
 		xplorer.addSnippets(
 			window.extraSnippets || {});
+		xplorer.showMap();
 	}
 	else {
 		if (typeof 'viewOptions' === 'undefined') {

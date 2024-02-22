@@ -74,18 +74,39 @@ function lines_features(data) {
 
 function makeLinesLayers(db, mount) {
 	let linesFeatures = lines_features(mount.data);
+	/*
 	mount.layers = Object.entries(linesFeatures)
 		.map(entry => {
 			let [branch, lines] = entry;
 			return makeLayerGroup(
 				lines, `tfl_lines ${branch}`);
 		});
+	*/
+	mount.layers = Object.entries(linesFeatures)
+		.map(entry => {
+			let [branch, lines] = entry;
+			return {
+				type: 'group',
+				name: `tfl_lines ${branch}`,
+				layers: lines
+					.map(line => ({
+						type: 'vector',
+						features: [line],
+					}))
+			};
+		});
 }
 
 function makeStationsLayer(db, mount) {
-	let layer = makeLayerJSON('tfl_stations');
+	//let layer = makeLayerJSON('tfl_stations');
+	//addJSON(layer, mount.data);
+	let layer = {
+		type: 'vector',
+		name: 'tfl_stations',
+		id: 'tfl_stations',
+		features: [mount.data],
+	};
 	mount.layers = [layer];
-	addJSON(layer, mount.data);
 }
 
 //let styles = {};
