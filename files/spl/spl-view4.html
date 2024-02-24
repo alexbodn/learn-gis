@@ -85,9 +85,9 @@ const rivers_local = new URL('./test/files/dbs/rivers.gpkg', window.location.hre
 const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.href).toString();
 
 // mountpoint/filename has to be unique.
-// but the array is used, to fetch files without mounting
-/**
-let url = rivers_local;
+/**/
+//let url = rivers_local;
+let url = dctour_local;
 window.userData = [
 	{
 		mountpoint: 'data',
@@ -100,7 +100,7 @@ window.userData = [
 /**/
 
 let program;
-program = "./stlouis.js";
+//program = "./stlouis.js";
 //program = "./london_boroughs.js";
 //program = "./lights.js";
 //program = "./tri.js";

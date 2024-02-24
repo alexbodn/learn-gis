@@ -367,13 +367,20 @@ static makeTiledLayer(name, id, {min_zoom, max_zoom, bounds, imgSizes, fetchTile
 		let timeLabel = `tile_${coords.x},${coords.y},${coords.z}`;
 		console.time(timeLabel);
 		let error = null;
-		let img = createImage(layer.options.imgSizes[coords.z]);
+		/**
+		 * let img;
+		if (coords.z in layer.options.imgSizes) {
+			img = createImage(layer.options.imgSizes[coords.z]);
+		}
+		**/
+		let img = L.DomUtil.create('img');
 		let timeRetrieve = `tile_${coords.x},${coords.y},${coords.z} retrieve`;
 		console.time(timeRetrieve);
 		layer.options.fetchTile(coords.x, coords.y, coords.z)
 		.then(url => {
 		console.timeEnd(timeRetrieve);
 			if (url) {
+console.log('found tile', url);
 				img.src = url;
 				img.addEventListener('load', function() {
 					URL.revokeObjectURL(url);

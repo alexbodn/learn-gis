@@ -211,7 +211,14 @@ case
 when sqlite_schema.type='index'
 	then ' (table)'
 else ' (' || sqlite_schema.type || ')'
-end as entity,
+end ||
+case
+	when sqlite_schema.type NOT IN ('table', 'view', 'index')
+	then ''
+	else ' [button\tbrowse\tbrowseTable\t' ||
+	sqlite_schema.tbl_name || ']'
+end
+as entity,
 case
 when sqlite_schema.type='index'
 	then 'index ' || sqlite_schema.name
@@ -1894,6 +1901,17 @@ class SQLQuery {
 				return rows;
 			});
 		return Promise.allSettled(available);
+	}
+	
+	browseTable(name) {
+		this.addQueryTab(
+			name,
+			this.unindent(`
+				select *
+				from ${name}
+				limit 10;`
+			)
+		);
 	}
 	
 	async mapTable(data_type, table_name, column_name) {

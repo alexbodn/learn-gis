@@ -211,7 +211,14 @@ case
 when sqlite_schema.type='index'
 	then ' (table)'
 else ' (' || sqlite_schema.type || ')'
-end as entity,
+end ||
+case
+	when sqlite_schema.type NOT IN ('table', 'view', 'index')
+	then ''
+	else ' [button\tbrowse\tbrowseTable\t' ||
+	sqlite_schema.tbl_name || ']'
+end
+as entity,
 case
 when sqlite_schema.type='index'
 	then 'index ' || sqlite_schema.name
@@ -557,93 +564,94 @@ coalesce(index_fields.seqno, 0)
 
 let conditionalSchema = {
 	gpkg_contents: `
-SELECT 
-'gpkg' as gpkg,
-data_type,
-gpkg_contents.table_name ||
-case
-	when data_type='attributes'
-	then ''
-	else ' [button\tmap\tmapTable\t' ||
-	data_type || '\t' ||
-	gpkg_contents.table_name ||
-	case
-		when data_type='tiles'
-		then ''
-		else '\t' || column_name
-	end || ']'
-end,
-'column ' || column_name || ' ' || 
-geometry_type_name || ' ' ||
-'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
-'x y' ||
-case when z<>0 then ' z' else '' end ||
-case when m<>0 then ' m' else '' end
-as column
-FROM gpkg_contents
-left outer join gpkg_geometry_columns 
-on gpkg_contents.table_name=gpkg_geometry_columns.table_name
-order by data_type, gpkg_contents.table_name, column`,
+		SELECT 
+		'gpkg' as gpkg,
+		data_type,
+		gpkg_contents.table_name ||
+		case
+			when data_type='attributes'
+			then ' [button\tbrowse\tbrowseTable\t' ||
+				gpkg_contents.table_name || ']'
+			else ' [button\tmap\tmapTable\t' ||
+			data_type || '\t' ||
+			gpkg_contents.table_name ||
+			case
+				when data_type='tiles'
+				then ''
+				else '\t' || column_name
+			end || ']'
+		end,
+		'column ' || column_name || ' ' || 
+		geometry_type_name || ' ' ||
+		'srs_id ' || cast (gpkg_geometry_columns.srs_id as TEXT) || ' ' ||
+		'x y' ||
+		case when z<>0 then ' z' else '' end ||
+		case when m<>0 then ' m' else '' end
+		as column
+		FROM gpkg_contents
+		left outer join gpkg_geometry_columns 
+		on gpkg_contents.table_name=gpkg_geometry_columns.table_name
+		order by data_type, gpkg_contents.table_name, column`,
 	geometry_columns: `
-with
-	geometry_types as (
-		${snippets.geometryTypes.query}
-	)
-select 'spatialite', 'geometries', 'tables',
-f_table_name ||
-	' [button\tmap\tmapTable\tfeatures\t' ||
-	f_table_name || '\t' ||
-	f_geometry_column || ']'
-	as [table],
-f_geometry_column || ' ' ||
-coalesce(
-	geometry_types.name,
-	cast (geometry_type as TEXT)
-) as column
-from geometry_columns
-left outer join geometry_types
-	on geometry_types.number=geometry_type
-`,
+		with
+			geometry_types as (
+				${snippets.geometryTypes.query}
+			)
+		select 'spatialite', 'geometries', 'tables',
+		f_table_name ||
+			' [button\tmap\tmapTable\tfeatures\t' ||
+			f_table_name || '\t' ||
+			f_geometry_column || ']'
+			as [table],
+		f_geometry_column || ' ' ||
+		coalesce(
+			geometry_types.name,
+			cast (geometry_type as TEXT)
+		) as column
+		from geometry_columns
+		left outer join geometry_types
+			on geometry_types.number=geometry_type
+		`,
 	views_geometry_columns: `
-select 'spatialite', 'geometries', 'views',
-view_name as [view],
-view_geometry as geometry
-from views_geometry_columns`,
+		select 'spatialite', 'geometries', 'views',
+		view_name as [view],
+		view_geometry as geometry
+		from views_geometry_columns`,
 	virts_geometry_columns: `
-select 'spatialite', 'geometries', 'virts',
-virt_name as virt,
-virt_geometry as geometry
-from virts_geometry_columns`,
+		select 'spatialite', 'geometries', 'virts',
+		virt_name as virt,
+		virt_geometry as geometry
+		from virts_geometry_columns`,
 	networks: `
-select 'spatialite', 'networks',
-network_name,
-null, null
-from networks`,
+		select 'spatialite', 'networks',
+		network_name,
+		null, null
+		from networks`,
 	topologies: `
-select 'spatialite', 'topologies',
-topology_name,
-null, null
-from topologies`,
+		select 'spatialite', 'topologies',
+		topology_name,
+		null, null
+		from topologies`,
 	raster_coverages: `
-select 'spatialite', 'raster_coverages',
-coverage_name,
-null, null
-from raster_coverages`,
+		select 'spatialite', 'raster_coverages',
+		coverage_name,
+		null, null
+		from raster_coverages`,
 	vector_coverages: `
-select 'spatialite', 'vector_coverages',
-coverage_name,
-null, null
-from vector_coverages`,
+		select 'spatialite', 'vector_coverages',
+		coverage_name,
+		null, null
+		from vector_coverages`,
 	stored_procedures: `
-select 'spatialite', 'stored_procedures',
-name,
-null, null
-from stored_procedures`,
+		select 'spatialite', 'stored_procedures',
+		name,
+		null, null
+		from stored_procedures`,
 	stored_variables: `
-select 'spatialite', 'stored_variables',
-name,
-null, null
-from stored_variables`,
+		select 'spatialite', 'stored_variables',
+		name,
+		null, null
+		from stored_variables`,
 };
 
 const isInteger = value => Number.isInteger(value);
@@ -811,8 +819,8 @@ class SQLQuery {
 				<td style="width: 29%">
 					<input class="value" pattern="/^$/" disabled="disabled" value="${value || ''}" placeholder="null" style="width: 100%" />
 				</td>
-				<td style="width: 3%"><input type="checkbox" class="long-form" style="width: 100%" /></td>
-				<td style="width: 10%"><button class="del-param">del</button></td>
+				<td style="width: 6%; font-size: x-small;">@<input type="checkbox" class="long-form" style="width: 100%; margin: 0;" /></td>
+				<td style="width: 7%"><button class="del-param">del</button></td>
 			</tr>
 			`;
 		let params = this.queryTab(button)
@@ -881,12 +889,12 @@ class SQLQuery {
 		let params = this.buildParams(button, false);
 		let queryTab = this.queryTab(button);
 		let query = this.getQuery(queryTab, true);
-		let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
+		let paramRe = /(:+)([a-z_A-Z][a-z_A-Z0-9]*)/g;
 		let param;
 		while (param = paramRe.exec(query)) {
-			if (!(param[1] in params)) {
-				this.addParam(button, param[1]);
-				params[param[1]] = null;
+			if (param[1].length % 2 && !(param[2] in params)) {
+				this.addParam(button, param[2]);
+				params[param[2]] = null;
 			}
 		}
 	}
@@ -1020,7 +1028,7 @@ class SQLQuery {
 			selectedText = selectedText
 				.substring(startPos, endPos);
 		}
-		return selectedText;
+		return selectedText || queryElem.attributes.placeholder.value;
 	}
 	
 	async runQuery(button) {
@@ -1347,11 +1355,11 @@ class SQLQuery {
 				where zoom_level=${z} and tile_column=${x} and tile_row=${y}
 			`).first
 			.then(tile_data => {
-				//const buff = new Uint8Array(tile_data);
-				//let mime = getMimeTypeFromUint8Array(buff);
+				const buff = new Uint8Array(tile_data);
+				let mime = getMimeTypeFromUint8Array(buff);
 				let blob = new Blob(
-					[tile_data],
-					//{type: mime},
+					[buff],
+					{type: mime},
 				);
 				return URL.createObjectURL(blob);
 			});
@@ -1572,19 +1580,22 @@ class SQLQuery {
 		if (error || Array.isArray(obj)) {
 			return [params, query, error];
 		}
-		const paramRe = /:[a-z_A-Z][a-z_A-Z0-9]*/g;
 		if (typeof(obj) == 'object') {
 			params = {};
-			let paramRe = /:([a-z_A-Z][a-z_A-Z0-9]*)/g;
+			let paramRe = /(:+)([a-z_A-Z][a-z_A-Z0-9]*)/g;
 			let param;
 			while (param = paramRe.exec(query)) {
-				let val = obj[param[1]];
+				if (!(param[1].length % 2)) {
+					continue;
+				}
+				let val = obj[param[2]];
 				if (typeof(val) == 'undefined') {
-					error = `parameter ${param[1]} not defined for ${label}.`;
+					error = `parameter ${param[2]} not defined for ${label}.`;
 					break;
 				}
-				params[param[0]] = val;
+				params[':' + param[2]] = val;
 			}
+			query = query.replaceAll('::', ':');
 		}
 		return [params, query, error];
 	}
@@ -1600,7 +1611,8 @@ class SQLQuery {
 			flat: Promise.resolve([]),
 		};
 		let error = '';
-		[params, query, error] = this.prepKeys(params, query, timeLabel);
+		[params, query, error] = this.prepKeys(
+			params, query, timeLabel);
 		if (!error) {
 			if (timeLabel) {
 				console.time(timeLabel);
@@ -1896,6 +1908,25 @@ class SQLQuery {
 		return Promise.allSettled(available);
 	}
 	
+	browseTable(name) {
+		this.performQuery(`
+			SELECT name
+			FROM pragma_table_info('${name}')
+		`).flat
+		.then(async (columns) => {
+			columns = columns.map(
+				column => `[${column.replaceAll(':', '::')}]`);
+			this.addQueryTab(
+				name,
+				this.unindent(`
+					select ${columns.join(',\n')}
+					from [${name}]
+					limit 10;`
+				)
+			);
+		});
+	}
+	
 	async mapTable(data_type, table_name, column_name) {
 		if (table_name in this.layersOnMap) {
 			this.removeLayer(table_name);
@@ -1910,12 +1941,14 @@ class SQLQuery {
 				.then(async (columns) => {
 					let geomColumn = `asgeojson(
 						GeomFromGPB([${column_name}]), 15, 2) as feature`;
+					columns = columns.map(
+						column => `[${column.replaceAll(':', '::')}]`);
 					let query = `
 						select ${columns.join(', ')}, ${geomColumn}
 						from [${table_name}]`;
 					let sldStyle;
 					if (this.has_layer_styles) {
-						 let {first} = this.performQuery(`
+						let {first} = this.performQuery(`
 							SELECT styleSLD as sldStyle
 							FROM layer_styles
 							where f_table_name='${table_name}'
@@ -1924,12 +1957,14 @@ class SQLQuery {
 							sldStyle = style;
 						});
 					}
-					await this.featuresLayer(table_name, table_name, sldStyle, query);
+					await this.featuresLayer(
+						table_name, table_name, sldStyle, query);
 				})
 				;
 			}
 			else {
-				await this.tilesLayer(table_name, table_name, table_name);
+				await this.tilesLayer(
+					table_name, table_name, table_name);
 			}
 		}
 	}
@@ -2099,7 +2134,7 @@ class SQLQuery {
 				<table border="0"><tbody class="sqlParams"></tbody></table>
 				<div class="query-controls" style="width: 100%;">
 					<div class="query-control" style="width: 70%;">
-						<textarea class="query" style="white-space: nowrap; tab-size: 4; resize: none;" wrap="soft" spellcheck="false" placeholder="select 'hello';" rows="7"></textarea>
+						<textarea class="query" style="white-space: pre; tab-size: 4; resize: none;" wrap="soft" spellcheck="false" rows="7" autofocus="true"></textarea>
 					</div>
 					<div class="query-control" style="width: 28%;">
 						<button class="add-param">add param</button>
@@ -2127,7 +2162,29 @@ class SQLQuery {
 				click: this.queryOnClick,
 			}
 		});
-		tabInfo.querySelector('.query').value = query;
+		let queryElem = tabInfo.querySelector('.query')
+		queryElem.value = query;
+		let help = `
+			-- write sql queries to run.
+			-- the query may have parameters.
+			-- select :param1 as name
+			-- should be run with a parameters
+			-- object {param1: "it's value"}
+			-- if @ is checked, the parameter
+			-- will be rendered for stored
+			-- variables and procedures.
+			-- [make params] will build the
+			-- parameters object automaticaLy.
+			-- to put an ':' anywhere in the query,
+			-- please double it as '::'.
+			select 'this::' as [title],
+				'🌍' as [whom], :data as [data field];
+		`
+		.split('\n')
+		.filter(line => !!line)
+		.map(line => line.replace(/^\s+/, ''))
+		.join('\n');
+		queryElem.placeholder = help;
 		let addParam = tabInfo.querySelector('button.add-param');
 		for (let [name, value] of Object.entries(params)) {
 			this.addParam(addParam, name, value);
