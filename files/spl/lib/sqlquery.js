@@ -343,7 +343,7 @@ coalesce(index_fields.seqno, 0)
 			FROM generate_series as ctr
 			inner join icons on 1
 			where ctr.start=0 and ctr.stop=5`,
-		spatial: false,
+		spatial: true,
 	},
 	pinpng: {
 		query: `
@@ -489,6 +489,12 @@ coalesce(index_fields.seqno, 0)
 			group by n, color`,
 		spatial: true,
 	},
+	geometryExtent: {
+		query: `
+			select extent(geometry) as feature
+			from buildings_points`,
+		spatial: true,
+	},
 	builtFeatures: {
 		query: `
 			WITH t1 AS $(builtPolygons)
@@ -578,7 +584,8 @@ let conditionalSchema = {
 			case
 				when data_type='tiles'
 				then ''
-				else '\t' || column_name
+				else '\t' || column_name ||
+				'\t' || 'true'
 			end || ']'
 		end,
 		'column ' || column_name || ' ' || 
@@ -1478,6 +1485,10 @@ class SQLQuery {
 				if (code.endsWith('EPSG:4326')) {
 					crs = null;
 				}
+				else if (!(code in proj4.defs)) {
+					//load code
+					console.log(code);
+				}
 			}
 			if (crs) {
 				if (!crs.type) {
@@ -1927,7 +1938,7 @@ class SQLQuery {
 		});
 	}
 	
-	async mapTable(data_type, table_name, column_name) {
+	async mapTable(data_type, table_name, column_name, gpkg=0) {
 		if (table_name in this.layersOnMap) {
 			this.removeLayer(table_name);
 		}
@@ -1936,11 +1947,19 @@ class SQLQuery {
 				this.performQuery(`
 					SELECT name
 					FROM pragma_table_info('${table_name}')
-					WHERE name not in ('${column_name}')
+					WHERE name not like '${column_name}'
 				`).flat
 				.then(async (columns) => {
-					let geomColumn = `asgeojson(
-						GeomFromGPB([${column_name}]), 15, 2) as feature`;
+					let geomColumn = `
+						asgeojson(
+							--st_transform(
+								${gpkg ? 'GeomFromGPB' : ''}(
+									[${column_name}]
+								)
+							--	, 4326)
+							,
+							15, 2
+						) as feature`;
 					columns = columns.map(
 						column => `[${column.replaceAll(':', '::')}]`);
 					let query = `

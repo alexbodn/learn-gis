@@ -87,11 +87,12 @@ const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.hre
 // mountpoint/filename has to be unique.
 /**/
 //let url = rivers_local;
-let url = dctour_local;
+//let url = dctour_local;
+let url = db_small;
 window.userData = [
 	{
 		mountpoint: 'data',
-		filename: 'db_small.sqlite',
+		filename: 'db.sqlite',
 		isdb: true,
 		url,
 		method: 'arrayBuffer',
