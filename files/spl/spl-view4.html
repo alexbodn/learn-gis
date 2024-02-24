@@ -55,7 +55,7 @@
 				margin-left: 0;
 				margin-right: 0;
 			}
-			div#sqlQuery, #map {
+			div#sqlDiv, #map {
 				width: 98vw;
 				height: 59vh;
 				margin-top: 1vh;
@@ -72,7 +72,7 @@
 	</head>
 	<body>
 		
-		<script src="./lib/sqlquery.js"></script>
+		<script src="./lib/sqlitexplore.js"></script>
 
 		<script>
 
@@ -87,6 +87,7 @@ const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.hre
 // mountpoint/filename has to be unique.
 /**/
 //let url = rivers_local;
+//let url = natural_earth_local;
 //let url = dctour_local;
 let url = db_small;
 window.userData = [
@@ -132,10 +133,10 @@ function onData(db, fetched) {
 	document.head.querySelector('title')
 		.textContent = program;
 	if (1) {
-		let html = `<div id="sqlQuery"></div>`;
+		let html = `<div id="sqlDiv"></div>`;
 		document.body.insertAdjacentHTML('beforeend', html);
-		let div = document.querySelector('div#sqlQuery');
-		xplorer = new SQLQuery(div, db, {
+		let div = document.querySelector('div#sqlDiv');
+		xplorer = new SQLiteXplore(div, db, {
 			build_map: window.DisplayClass,
 		});
 		map = xplorer.getMap();

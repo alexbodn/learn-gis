@@ -17,7 +17,7 @@
 				width: 98vw;
 				overflow: scroll;
 			}
-			div#sqlQuery {
+			div#sqlDiv {
 				width: 98vw;
 				height: 59vh;
 				margin-top: 1vh;
@@ -32,7 +32,7 @@
 	<body>
 		<h1>1-2-sqlite3 demo</h1>
 		<div class="liteLog"></div>
-		<script src="./lib/sqlquery.js"></script>
+		<script src="./lib/sqlitexplore.js"></script>
 		<script src="jswasm/sqlite3.js"></script>
 		<script>
 	/**
@@ -246,10 +246,10 @@
 				}
 			}
 			
-			let html = `<div id="sqlQuery"></div>`;
+			let html = `<div id="sqlDiv"></div>`;
 			document.body.insertAdjacentHTML('beforeend', html);
-			let div = document.querySelector('div#sqlQuery');
-			let xplorer = new SQLQuery(div, db, {});
+			let div = document.querySelector('div#sqlDiv');
+			let xplorer = new SQLiteXplore(div, db, {});
 		}finally{
 			//db.close();
 		}

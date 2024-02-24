@@ -667,7 +667,7 @@ function isFloat(n){
 }
 const isString = value => typeof value === 'string' || value instanceof String;
 
-class SQLQuery {
+class SQLiteXplore {
 	
 	fieldTypes = {
 		NULL: ['^$', '', x => null, true, 'null'],
@@ -683,12 +683,12 @@ class SQLQuery {
 	constructor(container, db, {id, build_map}={}) {
 		this.container = isString(container) ?
 			document.querySelector(container) : container;
-		this.sqlQuery = document.createElement("div");
+		this.mainForm = document.createElement("div");
 		this.rootId = id || randomVar();
-		this.sqlQuery.setAttribute('id', this.rootId);
-		this.sqlQuery.style.height = '100%';
-		this.sqlQuery.style.width = '100%';
-		this.container.appendChild(this.sqlQuery);
+		this.mainForm.setAttribute('id', this.rootId);
+		this.mainForm.style.height = '100%';
+		this.mainForm.style.width = '100%';
+		this.container.appendChild(this.mainForm);
 		
 		this.withMap = !!build_map;
 		this.build_map = build_map;
@@ -751,25 +751,6 @@ class SQLQuery {
 		`).first
 		.then(isGpkg => {
 			this.isGpkg = isGpkg;
-			if (isGpkg && window.proj4) {
-				this.performQuery(`
-					SELECT
-						organization||':'||cast(organization_coordsys_id as text) as srs,
-						definition
-					FROM gpkg_spatial_ref_sys
-					WHERE
-						srs_id>0
-						--AND srs_id NOT IN (4326, 3857)
-					;
-				`).rows
-				.then(projections => {
-					//todo run this with each loaded geojson
-					proj4.defs(projections);
-				})
-				.catch(error => {
-					console.log('error loading projections', error);
-				});
-			}
 			if (isGpkg) {
 				this.performQuery(`
 					SELECT count(*)
@@ -960,7 +941,7 @@ class SQLQuery {
 					</tr>`
 			)
 			.reduce((a, b) => a + b, '');
-		let target = this.sqlQuery
+		let target = this.mainForm
 			.querySelector('.snippetsMenu');
 		target.textContent = '';
 		target.insertAdjacentHTML('beforeend', snippets);
@@ -1240,8 +1221,8 @@ class SQLQuery {
 		}, isElement);
 		maxZ = Math.max(maxZ, countZ);
 		
-		let overlay = this.sqlQuery.querySelector('.overlay');
-		let popup = this.sqlQuery.querySelector('.popup');
+		let overlay = this.mainForm.querySelector('.overlay');
+		let popup = this.mainForm.querySelector('.popup');
 		let popupcontent = popup.querySelector('.popupcontent');
 		popupcontent.textContent = '';
 		popupcontent.insertAdjacentHTML(
@@ -1450,7 +1431,7 @@ class SQLQuery {
 		});
 	}
 	
-	showLayer(tabId, tabLabel, objs, extent, {sldStyle}={}) {
+	async showLayer(tabId, tabLabel, objs, extent, {sldStyle}={}) {
 		let layer = {
 			type: 'vector',
 			name: tabLabel,
@@ -1460,6 +1441,7 @@ class SQLQuery {
 		};
 		let dataProjection = 'EPSG:900913';
 		//may set layer projection afterwards 
+		let projections = {};
 		for (let row of objs) {
 			let {feature, ...properties} = row;
 			if (!feature) {
@@ -1485,9 +1467,22 @@ class SQLQuery {
 				if (code.endsWith('EPSG:4326')) {
 					crs = null;
 				}
-				else if (!(code in proj4.defs)) {
-					//load code
-					console.log(code);
+				else if (!(code in projections)) {
+					let [auth_name, auth_srid] = code.split(':');
+					auth_srid = parseInt(auth_srid);
+					if (window.proj4) {
+						await this.performQuery(`
+							SELECT srtext --proj4text
+							FROM spatial_ref_sys
+							WHERE auth_name like :auth_name and auth_srid=:auth_srid
+						`, {auth_name, auth_srid}).first
+						.then(projection => {
+							projections[code] = projection;
+						})
+						.catch(error => {
+							console.log('error loading projections', error);
+						});
+					}
 				}
 			}
 			if (crs) {
@@ -1497,6 +1492,9 @@ class SQLQuery {
 				feature.crs = crs;
 			}
 			this.map.addFeature(layer, feature);
+		}
+		for (let [code, projection] of Object.entries(projections)) {
+			proj4.defs(code, projection);
 		}
 		this.map.addLayer(layer);
 		this.layersOnMap[tabId] = tabLabel;
@@ -1870,14 +1868,14 @@ class SQLQuery {
 				</div>
 			</div>
 			`;
-		this.sqlQuery.textContent = '';
-		this.sqlQuery.insertAdjacentHTML('beforeend', html);
-		this.sqlQuery.querySelector('.popupclose')
+		this.mainForm.textContent = '';
+		this.mainForm.insertAdjacentHTML('beforeend', html);
+		this.mainForm.querySelector('.popupclose')
 			.addEventListener('click', e => {this.popupClose()});
 		this.createMainMenu();
 		this.createMapTab();
 		this.createSnippetsTab();
-		this.sqlQuery.querySelector('.new-query')
+		this.mainForm.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
 		this.schemaTree();
 		this.addQueryTab();
@@ -1952,11 +1950,11 @@ class SQLQuery {
 				.then(async (columns) => {
 					let geomColumn = `
 						asgeojson(
-							--st_transform(
+							${window.proj4 ? '' : 'st_transform('}
 								${gpkg ? 'GeomFromGPB' : ''}(
 									[${column_name}]
 								)
-							--	, 4326)
+							${window.proj4 ? '' : '	, 4326)'}
 							,
 							15, 2
 						) as feature`;
@@ -2013,7 +2011,7 @@ class SQLQuery {
 			let html = htmlTree(tree);
 			
 			if (!tab) {
-				tab = this.sqlQuery;
+				tab = this.mainForm;
 			}
 			let target = tab.querySelector('.query-container.schema');
 			target.textContent = '';
@@ -2059,23 +2057,23 @@ class SQLQuery {
 	}
 	
 	popupClose() {
-		let popup = this.sqlQuery.querySelector('.popup');
+		let popup = this.mainForm.querySelector('.popup');
 		popup.style.display = 'none';
 		popup.style['z-index'] = 'auto';
-		let overlay = this.sqlQuery.querySelector('.overlay');
+		let overlay = this.mainForm.querySelector('.overlay');
 		overlay.style.display = 'none';
 		overlay.style['z-index'] = 'auto';
 	}
 	
 	tabClick = tab => {
-		const tabs = this.sqlQuery
+		const tabs = this.mainForm
 			.querySelectorAll('[data-tab-value]');
 		tabs.forEach(tab => {
 			tab.classList.remove('active')
 		});
-		const tabInfo = this.sqlQuery
+		const tabInfo = this.mainForm
 			.querySelector(tab.dataset.tabValue);
-		const tabInfos = this.sqlQuery
+		const tabInfos = this.mainForm
 			.querySelectorAll('[data-tab-info]');
 		tabInfos.forEach(tabInfo => {
 			tabInfo.classList.remove('active')
@@ -2109,7 +2107,7 @@ class SQLQuery {
 		if (!label) {
 			label = `query ${this.tabCounter}`;
 		}
-		let tabs = this.sqlQuery.querySelector('.tabs');
+		let tabs = this.mainForm.querySelector('.tabs');
 		let closeX = withClose ? '&nbsp;<span class="tab-close">x</span>' : '';
 		tabs.insertAdjacentHTML(
 			'beforeend',
@@ -2117,7 +2115,7 @@ class SQLQuery {
 				${label}${closeX}
 			</span>`
 		);
-		let tabInfos = this.sqlQuery.querySelector('.tab-content');
+		let tabInfos = this.mainForm.querySelector('.tab-content');
 		this.tabsSyncHeight();
 		tabInfos.insertAdjacentHTML(
 			'beforeend',
@@ -2224,7 +2222,7 @@ class SQLQuery {
 		
 	tabClose = button => {
 		let tab = button.closest('span[data-tab-value]');
-		let target = this.sqlQuery
+		let target = this.mainForm
 			.querySelector(tab.dataset.tabValue);
 		let tab_1;
 		if (Object.values(target.classList).includes('active')) {
@@ -2239,14 +2237,14 @@ class SQLQuery {
 	}
 	
 	tabsSyncHeight() {
-		let tabs = this.sqlQuery.querySelector('.tabs');
-		let tabInfos = this.sqlQuery.querySelector('.tab-content');
-		let sqlQueryRect = this.sqlQuery.getBoundingClientRect();
-		tabInfos.style.height = (sqlQueryRect.height + sqlQueryRect.y - tabInfos.getBoundingClientRect().y).toString() + 'px';
+		let tabs = this.mainForm.querySelector('.tabs');
+		let tabInfos = this.mainForm.querySelector('.tab-content');
+		let mainFormRect = this.mainForm.getBoundingClientRect();
+		tabInfos.style.height = (mainFormRect.height + mainFormRect.y - tabInfos.getBoundingClientRect().y).toString() + 'px';
 	}
 	
 	tabFetch(tabValue) {
-		return this.sqlQuery.querySelector(
+		return this.mainForm.querySelector(
 			`span[data-tab-value="${tabValue}"]`);
 	}
 };
