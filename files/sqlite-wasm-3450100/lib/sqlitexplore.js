@@ -992,18 +992,18 @@ class SQLiteXplore {
 		this.addQueryTab(snippet, query, params);
 	}
 	
-	ppQuery(button) {
+	ppQuery(button, uncomment=false) {
 		let queryElem = this.queryTab(button)
 			.querySelector('.query');
-		let query = queryElem.value;
-		query = this.prepQuery(query);
+		let query = queryElem.value || queryElem.attributes.placeholder.value;
+		query = this.prepQuery(query, uncomment);
 		queryElem.value = query;
 	}
 	
 	logQuery(button) {
 		let queryElem = this.queryTab(button)
 			.querySelector('.query');
-		let query = queryElem.value;
+		let query = queryElem.value || queryElem.attributes.placeholder.value;
 		query = this.prepQuery(query);
 	}
 	
@@ -1344,7 +1344,8 @@ class SQLiteXplore {
 			`).first
 			.then(tile_data => {
 				const buff = new Uint8Array(tile_data);
-				let mime = getMimeTypeFromUint8Array(buff);
+				let hex = this.hexUint8(buff);
+				let mime = getMimeTypeFromHex(hex);
 				let blob = new Blob(
 					[buff],
 					{type: mime},
@@ -1576,6 +1577,8 @@ class SQLiteXplore {
 			return replaced;
 		};
 		query = query.replace('&tab;', '\t');
+		query = query.replace(/^\s*/, '\n');
+		query = query.replace(/\s*$/, '\n');
 		return query.replace(snippetRe, replacer);
 	}
 	
@@ -2210,7 +2213,7 @@ class SQLiteXplore {
 		tabInfo.querySelector('button.make-params')
 			.addEventListener('click', e => {this.makeParams(e.currentTarget);});
 		tabInfo.querySelector('button.pp-query')
-			.addEventListener('click', e => {this.ppQuery(e.currentTarget);});
+			.addEventListener('click', e => {this.ppQuery(e.currentTarget, true);});
 		tabInfo.querySelector('button.log-query')
 			.addEventListener('click', e => {this.logQuery(e.currentTarget);});
 		tabInfo.querySelector('button.run-query')
