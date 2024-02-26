@@ -444,7 +444,7 @@ coalesce(index_fields.seqno, 0)
 				json_object(
 					'type', 'FeatureCollection',
 					'crs',
-					json('{ "type": "name", "properties": { "name": "EPSG:900913" } }'),
+					json('{ "type": "name", "properties": { "name": "EPSG:3857" } }'),
 					'features',
 					json_group_array(
 						json(feature)
@@ -519,7 +519,7 @@ coalesce(index_fields.seqno, 0)
 				json_object(
 					'type', 'FeatureCollection',
 					'crs',
-					json('{ "type": "name", "properties": { "name": "EPSG:900913" } }'),
+					json('{ "type": "name", "properties": { "name": "EPSG:3857" } }'),
 					'features',
 					json_group_array(
 						json(feature)
@@ -680,7 +680,7 @@ class SQLiteXplore {
 	
 	parse_json = "parse_json:";
 	
-	constructor(container, db, {id, build_map}={}) {
+	constructor(container, db, {id, build_map, withProj4JS}={}) {
 		this.container = isString(container) ?
 			document.querySelector(container) : container;
 		this.mainForm = document.createElement("div");
@@ -693,6 +693,7 @@ class SQLiteXplore {
 		this.withMap = !!build_map;
 		this.build_map = build_map;
 		this.layersOnMap = {};
+		this.withProj4JS = window.proj4 && withProj4JS;
 		
 		this.tabCounter = 0;
 		this.tabEvents = {};
@@ -701,6 +702,10 @@ class SQLiteXplore {
 		
 		this.buildForm();
 		
+		this.setDb(db);
+	}
+	
+	setDb(db) {
 		this.db = db;
 		
 		this.isSpatial = false;
@@ -721,6 +726,8 @@ class SQLiteXplore {
 				this.checkIsGpkg();
 				this.checkIsSpatial();
 			});
+		this.schemaTree();
+		this.addQueryTab();
 	}
 	
 	checkIsSpatial() {
@@ -1440,7 +1447,7 @@ class SQLiteXplore {
 			extent,
 			sldStyle
 		};
-		let dataProjection = 'EPSG:900913';
+		let dataProjection = 'EPSG:3857';
 		//may set layer projection afterwards 
 		let projections = {};
 		for (let row of objs) {
@@ -1471,7 +1478,7 @@ class SQLiteXplore {
 				else if (!(code in projections)) {
 					let [auth_name, auth_srid] = code.split(':');
 					auth_srid = parseInt(auth_srid);
-					if (window.proj4) {
+					if (this.withProj4JS) {
 						await this.performQuery(`
 							SELECT srtext --proj4text
 							FROM spatial_ref_sys
@@ -1880,10 +1887,7 @@ class SQLiteXplore {
 		this.createSnippetsTab();
 		this.mainForm.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
-		this.schemaTree();
-		this.addQueryTab();
 		
-		//lastly
 		this.showMap();
 	}
 	
@@ -1953,11 +1957,11 @@ class SQLiteXplore {
 				.then(async (columns) => {
 					let geomColumn = `
 						asgeojson(
-							${window.proj4 ? '' : 'st_transform('}
+							${this.withProj4JS ? '' : 'st_transform('}
 								${gpkg ? 'GeomFromGPB' : ''}(
 									[${column_name}]
 								)
-							${window.proj4 ? '' : '	, 4326)'}
+							${this.withProj4JS ? '' : '	, 4326)'}
 							,
 							15, 2
 						) as feature`;

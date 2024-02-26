@@ -43,7 +43,6 @@ static resource_urls = {
 		"./leaflet.zoomdisplay.css",
 	],
 	js: [
-		"./proj4.js",
 		"./leaflet-src.js",
 		"./leaflet.sld.js",
 		"./proj4leaflet.js",

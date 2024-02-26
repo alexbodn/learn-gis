@@ -72,8 +72,6 @@
 	</head>
 	<body>
 		
-		<script src="./lib/sqlitexplore.js"></script>
-
 		<script>
 
 
@@ -85,7 +83,7 @@ const rivers_local = new URL('./test/files/dbs/rivers.gpkg', window.location.hre
 const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.href).toString();
 
 // mountpoint/filename has to be unique.
-/**/
+/**
 //let url = rivers_local;
 //let url = natural_earth_local;
 //let url = dctour_local;
@@ -102,15 +100,19 @@ window.userData = [
 /**/
 
 let program;
-//program = "./stlouis.js";
+program = "./stlouis.js";
 //program = "./london_boroughs.js";
 //program = "./lights.js";
 //program = "./tri.js";
 
 const driver_href = "./lib/map_show.js";
 const driver_url = new URL(driver_href, window.location.href).toString();
-jsLoad(driver_url)
+Promise.all([
+	jsLoad(driver_url),
+])
 .then(() => Promise.all([
+	jsLoad("./lib/proj4.js"),
+	jsLoad("./lib/sqlitexplore.js"),
 	jsLoad("./lib/map_show_leaflet.js"),
 	jsLoad("./lib/map_show_ol.js"),
 ]))
@@ -138,6 +140,7 @@ function onData(db, fetched) {
 		let div = document.querySelector('div#sqlDiv');
 		xplorer = new SQLiteXplore(div, db, {
 			build_map: window.DisplayClass,
+			withProj4JS: true,
 		});
 		map = xplorer.getMap();
 	}

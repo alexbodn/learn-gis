@@ -8,7 +8,6 @@ class DisplayOpenLayers extends DisplayDriver{
 			"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.css",
 		],
 		js: [
-			"./proj4.js",
 			"https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js",
 			"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js",
 			"./sldreader.js",

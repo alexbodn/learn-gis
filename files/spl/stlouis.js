@@ -1,6 +1,6 @@
 
 const stlouis_remote = 'https://github.com/ngageoint/geopackage-js/raw/master/docs/examples/GeoPackageToGo/StLouis.gpkg';
-const stlouis_local = new URL('./test/files/dbs/stlouis.gpkg', window.location.href).toString();
+const stlouis_local = new URL('./test/files/dbs/StLouis.gpkg', window.location.href).toString();
 const stlouis_view = [[38.6258, -90.189933], 14];
 let pizzaPng = `data:image/png;base64,
 	iVBORw0KGgoAAAANSUhEUgAAACAAAAAoCAYAAACfKfiZAAAABGdBTUEAALGPC/xhBQAABcJJREFU
