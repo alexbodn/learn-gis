@@ -176,8 +176,11 @@ function onData(db, fetched) {
 	if (xplorer) {
 		xplorer.addSnippets(
 			window.extraSnippets || {});
+		xplorer.showMap(window.viewOptions);
 	}
-	map.show_map(window.viewOptions);
+	else {
+		map.show_map(window.viewOptions);
+	}
 }
 		</script>
 		<!--script src="./lib/eruda.js" type="text/javascript"></script-->
