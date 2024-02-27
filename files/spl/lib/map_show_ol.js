@@ -11,7 +11,6 @@ class DisplayOpenLayers extends DisplayDriver{
 			"https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js",
 			"https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js",
 			"./sldreader.js",
-//			"./lib/map_show_ol.js",
 		],
 	};
 	

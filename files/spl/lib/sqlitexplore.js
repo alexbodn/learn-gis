@@ -680,7 +680,7 @@ class SQLiteXplore {
 	
 	parse_json = "parse_json:";
 	
-	constructor(container, db, {id, build_map, withProj4JS}={}) {
+	constructor(container, {id, build_map, withProj4JS}={}) {
 		this.container = isString(container) ?
 			document.querySelector(container) : container;
 		this.mainForm = document.createElement("div");
@@ -701,8 +701,6 @@ class SQLiteXplore {
 		this.waitingSnippets = {};
 		
 		this.buildForm();
-		
-		this.setDb(db);
 	}
 	
 	setDb(db) {
@@ -726,8 +724,6 @@ class SQLiteXplore {
 				this.checkIsGpkg();
 				this.checkIsSpatial();
 			});
-		this.schemaTree();
-		this.addQueryTab();
 	}
 	
 	checkIsSpatial() {
@@ -747,6 +743,8 @@ class SQLiteXplore {
 				}
 				this.setSnippets(snippets);
 				this.addSnippets(this.waitingSnippets, true);
+				this.schemaTree();
+				this.addQueryTab();
 			});
 	}
 	
@@ -1517,11 +1515,11 @@ class SQLiteXplore {
 		}
 	}
 	
-	showMap() {
+	showMap(viewOptions) {
 		let map_tab = this.tabFetch(this.map_tab);
 		if (map_tab) {
 			this.tabActivate(map_tab);
-			this.map.show_map();
+			this.map.show_map(viewOptions);
 		}
 	}
 	
@@ -1972,14 +1970,11 @@ class SQLiteXplore {
 						from [${table_name}]`;
 					let sldStyle;
 					if (this.has_layer_styles) {
-						let {first} = this.performQuery(`
+						sldStyle = await this.performQuery(`
 							SELECT styleSLD as sldStyle
 							FROM layer_styles
-							where f_table_name='${table_name}'
-						`);
-						first.then(style => {
-							sldStyle = style;
-						});
+							where f_table_name=:table_name
+						`, {table_name}).first;
 					}
 					await this.featuresLayer(
 						table_name, table_name, sldStyle, query);

@@ -125,24 +125,16 @@ Promise.all([
 		window.DisplayClass.resources(driver_url)
 	);
 })
-.then(() => jsLoad(program))
-.then(() => jsLoad('./lib/spl-view4.js', true))
-;
-
-function onData(db, fetched) {
-	
-	let map, xplorer;
-	document.head.querySelector('title')
-		.textContent = program;
+.then(() => {
 	if (1) {
 		let html = `<div id="sqlDiv"></div>`;
 		document.body.insertAdjacentHTML('beforeend', html);
 		let div = document.querySelector('div#sqlDiv');
-		xplorer = new SQLiteXplore(div, db, {
+		window.xplorer = new SQLiteXplore(div, {
 			build_map: window.DisplayClass,
 			withProj4JS: true,
 		});
-		map = xplorer.getMap();
+		window.map = window.xplorer.getMap();
 	}
 	else {
 		let html = `
@@ -151,10 +143,28 @@ function onData(db, fetched) {
 		`;
 		document.body.insertAdjacentHTML('beforeend', html);
 		let div = document.querySelector('div#map');
-		map = build_map(div);
+		window.map = build_map(div);
 	}
-	//map._addLayer(map.osm_layer());
-	map._addLayer(map.bw_layer());
+	//window.map._addLayer(window.map.osm_layer());
+	window.map._addLayer(window.map.bw_layer());
+})
+.then(() => {
+	if (!program) {
+		return Promise.resolve();
+	}
+	document.head.querySelector('title')
+		.textContent = program;
+	return jsLoad(program);
+})
+.then(() => jsLoad('./lib/spl-view4.js', true))
+;
+
+function onData(db, fetched) {
+	
+	let map = window.map,
+		xplorer = window.xplorer;
+	
+	xplorer.setDb(db);
 	for (let [mount, info] of Object.entries(fetched)) {
 		if ('layers' in info) {
 			for (let layer of info.layers) {
@@ -166,14 +176,8 @@ function onData(db, fetched) {
 	if (xplorer) {
 		xplorer.addSnippets(
 			window.extraSnippets || {});
-		xplorer.showMap();
 	}
-	else {
-		if (typeof 'viewOptions' === 'undefined') {
-			var viewOptions = null;
-		}
-		map.show_map(viewOptions);
-	}
+	map.show_map(window.viewOptions);
 }
 		</script>
 		<!--script src="./lib/eruda.js" type="text/javascript"></script-->

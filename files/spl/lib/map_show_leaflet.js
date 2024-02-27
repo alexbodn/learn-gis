@@ -37,20 +37,19 @@ function onEachFeature(feature, layer) {
 }
 
 class DisplayLeaflet extends DisplayDriver{
-static resource_urls = {
-	css: [
-		"./leaflet.css",
-		"./leaflet.zoomdisplay.css",
-	],
-	js: [
-		"./leaflet-src.js",
-		"./leaflet.sld.js",
-		"./proj4leaflet.js",
-		"./leaflet.zoomdisplay-src.js",
-		//"./leaflet.textpath.js",
-	],
-};
-
+	static resource_urls = {
+		css: [
+			"./leaflet.css",
+			"./leaflet.zoomdisplay.css",
+		],
+		js: [
+			"./leaflet-src.js",
+			"./leaflet.sld.js",
+			"./proj4leaflet.js",
+			"./leaflet.zoomdisplay-src.js",
+		],
+	};
+	
 	constructor(target='map') {
 		super();
 		this._map = this.build_map(target);
@@ -264,7 +263,6 @@ build_map1(target='map') {
 					"fillOpacity": 0.5 // value between 0-1 or 0% - 100%
 				}
 			});
-
 	
 	layerControl.addBaseLayer(openTopoMap, "OpenTopoMap");
 	//map.addLayer(osm);
