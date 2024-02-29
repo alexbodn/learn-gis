@@ -202,51 +202,12 @@ const pinBase64 = `
 	`;
 
 const snippets = {
-	schemaTree: {
-		query: `
-SELECT
-'tables' as tables,
-tbl_name ||
-case
-when sqlite_schema.type='index'
-	then ' (table)'
-else ' (' || sqlite_schema.type || ')'
-end ||
-case
-	when sqlite_schema.type NOT IN ('table', 'view', 'index')
-	then ''
-	else ' [button\tbrowse\tbrowseTable\t' ||
-	sqlite_schema.tbl_name || ']'
-end
-as entity,
-case
-when sqlite_schema.type='index'
-	then 'index ' || sqlite_schema.name
-when sqlite_schema.type='trigger'
-	then null
-else 'columns'
-end as [group],
-case
-when sqlite_schema.type='index'
-	then index_fields.name
-else table_fields.name || ' ' ||
-table_fields.type ||
-(case when [notnull]>0 then ' not null' else '' end) ||
-(case when dflt_value is not null then ' default(' || cast(dflt_value as TEXT) || ')' else '' end) ||
-(case when pk>0 then ' primary key' else '' end)
-end as field
-FROM sqlite_schema
-left outer JOIN pragma_table_info(sqlite_schema.name) table_fields
-left outer JOIN pragma_index_info(sqlite_schema.name) index_fields
-WHERE sqlite_schema.name NOT LIKE 'sqlite_%'
---and sqlite_schema.type<>'view'
-order by 
-tbl_name, 
-sqlite_schema.type desc,
-[group],
-coalesce(table_fields.cid, 0),
-coalesce(index_fields.seqno, 0)
-		`,
+	quickCheck: {
+		query: 'pragma quick_check',
+		spatial: false,
+	},
+	integrityCheck: {
+		query: 'pragma integrity_check',
 		spatial: false,
 	},
 	geometryTypes: {
@@ -444,7 +405,7 @@ coalesce(index_fields.seqno, 0)
 				json_object(
 					'type', 'FeatureCollection',
 					'crs',
-					json('{ "type": "name", "properties": { "name": "EPSG:900913" } }'),
+					json('{ "type": "name", "properties": { "name": "EPSG:3857" } }'),
 					'features',
 					json_group_array(
 						json(feature)
@@ -519,7 +480,7 @@ coalesce(index_fields.seqno, 0)
 				json_object(
 					'type', 'FeatureCollection',
 					'crs',
-					json('{ "type": "name", "properties": { "name": "EPSG:900913" } }'),
+					json('{ "type": "name", "properties": { "name": "EPSG:3857" } }'),
 					'features',
 					json_group_array(
 						json(feature)
@@ -568,7 +529,53 @@ coalesce(index_fields.seqno, 0)
 	},
 };
 
-let conditionalSchema = {
+const schemaTree = `
+	SELECT
+	'tables' as tables,
+	tbl_name ||
+	case
+	when sqlite_schema.type='index'
+		then ' (table)'
+	else ' (' || sqlite_schema.type || ')'
+	end ||
+	case
+		when sqlite_schema.type NOT IN ('table', 'view', 'index')
+		then ''
+		else ' [button\tbrowse\tbrowseTable\t' ||
+		sqlite_schema.tbl_name || ']'
+	end
+	as entity,
+	case
+	when sqlite_schema.type='index'
+		then 'index ' || sqlite_schema.name
+	when sqlite_schema.type='trigger'
+		then null
+	else 'columns'
+	end as [group],
+	case
+	when sqlite_schema.type='index'
+		then index_fields.name
+	else table_fields.name || ' ' ||
+	table_fields.type ||
+	(case when [notnull]>0 then ' not null' else '' end) ||
+	(case when dflt_value is not null then ' default(' || cast(dflt_value as TEXT) || ')' else '' end) ||
+	(case when pk>0 then ' primary key' else '' end)
+	end as field
+	FROM sqlite_schema
+	left outer JOIN pragma_table_info(sqlite_schema.name) table_fields
+	left outer JOIN pragma_index_info(sqlite_schema.name) index_fields
+	WHERE sqlite_schema.name NOT LIKE 'sqlite_%'
+		and sqlite_schema.name not like 'SpatialIndex'
+		and sqlite_schema.name not like 'ElementaryGeometries'
+	order by 
+	tbl_name, 
+	sqlite_schema.type desc,
+	[group],
+	coalesce(table_fields.cid, 0),
+	coalesce(index_fields.seqno, 0)
+`;
+
+const conditionalSchema = {
 	gpkg_contents: `
 		SELECT 
 		'gpkg' as gpkg,
@@ -680,7 +687,7 @@ class SQLiteXplore {
 	
 	parse_json = "parse_json:";
 	
-	constructor(container, db, {id, build_map}={}) {
+	constructor(container, {id, build_map, withProj4JS}={}) {
 		this.container = isString(container) ?
 			document.querySelector(container) : container;
 		this.mainForm = document.createElement("div");
@@ -693,6 +700,7 @@ class SQLiteXplore {
 		this.withMap = !!build_map;
 		this.build_map = build_map;
 		this.layersOnMap = {};
+		this.withProj4JS = window.proj4 && withProj4JS;
 		
 		this.tabCounter = 0;
 		this.tabEvents = {};
@@ -700,7 +708,9 @@ class SQLiteXplore {
 		this.waitingSnippets = {};
 		
 		this.buildForm();
-		
+	}
+	
+	setDb(db) {
 		this.db = db;
 		
 		this.isSpatial = false;
@@ -740,6 +750,8 @@ class SQLiteXplore {
 				}
 				this.setSnippets(snippets);
 				this.addSnippets(this.waitingSnippets, true);
+				this.schemaTree();
+				this.addQueryTab();
 			});
 	}
 	
@@ -1185,7 +1197,7 @@ class SQLiteXplore {
 			tfoot.insertAdjacentHTML(
 				'beforeend',
 				`<tr><td colspan="${colnames.length}">
-					<span style="background-color: blue;">${objs?.length || 0} rows</span>
+					<span style="background-color: green;">${objs?.length || 0} rows</span>
 					<span style="background-color: green;">${duration} ms</span>
 					<button class="csv-cp" style="display: ${csvDisplay}">csv cp</button>
 					<span style="background-color: red;">${error ? error.toString() : ''}</span>
@@ -1440,7 +1452,7 @@ class SQLiteXplore {
 			extent,
 			sldStyle
 		};
-		let dataProjection = 'EPSG:900913';
+		let dataProjection = 'EPSG:3857';
 		//may set layer projection afterwards 
 		let projections = {};
 		for (let row of objs) {
@@ -1471,7 +1483,7 @@ class SQLiteXplore {
 				else if (!(code in projections)) {
 					let [auth_name, auth_srid] = code.split(':');
 					auth_srid = parseInt(auth_srid);
-					if (window.proj4) {
+					if (this.withProj4JS) {
 						await this.performQuery(`
 							SELECT srtext --proj4text
 							FROM spatial_ref_sys
@@ -1510,11 +1522,11 @@ class SQLiteXplore {
 		}
 	}
 	
-	showMap() {
+	showMap(viewOptions) {
 		let map_tab = this.tabFetch(this.map_tab);
 		if (map_tab) {
 			this.tabActivate(map_tab);
-			this.map.show_map();
+			this.map.show_map(viewOptions);
 		}
 	}
 	
@@ -1528,11 +1540,11 @@ class SQLiteXplore {
 	
 	unindent(text, tabSpaces=4) {
 		let spaceRep = ' '.repeat(tabSpaces);
-		let minIndent = text.match(/^\s+/gm)
+		let minIndent = text.match(/^\s+/gm) || []
 			.map(indent => indent
 				.replaceAll(spaceRep, '\t')
 				.length)
-			.reduce((a, b) => Math.min(a, b));
+			.reduce((a, b) => Math.min(a, b), '');
 		text = text.replace(
 			/^\s+/gm,
 			match => match.replaceAll(spaceRep, '\t')
@@ -1690,6 +1702,13 @@ class SQLiteXplore {
 					height: 100%;
 				}
 			</style>
+			
+			<style>
+				#${this.rootId} .log .warning,
+				#${this.rootId} .log .error {color: red}
+				#${this.rootId} .log .error {background-color: yellow}
+			</style>
+			
 			<style>
 				/*
 				the code for the tabbed ui comes from
@@ -1876,16 +1895,51 @@ class SQLiteXplore {
 		this.mainForm.querySelector('.popupclose')
 			.addEventListener('click', e => {this.popupClose()});
 		this.createMainMenu();
+		this.createLog();
 		this.createMapTab();
 		this.createSnippetsTab();
 		this.mainForm.querySelector('.new-query')
 			.addEventListener('click', e => {this.addQueryTab()});
-		this.schemaTree();
-		this.addQueryTab();
 		
-		//lastly
 		this.showMap();
 	}
+	
+	createLog() {
+		this.createTab(
+			'log', `
+			<div class="query-container" style="overflow: hidden;">
+				<div style="overflow: scroll; height: 90%; width: 100%;"><ul class="log"></ul></div>
+				<button class="log-clear">clear</button>
+			</div>
+			`,
+		);
+		let button = this.mainForm.querySelector('.query-container .log-clear');
+		button.addEventListener('click', e => {this.logClear();});
+	}
+	
+	logClear() {
+		let target = this.mainForm.querySelector('.query-container .log');
+		target.textContent = '';
+	}
+	
+	logHtml(cssClass, ...data) {
+		let target = this.mainForm.querySelector('.query-container .log');
+		let li = document.createElement("li");
+		if(cssClass) {
+			li.classList.add(cssClass);
+		}
+		for (let field of data) {
+			li.insertAdjacentHTML(
+				'beforeend',
+				JSON.stringify(field) + ' ');
+		}
+		target.insertAdjacentElement(
+			'beforeend', li);
+	}
+	
+	log = (...args) => this.logHtml('',...args);
+	warn = (...args) => this.logHtml('warning',...args);
+	error = (...args) => this.logHtml('error',...args);
 	
 	schemaTree = () => {
 		this.createTab(
@@ -1953,11 +2007,11 @@ class SQLiteXplore {
 				.then(async (columns) => {
 					let geomColumn = `
 						asgeojson(
-							${window.proj4 ? '' : 'st_transform('}
+							${this.withProj4JS ? '' : 'st_transform('}
 								${gpkg ? 'GeomFromGPB' : ''}(
 									[${column_name}]
 								)
-							${window.proj4 ? '' : '	, 4326)'}
+							${this.withProj4JS ? '' : '	, 4326)'}
 							,
 							15, 2
 						) as feature`;
@@ -1968,14 +2022,11 @@ class SQLiteXplore {
 						from [${table_name}]`;
 					let sldStyle;
 					if (this.has_layer_styles) {
-						let {first} = this.performQuery(`
+						sldStyle = await this.performQuery(`
 							SELECT styleSLD as sldStyle
 							FROM layer_styles
-							where f_table_name='${table_name}'
-						`);
-						first.then(style => {
-							sldStyle = style;
-						});
+							where f_table_name=:table_name
+						`, {table_name}).first;
 					}
 					await this.featuresLayer(
 						table_name, table_name, sldStyle, query);
@@ -1990,8 +2041,7 @@ class SQLiteXplore {
 	}
 	
 	async setSchema(tab) {
-		let {rows} = this.performQuery(
-			snippets.schemaTree.query);
+		let {rows} = this.performQuery(schemaTree);
 		Promise.all([
 			Promise.allSettled([rows]),
 			this.buildConditionalSchema()

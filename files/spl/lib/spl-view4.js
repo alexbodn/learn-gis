@@ -54,23 +54,34 @@ async function fetchData(urlsInfo) {
 		if (info.filename) {
 			key += ('/' + info.filename);
 		}
+		if (info.noFetch) {
+			info.data = info.url;
+			info.immutable = 1;
+			fetched[key] = info;
+			continue;
+		}
 		let promise = fetch(info.url)
 			.then(response => {
 				let method = info.method || 'text';
 				return response[method]();
 			})
+			.catch(error => {
+				let one = {error, url, ...info};
+				console.warn(error);
+				return one;
+			})
 			.then(data => {
-				let mount = {
+				let one = {
 					data, ...info,
 				};
-				fetched[key] = mount;
-				//console.log(key, mount);
-				return mount;
+				fetched[key] = one;
+				//console.log(key, one);
+				return one;
 			})
 			.catch(error => {
-				let mount = {error, url, ...info};
+				let one = {error, url, ...info};
 				console.warn(error);
-				return mount;
+				return one;
 			})
 			;
 		promises.push(promise);

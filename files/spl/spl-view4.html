@@ -71,22 +71,18 @@
 		</title>
 	</head>
 	<body>
-		
+		<div id="logger"></div>
 		<script>
 
-
 const natural_earth_local = new URL('./test/files/dbs/Natural_Earth_QGIS_layers_and_styles.gpkg', window.location.href).toString();
-const dctour_remote = 'https://github.com/ngageoint/geopackage-js/raw/master/docs/examples/GoingOfflineWithGeoPackage/public/DCTour.gpkg';
-const dctour_local = new URL('./test/files/dbs/dctour.gpkg', window.location.href).toString();
 const rivers_remote = 'https://www.geopackage.org/data/rivers.gpkg';
 const rivers_local = new URL('./test/files/dbs/rivers.gpkg', window.location.href).toString();
 const db_small = new URL('./test/files/dbs/db_small.sqlite', window.location.href).toString();
 
 // mountpoint/filename has to be unique.
 /**
-//let url = rivers_local;
 //let url = natural_earth_local;
-//let url = dctour_local;
+//let url = rivers_local;
 let url = db_small;
 window.userData = [
 	{
@@ -94,13 +90,15 @@ window.userData = [
 		filename: 'db.sqlite',
 		isdb: true,
 		url,
+		//noFetch: true,
 		method: 'arrayBuffer',
 	},
 ];
 /**/
 
 let program;
-program = "./stlouis.js";
+program = "./dctour.js";
+//program = "./stlouis.js";
 //program = "./london_boroughs.js";
 //program = "./lights.js";
 //program = "./tri.js";
@@ -135,6 +133,7 @@ Promise.all([
 			withProj4JS: true,
 		});
 		window.map = window.xplorer.getMap();
+		window.log = window.xplorer.log;
 	}
 	else {
 		let html = `
@@ -145,8 +144,11 @@ Promise.all([
 		let div = document.querySelector('div#map');
 		window.map = build_map(div);
 	}
-	//window.map._addLayer(window.map.osm_layer());
-	window.map._addLayer(window.map.bw_layer());
+	window.map._addLayer(
+		window.map.
+		bw_layer()
+		//osm_layer()
+	);
 })
 .then(() => {
 	if (!program) {
@@ -156,6 +158,7 @@ Promise.all([
 		.textContent = program;
 	return jsLoad(program);
 })
+//.then(() => jsLoad("./lib/eruda.js"))
 .then(() => jsLoad('./lib/spl-view4.js', true))
 ;
 

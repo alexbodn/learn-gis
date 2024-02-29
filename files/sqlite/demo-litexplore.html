@@ -31,8 +31,13 @@
 	</head>
 	<body>
 		<h1>1-2-sqlite3 demo</h1>
-		<div class="liteLog"></div>
 		<script src="./lib/sqlitexplore.js"></script>
+		<script>
+			let html = `<div id="sqlDiv"></div>`;
+			document.body.insertAdjacentHTML('beforeend', html);
+			let div = document.querySelector('div#sqlDiv');
+			let xplorer = new SQLiteXplore(div, {});
+		</script>
 		<script src="jswasm/sqlite3.js"></script>
 		<script>
 	/**
@@ -58,15 +63,46 @@
 			});
 		};
 	}
+	/*
 	const log = (...args)=>logHtml('',...args);
 	const warn = (...args)=>logHtml('warning',...args);
 	const error = (...args)=>logHtml('error',...args);
-
-	const demo1 = function(sqlite3){
+	*/
+	const log = (...args)=>xplorer.log(...args);
+	const warn = (...args)=>xplorer.warn(...args);
+	const error = (...args)=>xplorer.error(...args);
+	
+	const demo1 = function(sqlite3, immutable=false) {
+		const dctour_local = new URL('./test/files/dbs/DCTour.gpkg', window.location.href).toString();
+		const dctour_remote = 'https://github.com/ngageoint/geopackage-js/raw/master/docs/examples/GoingOfflineWithGeoPackage/public/DCTour.gpkg';
+		const url = dctour_local;
+		
+		fetch(url)
+		.then(res => res.arrayBuffer())
+		.then(arrayBuffer => {
+			if (!immutable) {
+				arrayBuffer.resizeable = true;
+			}
+			const p = sqlite3.wasm.allocFromTypedArray(arrayBuffer);
+			const db = new sqlite3.oo1.DB();
+			let deserialize_flags =
+				sqlite3.capi.SQLITE_DESERIALIZE_FREEONCLOSE;
+			if (!immutable) {
+				deserialize_flags |= sqlite3.capi.SQLITE_DESERIALIZE_RESIZEABLE;
+			}
+			const rc = sqlite3.capi.sqlite3_deserialize(
+				db.pointer, 'main', p, arrayBuffer.byteLength, arrayBuffer.byteLength, deserialize_flags);
+			db.checkRc(rc);
+			xplorer.setDb(db);
+			db.exec("CREATE TABLE IF NOT EXISTS t(a,b)");
+		});
+	};
+	const demo2 = function(sqlite3){
 		const capi = sqlite3.capi/*C-style API*/,
 					oo = sqlite3.oo1/*high-level OO API*/;
 		log("sqlite3 version",capi.sqlite3_libversion(), capi.sqlite3_sourceid());
 		const db = new oo.DB("/mydb.sqlite3",'c');
+		xplorer.setDb(db);
 		log("transient db =",db.filename);
 		/**
 			 Never(!) rely on garbage collection to clean up DBs and
@@ -246,10 +282,6 @@
 				}
 			}
 			
-			let html = `<div id="sqlDiv"></div>`;
-			document.body.insertAdjacentHTML('beforeend', html);
-			let div = document.querySelector('div#sqlDiv');
-			let xplorer = new SQLiteXplore(div, db, {});
 		}finally{
 			//db.close();
 		}
